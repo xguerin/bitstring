@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2008-03-31 22:52:17 rjones Exp $
+# $Id: Makefile,v 1.2 2008-04-01 08:56:43 rjones Exp $
 
 OCAMLFIND = ocamlfind
 OCAMLMKLIB = ocamlmklib
@@ -24,12 +24,14 @@ bitmatch.cma: bitmatch.cmo
 bitmatch.cmxa: bitmatch.cmx
 	$(OCAMLFIND) ocamlopt -a -o $@ $^
 
-test:
+test: pa_bitmatch.cmo bitmatch.cma
 	@for f in $(TESTS); do \
 	  echo Test: $$f; \
-	  $(OCAMLFIND) ocamlc -pp "camlp4o pa_bitmatch.cmo" \
+	  $(OCAMLFIND) ocamlc $(OCAMLCFLAGS) -pp "camlp4o pa_bitmatch.cmo" \
 	    -I . bitmatch.cma $$f.ml -o $$f; \
+	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	  $$f; \
+	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	done
 
 print-tests: pa_bitmatch.cmo

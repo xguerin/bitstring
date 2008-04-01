@@ -1,5 +1,5 @@
 (* Bitmatch library.
- * $Id: bitmatch.mli,v 1.1 2008-03-31 22:52:17 rjones Exp $
+ * $Id: bitmatch.mli,v 1.2 2008-04-01 08:56:43 rjones Exp $
  *)
 
 type bitstring = string * int * int
@@ -21,3 +21,5 @@ val extract_bitstring : string -> int -> int -> int -> bitstring * int * int
 val extract_remainder : string -> int -> int -> bitstring * int * int
 
 val extract_bit : string -> int -> int -> int -> bool * int * int
+
+val extract_char_unsigned : string -> int -> int -> int -> int * int * int

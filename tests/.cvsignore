@@ -5,3 +5,6 @@
 *.cmxa
 01_load
 05_bits
+06_ints1
+06_ints2
+06_ints3

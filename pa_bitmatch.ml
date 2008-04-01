@@ -1,5 +1,5 @@
 (* Bitmatch syntax extension.
- * $Id: pa_bitmatch.ml,v 1.1 2008-03-31 22:52:17 rjones Exp $
+ * $Id: pa_bitmatch.ml,v 1.2 2008-04-01 08:56:43 rjones Exp $
  *)
 
 open Printf
@@ -140,9 +140,16 @@ let output_bitmatch _loc bs cases =
 	  | _ -> None in
 
 	let name_of_int_extract_const = function
+	    (* XXX As an enhancement we should allow a 64-bit-only
+	     * mode which lets us use 'int' up to 63 bits and won't
+	     * compile on 32-bit platforms.
+	     *)
+	    (* XXX The meaning of signed/unsigned breaks down at
+	     * 31, 32, 63 and 64 bits.
+	     *)
 	  | (1, _, _) -> "extract_bit"
-	  | ((2|3|4|5|6|7), _, false) -> "extract_char_unsigned"
-	  | ((2|3|4|5|6|7), _, true) -> "extract_char_signed"
+	  | ((2|3|4|5|6|7|8), _, false) -> "extract_char_unsigned"
+	  | ((2|3|4|5|6|7|8), _, true) -> "extract_char_signed"
 	  | (i, BigEndian, false) when i <= 31 -> "extract_int_be_unsigned"
 	  | (i, BigEndian, true) when i <= 31 -> "extract_int_be_signed"
 	  | (i, LittleEndian, false) when i <= 31 -> "extract_int_le_unsigned"
