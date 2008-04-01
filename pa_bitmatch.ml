@@ -1,5 +1,5 @@
 (* Bitmatch syntax extension.
- * $Id: pa_bitmatch.ml,v 1.2 2008-04-01 08:56:43 rjones Exp $
+ * $Id: pa_bitmatch.ml,v 1.3 2008-04-01 10:05:14 rjones Exp $
  *)
 
 open Printf
@@ -314,9 +314,18 @@ let output_bitmatch _loc bs cases =
 
   ) cases in
 
+  (* Join them into a single expression.
+   *
+   * Don't do it with a normal fold_right because that leaves
+   * 'raise Exit; ()' at the end which causes a compiler warning.
+   * Hence a bit of complexity here.
+   *
+   * Note that the number of cases is always >= 1 so List.hd is safe.
+   *)
+  let cases = List.rev cases in
   let cases =
-    List.fold_right (fun case base -> <:expr< $case$ ; $base$ >>)
-      cases <:expr< () >> in
+    List.fold_left (fun base case -> <:expr< $case$ ; $base$ >>)
+      (List.hd cases) (List.tl cases) in
 
   (* The final code just wraps the list of cases in a
    * try/with construct so that each case is tried in
