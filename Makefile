@@ -1,8 +1,10 @@
-# $Id: Makefile,v 1.3 2008-04-01 17:05:37 rjones Exp $
+# $Id: Makefile,v 1.4 2008-04-01 22:18:24 rjones Exp $
+
+PACKAGE	= ocaml-bitmatch
+VERSION	= 0.1
 
 OCAMLFIND = ocamlfind
 OCAMLMKLIB = ocamlmklib
-
 
 OCAMLCFLAGS = -g
 OCAMLCPACKAGES =
@@ -64,6 +66,29 @@ depend: .depend
 ifeq ($(wildcard .depend),.depend)
 include .depend
 endif
+
+# Distribution.
+
+dist:
+	$(MAKE) check-manifest
+	rm -rf $(PACKAGE)-$(VERSION)
+	mkdir $(PACKAGE)-$(VERSION)
+	tar -cf - -T MANIFEST | tar -C $(PACKAGE)-$(VERSION) -xf -
+	$(INSTALL) -m 0755 configure $(PACKAGE)-$(VERSION)/
+	tar zcf $(PACKAGE)-$(VERSION).tar.gz $(PACKAGE)-$(VERSION)
+	rm -rf $(PACKAGE)-$(VERSION)
+	ls -l $(PACKAGE)-$(VERSION).tar.gz
+
+check-manifest:
+	@for d in `find -type d -name CVS`; do \
+	b=`dirname $$d`/; \
+	awk -F/ '$$1 != "D" {print $$2}' $$d/Entries | \
+	sed -e "s|^|$$b|" -e "s|^\./||"; \
+	done | sort > .check-manifest; \
+	sort MANIFEST > .orig-manifest; \
+	diff -u .orig-manifest .check-manifest; rv=$$?; \
+	rm -f .orig-manifest .check-manifest; \
+	exit $$rv
 
 .PHONY: depend dist check-manifest dpkg doc print-examples print-tests test
 
