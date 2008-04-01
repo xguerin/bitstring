@@ -1,5 +1,5 @@
 (* Create an IPv4 header.
- * $Id: make_ipv4_header.ml,v 1.1 2008-03-31 22:52:17 rjones Exp $
+ * $Id: make_ipv4_header.ml,v 1.2 2008-04-01 17:31:12 rjones Exp $
  *)
 
 open Printf
@@ -21,25 +21,13 @@ let payload_length = (length - hdrlen*4) * 8
 let payload = Bitmatch.create_bitstring payload_length
 
 let header =
-  <| version : 4; hdrlen : 4; tos : 8; length : 16;
-     identification : 16; flags : 3; fragoffset : 13;
-     ttl : 8; protocol : 8; checksum : 16;
-     source : 32;
-     dest : 32;
-     options : -1, bitstring;
-     payload : payload_length, bitstring |>
-
-(*
-  generates:
-
-  let header = Bitmatch.join_bitstrings [
-    Bitmatch.create_unsigned_be version 4;
-    Bitmatch.create_unsigned_be hdrlen 4; (* etc. *)
-    options;
-    Bitmatch.check_bitstring_length payload payload_length
-  ]
-
-  which can throw an exception if values are out of range.
-*)
+  BITSTRING
+    version : 4; hdrlen : 4; tos : 8; length : 16;
+    identification : 16; flags : 3; fragoffset : 13;
+    ttl : 8; protocol : 8; checksum : 16;
+    source : 32;
+    dest : 32;
+    options : -1, bitstring;
+    payload : payload_length, bitstring
 
 let () = Bitmatch.file_of_bitstring header "ipv4_header_out.dat"

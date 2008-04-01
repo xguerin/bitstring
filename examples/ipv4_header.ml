@@ -1,5 +1,5 @@
 (* Parse and display an IPv4 header from a file.
- * $Id: ipv4_header.ml,v 1.1 2008-03-31 22:52:17 rjones Exp $
+ * $Id: ipv4_header.ml,v 1.2 2008-04-01 17:31:12 rjones Exp $
  *)
 
 open Printf
@@ -39,40 +39,3 @@ let () =
   | _ as header ->
     eprintf "data is smaller than one nibble:\n";
     Bitmatch.hexdump_bitstring stderr header
-
-
-(* converted into:
-
-   let (data, off, len) = header in
-   let result = ref None in
-   try
-   if len >= 4 then (
-     let version, off, len = Bitmatch.extract_unsigned_be data off len 4 in
-     if len >= 4 then (
-       let hdrlen, off, len = Bitmatch.extract_unsigned_be data off len 4 in
-       (* ... *)
-       if (hdrlen-5)*32 >= 0 && len >= (hdrlen-5)*32 then (
-         let options, off, len =
-           Bitmatch.extract_bitstring data off len ((hdrlen-5)*32) in
-         let payload, off, len =
-           Bitmatch.extract_remainder data off len in
-
-         if version = 4 then (
-           ...
-           raise Exit
-         )
-       )
-     )
-   )
-   if len >= 4 then (
-     let version, off, len = Bitmatch.extract_unsigned_be data off len 4 in
-     ...;
-     raise Exit
-   )
-   ...
-   with Exit -> ();
-   match !result with
-   | Some x -> x
-   | None -> raise Match_failure _loc
-
-*)
