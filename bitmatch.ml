@@ -1,5 +1,5 @@
 (* Bitmatch library.
- * $Id: bitmatch.ml,v 1.5 2008-04-01 17:05:37 rjones Exp $
+ * $Id: bitmatch.ml,v 1.6 2008-04-01 19:10:45 rjones Exp $
  *)
 
 open Printf
@@ -42,6 +42,101 @@ let bitstring_of_file fname =
   bs
 
 let bitstring_length (_, _, len) = len
+
+(*----------------------------------------------------------------------*)
+(* Bitwise functions.
+ *
+ * We try to isolate all bitwise functions within these modules.
+ *)
+
+module I = struct
+  (* Bitwise operations on ints.  Note that we assume int <= 31 bits. *)
+  let (<<) = (lsl)
+  let (>>) = (lsr)
+  let one = 1
+  let minus_one = -1
+  let ff = 0xff
+
+  (* Create a mask so many bits wide. *)
+  let mask bits =
+    if bits < 30 then
+      pred (one << bits)
+    else if bits = 30 then
+      max_int
+    else
+      minus_one
+
+  (* Byte swap an int of a given size. *)
+  let byteswap v bits =
+    if bits <= 8 then v
+    else if bits <= 16 then (
+      let shift = bits-8 in
+      let v1 = v >> shift in
+      let v2 = (v land (mask shift)) << 8 in
+      v2 lor v1
+    ) else if bits <= 24 then (
+      let shift = bits - 16 in
+      let v1 = v >> (8+shift) in
+      let v2 = ((v >> shift) land ff) << 8 in
+      let v3 = (v land (mask shift)) << 16 in
+      v3 lor v2 lor v1
+    ) else (
+      let shift = bits - 24 in
+      let v1 = v >> (16+shift) in
+      let v2 = ((v >> (8+shift)) land ff) << 8 in
+      let v3 = ((v >> shift) land ff) << 16 in
+      let v4 = (v land (mask shift)) << 24 in
+      v4 lor v3 lor v2 lor v1
+    )
+end
+
+module I32 = struct
+  (* Bitwise operations on int32s.  Note we try to keep it as similar
+   * as possible to the I module above, to make it easier to track
+   * down bugs.
+   *)
+  let (<<) = Int32.shift_left
+  let (>>) = Int32.shift_right_logical
+  let (land) = Int32.logand
+  let (lor) = Int32.logor
+  let pred = Int32.pred
+  let max_int = Int32.max_int
+  let one = Int32.one
+  let minus_one = Int32.minus_one
+  let ff = 0xff_l
+
+  (* Create a mask so many bits wide. *)
+  let mask bits =
+    if bits < 31 then
+      pred (one << bits)
+    else if bits = 31 then
+      max_int
+    else
+      minus_one
+
+  (* Byte swap an int of a given size. *)
+  let byteswap v bits =
+    if bits <= 8 then v
+    else if bits <= 16 then (
+      let shift = bits-8 in
+      let v1 = v >> shift in
+      let v2 = (v land (mask shift)) << 8 in
+      v2 lor v1
+    ) else if bits <= 24 then (
+      let shift = bits - 16 in
+      let v1 = v >> (8+shift) in
+      let v2 = ((v >> shift) land ff) << 8 in
+      let v3 = (v land (mask shift)) << 16 in
+      v3 lor v2 lor v1
+    ) else (
+      let shift = bits - 24 in
+      let v1 = v >> (16+shift) in
+      let v2 = ((v >> (8+shift)) land ff) << 8 in
+      let v3 = ((v >> shift) land ff) << 16 in
+      let v4 = (v land (mask shift)) << 24 in
+      v4 lor v3 lor v2 lor v1
+    )
+end
 
 (*----------------------------------------------------------------------*)
 (* Extraction functions.
@@ -146,6 +241,11 @@ let extract_int_be_unsigned data off len flen =
     ) in
   word, off+flen, len-flen
 
+let extract_int_le_unsigned data off len flen =
+  let v, off, len = extract_int_be_unsigned data off len flen in
+  let v = I.byteswap v flen in
+  v, off, len
+
 let _make_int32_be c0 c1 c2 c3 =
   Int32.logor
     (Int32.logor
@@ -154,6 +254,15 @@ let _make_int32_be c0 c1 c2 c3 =
 	  (Int32.shift_left c1 16))
        (Int32.shift_left c2 8))
     c3
+
+let _make_int32_le c0 c1 c2 c3 =
+  Int32.logor
+    (Int32.logor
+       (Int32.logor
+	  (Int32.shift_left c3 24)
+	  (Int32.shift_left c2 16))
+       (Int32.shift_left c1 8))
+    c0
 
 (* Extract exactly 32 bits.  We have to consider endianness and signedness. *)
 let extract_int32_be_unsigned data off len flen =
@@ -186,6 +295,11 @@ let extract_int32_be_unsigned data off len flen =
       Int32.shift_right_logical word (32 - flen)
     ) in
   word, off+flen, len-flen
+
+let extract_int32_le_unsigned data off len flen =
+  let v, off, len = extract_int32_be_unsigned data off len flen in
+  let v = I32.byteswap v flen in
+  v, off, len
 
 let _make_int64_be c0 c1 c2 c3 c4 c5 c6 c7 =
   Int64.logor
@@ -426,6 +540,6 @@ let hexdump_bitstring chan (data, off, len) =
   if !linelen > 0 then (
     let skip = (16 - !linelen) * 3 + if !linelen < 8 then 1 else 0 in
     for i = 0 to skip-1 do fprintf chan " " done;
-    fprintf chan " |%s|\n" linechars
+    fprintf chan " |%s|\n%!" linechars
   ) else
-    fprintf chan "\n"
+    fprintf chan "\n%!"

@@ -1,5 +1,5 @@
 (* Bitmatch library.
- * $Id: bitmatch.mli,v 1.5 2008-04-01 17:05:37 rjones Exp $
+ * $Id: bitmatch.mli,v 1.6 2008-04-01 19:10:45 rjones Exp $
  *)
 
 exception Construct_failure of string * string * int * int
@@ -46,7 +46,11 @@ val extract_char_unsigned : string -> int -> int -> int -> int * int * int
 
 val extract_int_be_unsigned : string -> int -> int -> int -> int * int * int
 
+val extract_int_le_unsigned : string -> int -> int -> int -> int * int * int
+
 val extract_int32_be_unsigned : string -> int -> int -> int -> int32 * int * int
+
+val extract_int32_le_unsigned : string -> int -> int -> int -> int32 * int * int
 
 val extract_int64_be_unsigned : string -> int -> int -> int -> int64 * int * int
 

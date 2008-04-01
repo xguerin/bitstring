@@ -1,5 +1,5 @@
 (* Bitmatch syntax extension.
- * $Id: pa_bitmatch.ml,v 1.4 2008-04-01 17:05:37 rjones Exp $
+ * $Id: pa_bitmatch.ml,v 1.5 2008-04-01 19:10:45 rjones Exp $
  *)
 
 open Printf
@@ -551,6 +551,8 @@ let output_bitmatch _loc bs cases =
 		Printf.eprintf "PA_BITMATCH: TEST:\n";
 		Printf.eprintf "  %s\n" $str:field$;
 		Printf.eprintf "  off %d len %d\n%!" $lid:off$ $lid:len$;
+		(*Bitmatch.hexdump_bitstring stderr
+		  ($lid:data$,$lid:off$,$lid:len$);*)
 	      );
 	      $expr$
 	    >>
