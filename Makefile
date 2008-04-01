@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.2 2008-04-01 08:56:43 rjones Exp $
+# $Id: Makefile,v 1.3 2008-04-01 17:05:37 rjones Exp $
 
 OCAMLFIND = ocamlfind
 OCAMLMKLIB = ocamlmklib
@@ -37,7 +37,9 @@ test: pa_bitmatch.cmo bitmatch.cma
 print-tests: pa_bitmatch.cmo
 	@for f in $(TESTS); do \
 	  echo Test: $$f.ml; \
-	  camlp4o pa_bitmatch.cmo -printer pr_o.cmo $$f.ml; \
+	  cmd="camlp4o pa_bitmatch.cmo -printer pr_o.cmo $$f.ml"; \
+	  echo $$cmd; \
+	  $$cmd; \
 	done
 
 print-examples: pa_bitmatch.cmo

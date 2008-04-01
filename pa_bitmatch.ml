@@ -1,5 +1,5 @@
 (* Bitmatch syntax extension.
- * $Id: pa_bitmatch.ml,v 1.3 2008-04-01 10:05:14 rjones Exp $
+ * $Id: pa_bitmatch.ml,v 1.4 2008-04-01 17:05:37 rjones Exp $
  *)
 
 open Printf
@@ -8,14 +8,24 @@ open Camlp4.PreCast
 open Syntax
 open Ast
 
+(* If this is true then we emit some debugging code which can
+ * be useful to tell what is happening during matches.  You
+ * also need to do 'Bitmatch.debug := true' in your main program.
+ *
+ * If this is false then no extra debugging code is emitted.
+ *)
+let debug = true
+
 type m = Fields of f list		(* field ; field -> ... *)
        | Bind of string option		(* _ -> ... *)
 and f = {
-  ident : string;			(* field name *)
+  (* XXX fval should be a patt, not an expr *)
+  fval : expr;				(* field binding or value *)
   flen : expr;				(* length in bits, may be non-const *)
   endian : endian;			(* endianness *)
   signed : bool;			(* true if signed, false if unsigned *)
   t : t;				(* type *)
+  _loc : Loc.t;				(* location in source code *)
 }
 and endian = BigEndian | LittleEndian | NativeEndian
 and t = Int | Bitstring
@@ -28,7 +38,7 @@ let gensym =
     sprintf "__pabitmatch_%s_%d" name i
 
 (* Deal with the qualifiers which appear for a field. *)
-let output_field _loc name flen qs =
+let parse_field _loc fval flen qs =
   let endian, signed, t =
     match qs with
     | None -> (None, None, None)
@@ -103,12 +113,244 @@ let output_field _loc name flen qs =
   let t = match t with None -> Int | Some t -> t in
 
   {
-    ident = name;
+    fval = fval;
     flen = flen;
     endian = endian;
     signed = signed;
     t = t;
+    _loc = _loc;
   }
+
+let string_of_endian = function
+  | BigEndian -> "bigendian"
+  | LittleEndian -> "littleendian"
+  | NativeEndian -> "nativeendian"
+
+let string_of_t = function
+  | Int -> "int"
+  | Bitstring -> "bitstring"
+
+let string_of_field { fval = fval; flen = flen;
+		      endian = endian; signed = signed; t = t;
+		      _loc = _loc } =
+  let fval =
+    match fval with
+    | <:expr< $lid:id$ >> -> id
+    | _ -> "[expression]" in
+  let flen =
+    match flen with
+    | <:expr< $int:i$ >> -> i
+    | _ -> "[non-const-len]" in
+  let endian = string_of_endian endian in
+  let signed = if signed then "signed" else "unsigned" in
+  let t = string_of_t t in
+  let loc_fname = Loc.file_name _loc in
+  let loc_line = Loc.start_line _loc in
+  let loc_char = Loc.start_off _loc - Loc.start_bol _loc in
+
+  sprintf "%s : %s : %s, %s, %s @ (%S, %d, %d)"
+    fval flen t endian signed loc_fname loc_line loc_char
+
+(* Generate the code for a constructor, ie. 'BITSTRING ...'. *)
+let output_constructor _loc fields =
+  let loc_fname = Loc.file_name _loc in
+  let loc_line = string_of_int (Loc.start_line _loc) in
+  let loc_char = string_of_int (Loc.start_off _loc - Loc.start_bol _loc) in
+
+  (* Bitstrings are created like the 'Buffer' module (in fact, using
+   * the Buffer module), by appending snippets to a growing buffer.
+   * This is reasonable efficient and avoids a lot of garbage.
+   *)
+  let buffer = gensym "buffer" in
+
+  (* General exception which is raised inside the constructor functions
+   * when an int expression is out of range at runtime.
+   *)
+  let exn = gensym "exn" in
+  let exn_used = ref false in
+
+  (* Convert each field to a simple bitstring-generating expression. *)
+  let fields = List.map (
+    fun {fval=fval; flen=flen; endian=endian; signed=signed; t=t} ->
+      (* Is flen an integer constant?  If so, what is it?  This
+       * is very simple-minded and only detects simple constants.
+       *)
+      let flen_is_const =
+	match flen with
+	| <:expr< $int:i$ >> -> Some (int_of_string i)
+	| _ -> None in
+
+      let name_of_int_construct_const = function
+	  (* XXX As an enhancement we should allow a 64-bit-only
+	   * mode which lets us use 'int' up to 63 bits and won't
+	   * compile on 32-bit platforms.
+	   *)
+	  (* XXX The meaning of signed/unsigned breaks down at
+	   * 31, 32, 63 and 64 bits.
+	   *)
+	| (1, _, _) -> "construct_bit"
+	| ((2|3|4|5|6|7|8), _, false) -> "construct_char_unsigned"
+	| ((2|3|4|5|6|7|8), _, true) -> "construct_char_signed"
+	| (i, BigEndian, false) when i <= 31 -> "construct_int_be_unsigned"
+	| (i, BigEndian, true) when i <= 31 -> "construct_int_be_signed"
+	| (i, LittleEndian, false) when i <= 31 -> "construct_int_le_unsigned"
+	| (i, LittleEndian, true) when i <= 31 -> "construct_int_le_signed"
+	| (i, NativeEndian, false) when i <= 31 -> "construct_int_ne_unsigned"
+	| (i, NativeEndian, true) when i <= 31 -> "construct_int_ne_signed"
+	| (32, BigEndian, false) -> "construct_int32_be_unsigned"
+	| (32, BigEndian, true) -> "construct_int32_be_signed"
+	| (32, LittleEndian, false) -> "construct_int32_le_unsigned"
+	| (32, LittleEndian, true) -> "construct_int32_le_signed"
+	| (32, NativeEndian, false) -> "construct_int32_ne_unsigned"
+	| (32, NativeEndian, true) -> "construct_int32_ne_signed"
+	| (_, BigEndian, false) -> "construct_int64_be_unsigned"
+	| (_, BigEndian, true) -> "construct_int64_be_signed"
+	| (_, LittleEndian, false) -> "construct_int64_le_unsigned"
+	| (_, LittleEndian, true) -> "construct_int64_le_signed"
+	| (_, NativeEndian, false) -> "construct_int64_ne_unsigned"
+	| (_, NativeEndian, true) -> "construct_int64_ne_signed"
+      in
+      let name_of_int_construct = function
+	  (* XXX As an enhancement we should allow users to
+	   * specify that a field length can fit into a char/int/int32
+	   * (of course, this would have to be checked at runtime).
+	   *)
+	| (BigEndian, false) -> "construct_int64_be_unsigned"
+	| (BigEndian, true) -> "construct_int64_be_signed"
+	| (LittleEndian, false) -> "construct_int64_le_unsigned"
+	| (LittleEndian, true) -> "construct_int64_le_signed"
+	| (NativeEndian, false) -> "construct_int64_ne_unsigned"
+	| (NativeEndian, true) -> "construct_int64_ne_signed"
+      in
+
+      let expr =
+	match t, flen_is_const with
+	(* Common case: int field, constant flen.
+	 *
+	 * Range checks are done inside the construction function
+	 * because that's a lot simpler w.r.t. types.  It might
+	 * be better to move them here. XXX
+	 *)
+	| Int, Some i when i > 0 && i <= 64 ->
+	    let construct_func =
+	      name_of_int_construct_const (i,endian,signed) in
+	    exn_used := true;
+
+	    <:expr<
+	      Bitmatch.$lid:construct_func$ $lid:buffer$ $fval$ $flen$
+	        $lid:exn$
+	    >>
+
+	| Int, Some _ ->
+	    Loc.raise _loc (Failure "length of int field must be [1..64]")
+
+	(* Int field, non-constant length.  We need to perform a runtime
+	 * test to ensure the length is [1..64].
+	 *
+	 * Range checks are done inside the construction function
+	 * because that's a lot simpler w.r.t. types.  It might
+	 * be better to move them here. XXX
+	 *)
+	| Int, None ->
+	    let construct_func = name_of_int_construct (endian,signed) in
+	    exn_used := true;
+
+	    <:expr<
+	      if $flen$ >= 1 && $flen$ <= 64 then
+		Bitmatch.$lid:construct_func$ $lid:buffer$ $fval$ $flen$
+		  $lid:exn$
+	      else
+		raise (Bitmatch.Construct_failure
+			 ("length of int field must be [1..64]",
+			  $str:loc_fname$,
+			  $int:loc_line$, $int:loc_char$))
+	    >>
+
+        (* Bitstring, constant length > 0. *)
+	| Bitstring, Some i when i > 0 ->
+	    let bs = gensym "bs" in
+	    <:expr<
+	      let $lid:bs$ = $fval$ in
+	      if Bitmatch.bitstring_length $lid:bs$ = $flen$ then
+		Bitmatch.construct_bitstring $lid:buffer$ $lid:bs$
+	      else
+		raise (Bitmatch.Construct_failure
+			 ("length of bitstring does not match declaration",
+			  $str:loc_fname$,
+			  $int:loc_line$, $int:loc_char$))
+	    >>
+
+	(* Bitstring, constant length -1, means variable length bitstring
+	 * with no checks.
+	 *)
+	| Bitstring, Some (-1) ->
+	    <:expr< Bitmatch.construct_bitstring $lid:buffer$ $fval$ >>
+
+	(* Bitstring, constant length = 0 is probably an error, and so it
+	 * any other value.
+	 *)
+	| Bitstring, Some _ ->
+	    Loc.raise _loc
+	      (Failure
+		 "length of bitstring must be > 0 or the special value -1")
+
+	(* Bitstring, non-constant length.
+	 * We check at runtime that the length is > 0 and matches
+	 * the declared length.
+	 *)
+	| Bitstring, None ->
+	    let bslen = gensym "bslen" in
+	    let bs = gensym "bs" in
+	    <:expr<
+	      let $lid:bslen$ = $flen$ in
+	      if $lid:bslen$ > 0 then (
+		let $lid:bs$ = $fval$ in
+		if Bitmatch.bitstring_length $lid:bs$ = $lid:bslen$ then
+		  Bitmatch.construct_bitstring $lid:buffer$ $lid:bs$
+		else
+		  raise (Bitmatch.Construct_failure
+			   ("length of bitstring does not match declaration",
+			    $str:loc_fname$,
+			    $int:loc_line$, $int:loc_char$))
+	      ) else
+		raise (Bitmatch.Construct_failure
+			 ("length of bitstring must be > 0",
+			  $str:loc_fname$,
+			  $int:loc_line$, $int:loc_char$))
+	    >> in
+      expr
+  ) fields in
+
+  (* Create the final bitstring.  Start by creating an empty buffer
+   * and then evaluate each expression above in turn which will
+   * append some more to the bitstring buffer.  Finally extract
+   * the bitstring.
+   *
+   * XXX We almost have enough information to be able to guess
+   * a good initial size for the buffer.
+   *)
+  let fields =
+    match fields with
+    | [] -> <:expr< [] >>
+    | h::t -> List.fold_left (fun h t -> <:expr< $h$; $t$ >>) h t in
+
+  let expr =
+    <:expr<
+      let $lid:buffer$ = Bitmatch.Buffer.create () in
+      $fields$;
+      Bitmatch.Buffer.contents $lid:buffer$
+    >> in
+
+  if !exn_used then
+    <:expr<
+      let $lid:exn$ =
+	Bitmatch.Construct_failure ("value out of range",
+				    $str:loc_fname$,
+				    $int:loc_line$, $int:loc_char$) in
+	$expr$
+    >>
+  else
+    expr
 
 (* Generate the code for a bitmatch statement.  '_loc' is the
  * location, 'bs' is the bitstring parameter, 'cases' are
@@ -130,8 +372,21 @@ let output_bitmatch _loc bs cases =
    *)
   let rec output_field_extraction inner = function
     | [] -> inner
-    | {ident=ident; flen=flen; endian=endian; signed=signed; t=t} :: fields ->
-	(* If length an integer constant?  If so, what is it?  This
+    | field :: fields ->
+	let {fval=fval; flen=flen; endian=endian; signed=signed; t=t}
+	    = field in
+
+	(* Is fval a binding (an ident) or an expression?  If it's
+	 * a binding then we will generate a binding for this field.
+	 * If it's an expression then we will test the field against
+	 * the expression.
+	 *)
+	let fval_is_ident =
+	  match fval with
+	  | <:expr< $lid:id$ >> -> Some id
+	  | _ -> None in
+
+	(* Is flen an integer constant?  If so, what is it?  This
 	 * is very simple-minded and only detects simple constants.
 	 *)
 	let flen_is_const =
@@ -183,9 +438,9 @@ let output_bitmatch _loc bs cases =
 	in
 
 	let expr =
-	  match t, flen_is_const with
-	  (* Common case: int field, constant flen *)
-	  | Int, Some i when i > 0 && i <= 64 ->
+	  match t, fval_is_ident, flen_is_const with
+	  (* Common case: int field, binding, constant flen *)
+	  | Int, Some ident, Some i when i > 0 && i <= 64 ->
 	      let extract_func = name_of_int_extract_const (i,endian,signed) in
 	      <:expr<
 		if $lid:len$ >= $flen$ then (
@@ -196,17 +451,32 @@ let output_bitmatch _loc bs cases =
 		)
 	      >>
 
-	  | Int, Some _ ->
+	  (* Int field, not a binding, constant flen *)
+	  | Int, None, Some i when i > 0 && i <= 64 ->
+	      let extract_func = name_of_int_extract_const (i,endian,signed) in
+	      let v = gensym "val" in
+	      <:expr<
+		if $lid:len$ >= $flen$ then (
+		  let $lid:v$, $lid:off$, $lid:len$ =
+		    Bitmatch.$lid:extract_func$ $lid:data$ $lid:off$ $lid:len$
+		      $flen$ in
+		  if $lid:v$ = $fval$ then (
+		    $inner$
+		  )
+		)
+	      >>
+
+	  | Int, _, Some _ ->
 	      Loc.raise _loc (Failure "length of int field must be [1..64]")
 
 	  (* Int field, non-const flen.  We have to test the range of
 	   * the field at runtime.  If outside the range it's a no-match
 	   * (not an error).
 	   *)
-	  | Int, None ->
+	  | Int, Some ident, None ->
 	      let extract_func = name_of_int_extract (endian,signed) in
 	      <:expr<
-		if $flen$ >= 1 && $flen$ <= 64 && $flen$ >= $lid:len$ then (
+		if $flen$ >= 1 && $flen$ <= 64 && $flen$ <= $lid:len$ then (
 		  let $lid:ident$, $lid:off$, $lid:len$ =
 		    Bitmatch.$lid:extract_func$ $lid:data$ $lid:off$ $lid:len$
 		      $flen$ in
@@ -214,8 +484,27 @@ let output_bitmatch _loc bs cases =
 		)
 	      >>
 
+	  | Int, None, None ->
+	      let extract_func = name_of_int_extract (endian,signed) in
+	      let v = gensym "val" in
+	      <:expr<
+		if $flen$ >= 1 && $flen$ <= 64 && $flen$ <= $lid:len$ then (
+		  let $lid:v$, $lid:off$, $lid:len$ =
+		    Bitmatch.$lid:extract_func$ $lid:data$ $lid:off$ $lid:len$
+		      $flen$ in
+		  if $lid:v$ = $fval$ then (
+		    $inner$
+		  )
+		)
+	      >>
+
+	  (* Can't compare bitstrings at the moment. *)
+	  | Bitstring, None, _ ->
+	      Loc.raise _loc
+		(Failure "cannot compare a bitstring to a constant")
+
           (* Bitstring, constant flen >= 0. *)
-	  | Bitstring, Some i when i >= 0 ->
+	  | Bitstring, Some ident, Some i when i >= 0 ->
 	      <:expr<
 		if $lid:len$ >= $flen$ then (
 		  let $lid:ident$, $lid:off$, $lid:len$ =
@@ -228,22 +517,22 @@ let output_bitmatch _loc bs cases =
           (* Bitstring, constant flen = -1, means consume all the
 	   * rest of the input.
 	   *)
-	  | Bitstring, Some i when i = -1 ->
+	  | Bitstring, Some ident, Some i when i = -1 ->
 	      <:expr<
 		let $lid:ident$, $lid:off$, $lid:len$ =
 		  Bitmatch.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
 		  $inner$
 	      >>
 
-	  | Bitstring, Some _ ->
+	  | Bitstring, _, Some _ ->
 	      Loc.raise _loc (Failure "length of bitstring must be >= 0 or the special value -1")
 
 	  (* Bitstring field, non-const flen.  We check the flen is >= 0
 	   * (-1 is not allowed here) at runtime.
 	   *)
-	  | Bitstring, None ->
+	  | Bitstring, Some ident, None ->
 	      <:expr<
-		if $flen$ >= 0 && $lid:len$ >= $flen$ then (
+		if $flen$ >= 0 && $flen$ <= $lid:len$ then (
 		  let $lid:ident$, $lid:off$, $lid:len$ =
 		    Bitmatch.extract_bitstring $lid:data$ $lid:off$ $lid:len$
 		      $flen$ in
@@ -251,6 +540,21 @@ let output_bitmatch _loc bs cases =
 		)
 	      >>
 	in
+
+	(* Emit extra debugging code. *)
+	let expr =
+	  if not debug then expr else (
+	    let field = string_of_field field in
+
+	    <:expr<
+	      if !Bitmatch.debug then (
+		Printf.eprintf "PA_BITMATCH: TEST:\n";
+		Printf.eprintf "  %s\n" $str:field$;
+		Printf.eprintf "  off %d len %d\n%!" $lid:off$ $lid:len$;
+	      );
+	      $expr$
+	    >>
+	  ) in
 
 	output_field_extraction expr fields
   in
@@ -359,30 +663,37 @@ EXTEND Gram
   ];
 
   field: [
-    [ name = LIDENT; ":"; len = expr LEVEL "top";
+    [ fval = expr LEVEL "top"; ":"; len = expr LEVEL "top";
       qs = OPT [ ":"; qs = qualifiers -> qs ] ->
-	output_field _loc name len qs
+	parse_field _loc fval len qs
     ]
   ];
 
   match_case: [
-    [ fields = LIST0 field SEP ";";
-      w = OPT [ "when"; e = expr -> e ]; "->";
-      code = expr ->
-	(Fields fields, w, code)
-    ]
-  | [ "_";
+    [ "_";
       bind = OPT [ "as"; name = LIDENT -> name ];
       w = OPT [ "when"; e = expr -> e ]; "->";
       code = expr ->
 	(Bind bind, w, code)
     ]
+  | [ fields = LIST0 field SEP ";";
+      w = OPT [ "when"; e = expr -> e ]; "->";
+      code = expr ->
+	(Fields fields, w, code)
+    ]
   ];
 
+  (* 'bitmatch' expressions. *)
   expr: LEVEL ";" [
     [ "bitmatch"; bs = expr; "with"; OPT "|";
       cases = LIST1 match_case SEP "|" ->
 	output_bitmatch _loc bs cases
+    ]
+
+  (* Constructor. *)
+  | [ "BITSTRING";
+      fields = LIST0 field SEP ";" ->
+	output_constructor _loc fields
     ]
   ];
 
