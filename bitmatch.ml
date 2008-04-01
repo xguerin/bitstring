@@ -1,5 +1,5 @@
 (* Bitmatch library.
- * $Id: bitmatch.ml,v 1.2 2008-04-01 08:56:43 rjones Exp $
+ * $Id: bitmatch.ml,v 1.3 2008-04-01 10:06:12 rjones Exp $
  *)
 
 open Printf
@@ -78,3 +78,47 @@ let extract_char_unsigned data off len flen =
   let word = word lsr shift in
 
   word, off+flen, len-flen
+
+(*----------------------------------------------------------------------*)
+(* Display functions. *)
+
+let isprint c =
+  let c = Char.code c in
+  c >= 32 && c < 127
+
+let hexdump_bitstring chan (data, off, len) =
+  let count = ref 0 in
+  let off = ref off in
+  let len = ref len in
+  let linelen = ref 0 in
+  let linechars = String.make 16 ' ' in
+
+  fprintf chan "00000000  ";
+
+  while !len > 0 do
+    let bits = min !len 8 in
+    let byte, off', len' = extract_char_unsigned data !off !len bits in
+    off := off'; len := len';
+
+    let byte = byte lsl (8-bits) in
+    fprintf chan "%02x " byte;
+
+    incr count;
+    linechars.[!linelen] <-
+      (let c = Char.chr byte in
+       if isprint c then c else '.');
+    incr linelen;
+    if !linelen = 8 then fprintf chan " ";
+    if !linelen = 16 then (
+      fprintf chan " |%s|\n%08x  " linechars !count;
+      linelen := 0;
+      for i = 0 to 15 do linechars.[i] <- ' ' done
+    )
+  done;
+
+  if !linelen > 0 then (
+    let skip = (16 - !linelen) * 3 + if !linelen < 8 then 1 else 0 in
+    for i = 0 to skip-1 do fprintf chan " " done;
+    fprintf chan " |%s|\n" linechars
+  ) else
+    fprintf chan "\n"

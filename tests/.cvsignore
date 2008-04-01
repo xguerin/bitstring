@@ -4,7 +4,9 @@
 *.cma
 *.cmxa
 01_load
+03_hexdump
 05_bits
 06_ints1
 06_ints2
 06_ints3
+60_ping

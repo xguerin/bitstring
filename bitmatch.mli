@@ -1,5 +1,5 @@
 (* Bitmatch library.
- * $Id: bitmatch.mli,v 1.2 2008-04-01 08:56:43 rjones Exp $
+ * $Id: bitmatch.mli,v 1.3 2008-04-01 10:06:12 rjones Exp $
  *)
 
 type bitstring = string * int * int
@@ -13,6 +13,8 @@ val make_bitstring : int -> char -> bitstring
 val bitstring_of_chan : in_channel -> bitstring
 
 val bitstring_of_file : string -> bitstring
+
+val hexdump_bitstring : out_channel -> bitstring -> unit
 
 (**/**)
 
