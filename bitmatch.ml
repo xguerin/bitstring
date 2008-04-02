@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.ml,v 1.7 2008-04-02 08:05:58 rjones Exp $
+ * $Id: bitmatch.ml,v 1.8 2008-04-02 11:06:07 rjones Exp $
  *)
 
 open Printf
@@ -69,6 +69,8 @@ module I = struct
   (* Bitwise operations on ints.  Note that we assume int <= 31 bits. *)
   let (<<) = (lsl)
   let (>>) = (lsr)
+  external to_int : int -> int = "%identity"
+  let zero = 0
   let one = 1
   let minus_one = -1
   let ff = 0xff
@@ -79,8 +81,10 @@ module I = struct
       pred (one << bits)
     else if bits = 30 then
       max_int
-    else
+    else if bits = 31 then
       minus_one
+    else
+      invalid_arg "Bitmatch.I.mask"
 
   (* Byte swap an int of a given size. *)
   let byteswap v bits =
@@ -104,6 +108,24 @@ module I = struct
       let v4 = (v land (mask shift)) << 24 in
       v4 lor v3 lor v2 lor v1
     )
+
+  (* Check a value is in range 0 .. 2^bits-1. *)
+  let range_unsigned v bits =
+    let mask = lnot (mask bits) in
+    (v land mask) = zero
+
+  (* Call function g on the top bits, then f on each full byte
+   * (big endian - so start at top).
+   *)
+  let rec map_bytes_be g f v bits =
+    if bits >= 8 then (
+      map_bytes_be g f (v >> 8) (bits-8);
+      let lsb = v land ff in
+      f (to_int lsb)
+    ) else if bits > 0 then (
+      let lsb = v land (mask bits) in
+      g (to_int lsb) bits
+    )
 end
 
 module I32 = struct
@@ -115,8 +137,11 @@ module I32 = struct
   let (>>) = Int32.shift_right_logical
   let (land) = Int32.logand
   let (lor) = Int32.logor
+  let lnot = Int32.lognot
   let pred = Int32.pred
   let max_int = Int32.max_int
+  let to_int = Int32.to_int
+  let zero = Int32.zero
   let one = Int32.one
   let minus_one = Int32.minus_one
   let ff = 0xff_l
@@ -127,8 +152,10 @@ module I32 = struct
       pred (one << bits)
     else if bits = 31 then
       max_int
-    else
+    else if bits = 32 then
       minus_one
+    else
+      invalid_arg "Bitmatch.I32.mask"
 
   (* Byte swap an int of a given size. *)
   let byteswap v bits =
@@ -151,6 +178,75 @@ module I32 = struct
       let v3 = ((v >> shift) land ff) << 16 in
       let v4 = (v land (mask shift)) << 24 in
       v4 lor v3 lor v2 lor v1
+    )
+
+  (* Check a value is in range 0 .. 2^bits-1. *)
+  let range_unsigned v bits =
+    let mask = lnot (mask bits) in
+    (v land mask) = zero
+
+  (* Call function g on the top bits, then f on each full byte
+   * (big endian - so start at top).
+   *)
+  let rec map_bytes_be g f v bits =
+    if bits >= 8 then (
+      map_bytes_be g f (v >> 8) (bits-8);
+      let lsb = v land ff in
+      f (to_int lsb)
+    ) else if bits > 0 then (
+      let lsb = v land (mask bits) in
+      g (to_int lsb) bits
+    )
+end
+
+module I64 = struct
+  (* Bitwise operations on int64s.  Note we try to keep it as similar
+   * as possible to the I/I32 modules above, to make it easier to track
+   * down bugs.
+   *)
+  let (<<) = Int64.shift_left
+  let (>>) = Int64.shift_right_logical
+  let (land) = Int64.logand
+  let (lor) = Int64.logor
+  let lnot = Int64.lognot
+  let pred = Int64.pred
+  let max_int = Int64.max_int
+  let to_int = Int64.to_int
+  let zero = Int64.zero
+  let one = Int64.one
+  let minus_one = Int64.minus_one
+  let ff = 0xff_L
+
+  (* Create a mask so many bits wide. *)
+  let mask bits =
+    if bits < 63 then
+      pred (one << bits)
+    else if bits = 63 then
+      max_int
+    else if bits = 64 then
+      minus_one
+    else
+      invalid_arg "Bitmatch.I64.mask"
+
+  (* Byte swap an int of a given size. *)
+  (* let byteswap v bits = *)
+
+  (* Check a value is in range 0 .. 2^bits-1. *)
+  let range_unsigned v bits =
+    let mask = lnot (mask bits) in
+    (v land mask) = zero
+
+  (* Call function g on the top bits, then f on each full byte
+   * (big endian - so start at top).
+   *)
+  let rec map_bytes_be g f v bits =
+    if bits >= 8 then (
+      map_bytes_be g f (v >> 8) (bits-8);
+      let lsb = v land ff in
+      f (to_int lsb)
+    ) else if bits > 0 then (
+      let lsb = v land (mask bits) in
+      g (to_int lsb) bits
     )
 end
 
@@ -490,31 +586,19 @@ let construct_char_unsigned buf v flen exn =
   else
     Buffer._add_bits buf v flen
 
-(* Generate a mask with the lower 'bits' bits set. *)
-let mask64 bits =
-  if bits < 63 then Int64.pred (Int64.shift_left 1L bits)
-  else if bits = 63 then Int64.max_int
-  else if bits = 64 then -1L
-  else invalid_arg "Bitmatch.mask64"
+(* Construct a field of up to 31 bits. *)
+let construct_int_be_unsigned buf v flen exn =
+  (* Check value is within range. *)
+  if not (I.range_unsigned v flen) then raise exn;
+  (* Add the bytes. *)
+  I.map_bytes_be (Buffer._add_bits buf) (Buffer.add_byte buf) v flen
 
 (* Construct a field of up to 64 bits. *)
 let construct_int64_be_unsigned buf v flen exn =
   (* Check value is within range. *)
-  let m = Int64.lognot (mask64 flen) in
-  if Int64.logand v m <> 0L then raise exn;
-
+  if not (I64.range_unsigned v flen) then raise exn;
   (* Add the bytes. *)
-  let rec loop v flen =
-    if flen > 8 then (
-      loop (Int64.shift_right_logical v 8) (flen-8);
-      let lsb = Int64.to_int (Int64.logand v 0xffL) in
-      Buffer.add_byte buf lsb
-    ) else if flen > 0 then (
-      let lsb = Int64.to_int (Int64.logand v (mask64 flen)) in
-      Buffer._add_bits buf lsb flen
-    )
-  in
-  loop v flen
+  I64.map_bytes_be (Buffer._add_bits buf) (Buffer.add_byte buf) v flen
 
 (*----------------------------------------------------------------------*)
 (* Display functions. *)
