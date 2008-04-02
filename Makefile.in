@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #
-# $Id: Makefile.in,v 1.3 2008-04-02 08:14:40 rjones Exp $
+# $Id: Makefile.in,v 1.4 2008-04-02 13:22:46 rjones Exp $
 
 PACKAGE		= @PACKAGE_NAME@
 VERSION		= @PACKAGE_VERSION@
@@ -94,7 +94,9 @@ endif
 # Install.
 
 install:
-	ocamlfind install bitmatch META *.mli *.cmi *.cmx *.cma *.cmxa *.a
+	ocamlfind install bitmatch META *.mli *.cmx *.cma *.cmxa *.a \
+		bitmatch.cmi \
+		pa_bitmatch.cmo
 
 # Standard rules.
 
@@ -123,6 +125,7 @@ dist:
 	mkdir $(PACKAGE)-$(VERSION)
 	tar -cf - -T MANIFEST | tar -C $(PACKAGE)-$(VERSION) -xf -
 	$(INSTALL) -m 0755 configure $(PACKAGE)-$(VERSION)/
+	$(INSTALL) -m 0644 config.h.in $(PACKAGE)-$(VERSION)/
 	tar zcf $(PACKAGE)-$(VERSION).tar.gz $(PACKAGE)-$(VERSION)
 	rm -rf $(PACKAGE)-$(VERSION)
 	ls -l $(PACKAGE)-$(VERSION).tar.gz
