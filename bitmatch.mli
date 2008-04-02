@@ -1,5 +1,5 @@
-(* Bitmatch library.
- * Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
+(** Bitmatch library. *)
+(* Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,12 +15,25 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.mli,v 1.7 2008-04-02 08:05:58 rjones Exp $
+ * $Id: bitmatch.mli,v 1.8 2008-04-02 08:14:40 rjones Exp $
  *)
+
+(**
+   {2 Introduction and examples}
+
+
+   {2 Reference}
+
+   {3 Types}
+*)
+
+type bitstring = string * int * int
+
+(** {3 Exceptions} *)
 
 exception Construct_failure of string * string * int * int
 
-type bitstring = string * int * int
+(** {3 Bitstrings} *)
 
 val empty_bitstring : bitstring
 
@@ -36,6 +49,8 @@ val hexdump_bitstring : out_channel -> bitstring -> unit
 
 val bitstring_length : bitstring -> int
 
+(** {3 Bitstring buffer} *)
+
 module Buffer : sig
   type t
   val create : unit -> t
@@ -44,6 +59,8 @@ module Buffer : sig
   val add_bit : t -> bool -> unit
   val add_byte : t -> int -> unit
 end
+
+(** {3 Miscellaneous} *)
 
 val debug : bool ref
 

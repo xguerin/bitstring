@@ -1,9 +1,9 @@
 ocaml-bitmatch copyright (C) 2008 Red Hat Inc.
 License: LGPLv2+ with OCaml linking exception.
 
-Please see the doc/ subdirectory for developer documentation.
+Please see the html subdirectory for developer documentation.
 
-The only dependencies are OCaml >= 3.10.0, camlp4, and findlib.
+The only dependencies are OCaml >= 3.10.0, camlp4, ocamldoc, and findlib.
 
 To build:
 
