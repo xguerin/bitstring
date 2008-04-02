@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.mli,v 1.10 2008-04-02 12:29:03 rjones Exp $
+ * $Id: bitmatch.mli,v 1.11 2008-04-02 13:22:07 rjones Exp $
  *)
 
 (**
@@ -26,7 +26,8 @@
 
    Bitmatch adds Erlang-style bitstrings and matching over bitstrings
    as a syntax extension and library for OCaml.  You can use
-   this module to both parse and generate binary formats.
+   this module to both parse and generate binary formats, for
+   example, communications protocols, disk formats and binary files.
 
    {{:http://et.redhat.com/~rjones/bitmatch/}OCaml bitmatch website}
 
