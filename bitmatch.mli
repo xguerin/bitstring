@@ -15,15 +15,20 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.mli,v 1.9 2008-04-02 11:06:31 rjones Exp $
+ * $Id: bitmatch.mli,v 1.10 2008-04-02 12:29:03 rjones Exp $
  *)
 
 (**
+   {{:#reference}Jump straight to the reference section for
+   documentation on types and functions}.
+
    {2 Introduction}
 
    Bitmatch adds Erlang-style bitstrings and matching over bitstrings
    as a syntax extension and library for OCaml.  You can use
    this module to both parse and generate binary formats.
+
+   {{:http://et.redhat.com/~rjones/bitmatch/}OCaml bitmatch website}
 
    {2 Examples}
 
@@ -156,7 +161,7 @@ let make_message typ subtype param =
    {!bitstring_of_chan}.
 
    There are also functions to create bitstrings from arbitrary data.
-   See the reference below.
+   See the {{:#reference}reference} below.
 
    {2 Matching bitstrings with patterns}
 
@@ -247,7 +252,7 @@ bitmatch bits with
    (* Only matches if the first 4 bits contain the integer 6. *)
 ]}
 
-   {3 Pattern field reference}
+   {3:patternfieldreference Pattern field reference}
 
    The exact format of each pattern field is:
 
@@ -259,7 +264,7 @@ bitmatch bits with
    expression and can use any values defined in the program, and refer
    back to earlier fields (but not to later fields).
 
-   Integers can only have lengths in the range [1..64] bits.  See the
+   Integers can only have lengths in the range \[1..64\] bits.  See the
    {{:#integertypes}integer types} section below for how these are
    mapped to the OCaml int/int32/int64 types.  This is checked
    at compile time if the length expression is constant, otherwise it is
@@ -331,34 +336,169 @@ Bitmatch.hexdump_bitstring stdout bits ;;
     *)
 ]}
 
-   
+   The format of each field is the same as for pattern fields (see
+   {{:#patternfieldreference}Pattern field reference section}), and
+   things like computed length fields, fixed value fields, insertion
+   of bitstrings within bitstrings, etc. are all supported.
 
+   {3 Construction exception}
+
+   The [BITSTRING] operator may throw a {!Construct_failure}
+   exception at runtime.
+
+   Runtime errors include:
+
+   - int field length not in the range \[1..64\]
+   - a bitstring with a length declared which doesn't have the
+     same length at runtime
+   - trying to insert an out of range value into an int field
+     (eg. an unsigned int field which is 2 bits wide can only
+     take values in the range \[0..3\]).
 
    {2:integertypes Integer types}
 
+   Integer types are mapped to OCaml types [bool], [int], [int32] or
+   [int64] using a system which tries to ensure that (a) the types are
+   reasonably predictable and (b) the most efficient type is
+   preferred.
 
+   The rules are slightly different depending on whether the bit
+   length expression in the field is a compile-time constant or a
+   computed expression.
 
+   Detection of compile-time constants is quite simplistic so only an
+   immediate, simple integer is recognised as a constant and anything
+   else is considered a computed expression, even expressions such as
+   [5-2] which are obviously (to our eyes) constant.
 
+   In any case the bit size of an integer is limited to the range
+   \[1..64\].  This is detected as a compile-time error if that is
+   possible, otherwise a runtime check is added which can throw an
+   [Invalid_argument] exception.
 
+   The mapping is thus:
+
+   {v
+   Bit size	    ---- OCaml type ----
+                Constant	Computed expression
+
+   1		bool		int64
+   2..31	int		int64
+   32		int32		int64
+   33..64	int64		int64
+   v}
+
+   A possible future extension may allow people with 64 bit computers
+   to specify a more optimal [int] type for bit sizes in the range
+   [32..63].  If this was implemented then such code {i could not even
+   be compiled} on 32 bit platforms, so it would limit portability.
+
+   Another future extension may be to allow computed
+   expressions to assert min/max range for the bit size,
+   allowing a more efficient data type than int64 to be
+   used.  (Of course under such circumstances there would
+   still need to be a runtime check to enforce the
+   size).
 
    {2 Compiling}
 
+   Using the compiler directly you can do:
 
+   {v
+   ocamlc -I bitmatch -pp "camlp4o -I bitmatch pa_bitmatch.cmo" foo.ml -o foo
+   v}
 
+   Using findlib:
 
+   {v
+   ocamlfind ocamlc -package bitmatch.syntax -linkpkg foo.ml -o foo
+   v}
 
-   {2 Safety and security considerations}
+   {2 Security and type safety}
 
+   {3 Security on input}
 
+   The main concerns for input are buffer overflows and denial
+   of service.
 
+   It is believed that this library is robust against attempted buffer
+   overflows.  In addition to OCaml's normal bounds checks, we check
+   that field lengths are >= 0, and many additional checks.
+
+   Denial of service attacks are more problematic although we still
+   believe that the library is robust.  We only work forwards through
+   the bitstring, thus computation will eventually terminate.  As for
+   computed lengths, code such as this is thought to be secure:
+
+{[
+bitmatch bits with
+| len : 64;
+  buffer : Int64.to_int len : bitstring ->
+]}
+
+   The [len] field can be set arbitrarily large by an attacker, but
+   when pattern-matching against the [buffer] field this merely causes
+   a test such as [if len <= remaining_size] to fail.  Even if the
+   length is chosen so that [buffer] bitstring is allocated, the
+   allocation of sub-bitstrings is efficient and doesn't involve an
+   arbitary-sized allocation or any copying.
+
+   The main protection against attackers should therefore be to ensure
+   that the main program will only read input bitstrings up to a
+   certain length, which is outside the scope of this library.
+
+   {3 Security on output}
+
+   As with the input side, computed lengths are believed to be
+   safe.  For example:
+
+{[
+let len = read_untrusted_source () in
+let buffer = allocate_bitstring () in
+BITSTRING
+  buffer : len : bitstring
+]}
+
+   This code merely causes a check that buffer's length is the same as
+   [len].  However the program function [allocate_bitstring] must
+   refuse to allocate an oversized buffer (but that is outside the
+   scope of this library).
+
+   {3 Order of evaluation}
+
+   In [bitmatch] statements, fields are evaluated left to right.
+
+   Note that the when-clause is evaluated {i last}, so if you are
+   relying on the when-clause to filter cases then your code may do a
+   lot of extra and unncessary pattern-matching work on fields which
+   may never be needed just to evaluate the when-clause.  You can
+   usually rearrange the code to do only the first part of the match,
+   followed by the when-clause, followed by a second inner bitmatch.
+
+   {3 Safety}
+
+   The current implementation is believed to be fully type-safe,
+   and makes compile and run-time checks where appropriate.  If
+   you find a case where a check is missing please submit a
+   bug report or a patch.
 
    {2 Limits}
 
+   These are thought to be the current limits:
 
+   Integers: \[1..64\] bits.
 
+   Bitstrings (32 bit platforms): maximum length is limited
+   by the string size, ie. 16 MBytes.
 
+   Bitstrings (64 bit platforms): maximum length is thought to be
+   limited by the string size, ie. effectively unlimited.
 
-   {2 Reference}
+   Bitstrings must be loaded into memory before we can match against
+   them.  Thus available memory may be considered a limit for some
+   applications.
+
+   {2:reference Reference}
    {3 Types}
 *)
 
