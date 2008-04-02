@@ -1,0 +1,20 @@
+ocaml-bitmatch copyright (C) 2008 Red Hat Inc.
+License: LGPLv2+ with OCaml linking exception.
+
+Please see the doc/ subdirectory for developer documentation.
+
+The only dependencies are OCaml >= 3.10.0, camlp4, and findlib.
+
+To build:
+
+	./configure
+	make
+
+	make test		# optional, to run tests
+
+	make print-tests	# optional, to print expanded test macros
+	make print-examples	# optional, to print expanded example macros
+
+To install, run this as root:
+
+	make install
