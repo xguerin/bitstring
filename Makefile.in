@@ -1,30 +1,52 @@
-# $Id: Makefile.in,v 1.1 2008-04-02 07:20:26 rjones Exp $
+# Bitmatch syntax extension.
+# Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+#
+# $Id: Makefile.in,v 1.2 2008-04-02 08:03:26 rjones Exp $
 
-PACKAGE	= ocaml-bitmatch
-VERSION	= 0.1
+PACKAGE		= @PACKAGE_NAME@
+VERSION		= @PACKAGE_VERSION@
 
-OCAMLFIND = ocamlfind
-OCAMLMKLIB = ocamlmklib
+OCAMLFIND	= @OCAMLFIND@
+OCAMLMKLIB	= @OCAMLMKLIB@
+OCAMLDOC	= @OCAMLDOC@
+INSTALL		= @INSTALL@
 
-OCAMLCFLAGS = -g
-OCAMLCPACKAGES =
-OCAMLOPTFLAGS =
+OCAMLCFLAGS	= -g
+OCAMLCPACKAGES	=
+OCAMLOPTFLAGS	=
 OCAMLOPTPACKAGES =
 
-EXAMPLES := $(wildcard examples/*.ml)
+EXAMPLES	= $(wildcard examples/*.ml)
 
-TESTS	:= $(patsubst %.ml,%,$(wildcard tests/*.ml))
+TESTS		= $(patsubst %.ml,%,$(wildcard tests/*.ml))
 
 all:	pa_bitmatch.cmo bitmatch.cma bitmatch.cmxa
 
 pa_bitmatch.cmo: pa_bitmatch.ml
-	ocamlfind ocamlc -I +camlp4 camlp4lib.cma -pp camlp4of.opt -c $< -o $@
+	$(OCAMLFIND) ocamlc -I +camlp4 camlp4lib.cma \
+	  -pp camlp4of.opt -c $< -o $@
 
 bitmatch.cma: bitmatch.cmo
 	$(OCAMLFIND) ocamlc -a -o $@ $^
 
 bitmatch.cmxa: bitmatch.cmx
 	$(OCAMLFIND) ocamlopt -a -o $@ $^
+
+# Tests and examples.
 
 test: pa_bitmatch.cmo bitmatch.cma
 	@for f in $(TESTS); do \
@@ -48,7 +70,19 @@ print-examples: pa_bitmatch.cmo
 	@for f in $(EXAMPLES); do \
 	  echo Example: $$f; \
 	  camlp4o pa_bitmatch.cmo -printer pr_o.cmo $$f; \
+	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	done
+
+# Clean.
+
+clean:
+	rm -f core *~ *.cmi *.cmo *.cmx *.cma *.cmxa *.a *.o
+	rm -f tests/*~ tests/*.cmi tests/*.cmo $(TESTS)
+	rm -f examples/*~
+
+install:
+
+# Standard rules.
 
 .mli.cmi:
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) -c $<
