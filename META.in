@@ -1,12 +1,11 @@
 name="bitmatch"
 version="@PACKAGE_VERSION@"
 description="Bitstrings and bitstring matching"
-requires="camlp4"
 archive(byte)="bitmatch.cma"
 archive(native)="bitmatch.cmxa"
 
 package "syntax" (
-  requires = "bitmatch,camlp4"
+  requires = "camlp4.quotations.o"
   version = "@PACKAGE_VERSION@"
   description = "Syntax extension: bitmatch operators"
   archive(syntax,preprocessor) = "pa_bitmatch.cmo"
