@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.mli,v 1.11 2008-04-02 13:22:07 rjones Exp $
+ * $Id: bitmatch.mli,v 1.12 2008-04-02 13:59:37 rjones Exp $
  *)
 
 (**
@@ -406,13 +406,17 @@ Bitmatch.hexdump_bitstring stdout bits ;;
    Using the compiler directly you can do:
 
    {v
-   ocamlc -I bitmatch -pp "camlp4o -I bitmatch pa_bitmatch.cmo" foo.ml -o foo
+   ocamlc -I +bitmatch \
+     -pp "camlp4o `ocamlc -where`/bitmatch/pa_bitmatch.cmo" \
+     bitmatch.cma test.ml -o test
    v}
 
-   Using findlib:
+   Simpler method using findlib:
 
    {v
-   ocamlfind ocamlc -package bitmatch.syntax -linkpkg foo.ml -o foo
+   ocamlfind ocamlc \
+     -package bitmatch.syntax -syntax bitmatch.syntax \
+     -linkpkg test.ml -o test
    v}
 
    {2 Security and type safety}
