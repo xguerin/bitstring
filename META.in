@@ -1,14 +1,14 @@
-name="pgocaml"
-version="1.1"
-description="PG'OCaml is a set of OCaml bindings for the PostgreSQL database."
-requires="unix,extlib,csv,pcre,calendar"
-archive(byte)="pgocaml.cma"
-archive(native)="pgocaml.cmxa"
+name="bitmatch"
+version="@PACKAGE_VERSION@"
+description="Bitstrings and bitstring matching"
+requires="camlp4"
+archive(byte)="bitmatch.cma"
+archive(native)="bitmatch.cmxa"
 
-package "statements" (
-  requires = "pgocaml,camlp4"
-  version = "1.1"
-  description = "Syntax extension: PostgreSQL statements checked at compile-time"
-  archive(syntax,preprocessor) = "pa_pgsql.cmo"
-  archive(syntax,toploop) = "pa_pgsql.cmo"
+package "syntax" (
+  requires = "bitmatch,camlp4"
+  version = "@PACKAGE_VERSION@"
+  description = "Syntax extension: bitmatch operators"
+  archive(syntax,preprocessor) = "pa_bitmatch.cmo"
+  archive(syntax,toploop) = "pa_bitmatch.cmo"
 )
