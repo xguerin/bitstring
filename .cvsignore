@@ -4,3 +4,11 @@
 *.cma
 *.cmxa
 ocaml-bitmatch-*.tar.gz
+Makefile
+META
+configure
+autom4te.cache
+config.h.in
+config.h
+config.log
+config.status
