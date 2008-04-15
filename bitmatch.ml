@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.ml,v 1.8 2008-04-02 11:06:07 rjones Exp $
+ * $Id: bitmatch.ml,v 1.9 2008-04-15 13:40:51 rjones Exp $
  *)
 
 open Printf
@@ -599,6 +599,31 @@ let construct_int64_be_unsigned buf v flen exn =
   if not (I64.range_unsigned v flen) then raise exn;
   (* Add the bytes. *)
   I64.map_bytes_be (Buffer._add_bits buf) (Buffer.add_byte buf) v flen
+
+(*----------------------------------------------------------------------*)
+(* Extract a string from a bitstring. *)
+
+let string_of_bitstring (data, off, len) =
+  if off land 7 = 0 && len land 7 = 0 then
+    (* Easy case: everything is byte-aligned. *)
+    String.sub data (off lsr 3) (len lsr 3)
+  else (
+    (* Bit-twiddling case. *)
+    let strlen = (len + 7) lsr 3 in
+    let str = String.make strlen '\000' in
+    let rec loop data off len i =
+      if len >= 8 then (
+	let c, off, len = extract_char_unsigned data off len 8 in
+	str.[i] <- Char.chr c;
+	loop data off len (i+1)
+      ) else if len > 0 then (
+	let c, off, len = extract_char_unsigned data off len len in
+	str.[i] <- Char.chr c
+      )
+    in
+    loop data off len 0;
+    str
+  )
 
 (*----------------------------------------------------------------------*)
 (* Display functions. *)

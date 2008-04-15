@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.mli,v 1.12 2008-04-02 13:59:37 rjones Exp $
+ * $Id: bitmatch.mli,v 1.13 2008-04-15 13:40:51 rjones Exp $
  *)
 
 (**
@@ -576,6 +576,18 @@ val hexdump_bitstring : out_channel -> bitstring -> unit
 val bitstring_length : bitstring -> int
 (** [bitstring_length bitstring] returns the length of
     the bitstring in bits. *)
+
+val string_of_bitstring : bitstring -> string
+(** [string_of_bitstring bitstring] converts a bitstring to a string
+    (eg. to allow comparison).
+
+    This function is inefficient.  In the best case when the bitstring
+    is nicely byte-aligned we do a [String.sub] operation.  If the
+    bitstring isn't aligned then this involves a lot of bit twiddling
+    and is particularly inefficient.
+
+    XXX This function wouldn't be needed so much if the [bitmatch]
+    operator allowed us to pattern-match on strings. *)
 
 (** {3 Bitstring buffer} *)
 
