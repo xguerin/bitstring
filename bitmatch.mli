@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.mli,v 1.14 2008-04-25 11:08:43 rjones Exp $
+ * $Id: bitmatch.mli,v 1.15 2008-04-25 12:08:51 rjones Exp $
  *)
 
 (**
@@ -249,9 +249,10 @@ bitmatch bits with
    but you can also match a constant, as in:
 
 {[
-| { 6 : 4 } -> ...
+| { (4|6) : 4 } -> ...
 
-   (* Only matches if the first 4 bits contain the integer 6. *)
+   (* Only matches if the first 4 bits contain either
+      the integer 4 or the integer 6. *)
 ]}
 
    {3:patternfieldreference Pattern field reference}
