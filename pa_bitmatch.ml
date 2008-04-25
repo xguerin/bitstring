@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: pa_bitmatch.ml,v 1.10 2008-04-25 12:55:39 rjones Exp $
+ * $Id: pa_bitmatch.ml,v 1.11 2008-04-25 14:57:11 rjones Exp $
  *)
 
 open Printf
@@ -59,11 +59,6 @@ let gensym =
   fun name ->
     incr i; let i = !i in
     sprintf "__pabitmatch_%s_%d" name i
-
-(* Heuristic test if a pattern is exhaustive. *)
-let pattern_is_exhaustive = function
-  | <:patt< $lid:_$ >> -> true
-  | _ -> false
 
 let rec parse_patt_field _loc fpatt flen qs =
   let fpc = parse_field_common _loc flen qs in
@@ -548,24 +543,14 @@ let output_bitmatch _loc bs cases =
 	  | Int, Some i when i > 0 && i <= 64 ->
 	      let extract_func = name_of_int_extract_const (i,endian,signed) in
 	      let v = gensym "val" in
-	      if pattern_is_exhaustive fpatt then
-		<:expr<
-		  if $lid:len$ >= $flen$ then (
-		    let $lid:v$, $lid:off$, $lid:len$ =
-		      Bitmatch.$lid:extract_func$ $lid:data$ $lid:off$ $lid:len$
-			$flen$ in
-		    match $lid:v$ with $fpatt$ -> $inner$
-		  )
-		>>
-	      else
-		<:expr<
-		  if $lid:len$ >= $flen$ then (
-		    let $lid:v$, $lid:off$, $lid:len$ =
-		      Bitmatch.$lid:extract_func$ $lid:data$ $lid:off$ $lid:len$
-			$flen$ in
-		    match $lid:v$ with $fpatt$ -> $inner$ | _ -> ()
-		  )
-		>>
+	      <:expr<
+		if $lid:len$ >= $flen$ then (
+		  let $lid:v$, $lid:off$, $lid:len$ =
+		    Bitmatch.$lid:extract_func$ $lid:data$ $lid:off$ $lid:len$
+		      $flen$ in
+		  match $lid:v$ with $fpatt$ when true -> $inner$ | _ -> ()
+		)
+	      >>
 
 	  | Int, Some _ ->
 	      Loc.raise _loc (Failure "length of int field must be [1..64]")
@@ -577,70 +562,41 @@ let output_bitmatch _loc bs cases =
 	  | Int, None ->
 	      let extract_func = name_of_int_extract (endian,signed) in
 	      let v = gensym "val" in
-	      if pattern_is_exhaustive fpatt then
-		<:expr<
-		  if $flen$ >= 1 && $flen$ <= 64 && $flen$ <= $lid:len$ then (
-		    let $lid:v$, $lid:off$, $lid:len$ =
-		      Bitmatch.$lid:extract_func$ $lid:data$ $lid:off$ $lid:len$
-			$flen$ in
-		    match $lid:v$ with $fpatt$ -> $inner$
-		  )
-	        >>
-	      else
-		<:expr<
-		  if $flen$ >= 1 && $flen$ <= 64 && $flen$ <= $lid:len$ then (
-		    let $lid:v$, $lid:off$, $lid:len$ =
-		      Bitmatch.$lid:extract_func$ $lid:data$ $lid:off$ $lid:len$
-			$flen$ in
-		    match $lid:v$ with $fpatt$ -> $inner$ | _ -> ()
-		  )
-	        >>
+	      <:expr<
+		if $flen$ >= 1 && $flen$ <= 64 && $flen$ <= $lid:len$ then (
+		  let $lid:v$, $lid:off$, $lid:len$ =
+		    Bitmatch.$lid:extract_func$ $lid:data$ $lid:off$ $lid:len$
+		      $flen$ in
+		  match $lid:v$ with $fpatt$ when true -> $inner$ | _ -> ()
+		)
+	      >>
 
           (* String, constant flen > 0. *)
 	  | String, Some i when i > 0 && i land 7 = 0 ->
 	      let bs = gensym "bs" in
-	      if pattern_is_exhaustive fpatt then
-		<:expr<
-		  if $lid:len$ >= $flen$ then (
-		    let $lid:bs$, $lid:off$, $lid:len$ =
-		      Bitmatch.extract_bitstring $lid:data$ $lid:off$ $lid:len$
-			$flen$ in
-		    match Bitmatch.string_of_bitstring $lid:bs$ with
-		    | $fpatt$ -> $inner$
-		  )
-		>>
-	      else
-		<:expr<
-		  if $lid:len$ >= $flen$ then (
-		    let $lid:bs$, $lid:off$, $lid:len$ =
-		      Bitmatch.extract_bitstring $lid:data$ $lid:off$ $lid:len$
-			$flen$ in
-		    match Bitmatch.string_of_bitstring $lid:bs$ with
-		    | $fpatt$ -> $inner$
-		    | _ -> ()
-		  )
-		>>
+	      <:expr<
+		if $lid:len$ >= $flen$ then (
+		  let $lid:bs$, $lid:off$, $lid:len$ =
+		    Bitmatch.extract_bitstring $lid:data$ $lid:off$ $lid:len$
+		      $flen$ in
+		  match Bitmatch.string_of_bitstring $lid:bs$ with
+		  | $fpatt$ when true -> $inner$
+		  | _ -> ()
+		)
+	      >>
 
           (* String, constant flen = -1, means consume all the
 	   * rest of the input.
 	   *)
 	  | String, Some i when i = -1 ->
 	      let bs = gensym "bs" in
-	      if pattern_is_exhaustive fpatt then
-		<:expr<
-		  let $lid:bs$, $lid:off$, $lid:len$ =
-		    Bitmatch.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
-		  match Bitmatch.string_of_bitstring $lid:bs$ with
-		  | $fpatt$ -> $inner$
-		>>
-	      else
-		<:expr<
-		  let $lid:bs$, $lid:off$, $lid:len$ =
-		    Bitmatch.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
-		  match Bitmatch.string_of_bitstring $lid:bs$ with
-		  | $fpatt$ -> $inner$
-		  | _ -> ()
-		>>
+	      <:expr<
+		let $lid:bs$, $lid:off$, $lid:len$ =
+		  Bitmatch.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
+		match Bitmatch.string_of_bitstring $lid:bs$ with
+		| $fpatt$ when true -> $inner$
+		| _ -> ()
+	      >>
 
 	  | String, Some _ ->
 	      Loc.raise _loc (Failure "length of string must be > 0 and a multiple of 8, or the special value -1")
@@ -650,29 +606,17 @@ let output_bitmatch _loc bs cases =
 	   *)
 	  | String, None ->
 	      let bs = gensym "bs" in
-	      if pattern_is_exhaustive fpatt then
-		<:expr<
-		  if $flen$ >= 0 && $flen$ <= $lid:len$
-		    && $flen$ land 7 = 0 then (
-		      let $lid:bs$, $lid:off$, $lid:len$ =
-			Bitmatch.extract_bitstring
-			  $lid:data$ $lid:off$ $lid:len$ $flen$ in
-		      match Bitmatch.string_of_bitstring $lid:bs$ with
-		      | $fpatt$ -> $inner$
-		    )
-		>>
-	      else
-		<:expr<
-		  if $flen$ >= 0 && $flen$ <= $lid:len$
-		    && $flen$ land 7 = 0 then (
-		      let $lid:bs$, $lid:off$, $lid:len$ =
-			Bitmatch.extract_bitstring
-			  $lid:data$ $lid:off$ $lid:len$ $flen$ in
-		      match Bitmatch.string_of_bitstring $lid:bs$ with
-		      | $fpatt$ -> $inner$
-		      | _ -> ()
-		    )
-		>>
+	      <:expr<
+		if $flen$ >= 0 && $flen$ <= $lid:len$
+		  && $flen$ land 7 = 0 then (
+		    let $lid:bs$, $lid:off$, $lid:len$ =
+		      Bitmatch.extract_bitstring
+			$lid:data$ $lid:off$ $lid:len$ $flen$ in
+		    match Bitmatch.string_of_bitstring $lid:bs$ with
+		    | $fpatt$ when true -> $inner$
+		    | _ -> ()
+		  )
+	      >>
 
           (* Bitstring, constant flen >= 0.
 	   * At the moment all we can do is assign the bitstring to an
