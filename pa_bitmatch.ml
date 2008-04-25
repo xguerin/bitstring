@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: pa_bitmatch.ml,v 1.7 2008-04-25 10:44:00 rjones Exp $
+ * $Id: pa_bitmatch.ml,v 1.8 2008-04-25 11:08:43 rjones Exp $
  *)
 
 open Printf
@@ -688,13 +688,15 @@ EXTEND Gram
   ];
 
   match_case: [
-    [ "_";
+    [ "{"; "_"; "}";
       bind = OPT [ "as"; name = LIDENT -> name ];
       w = OPT [ "when"; e = expr -> e ]; "->";
       code = expr ->
 	(Bind bind, w, code)
     ]
-  | [ fields = LIST0 field SEP ";";
+  | [ "{";
+      fields = LIST0 field SEP ";";
+      "}";
       w = OPT [ "when"; e = expr -> e ]; "->";
       code = expr ->
 	(Fields fields, w, code)
@@ -703,14 +705,16 @@ EXTEND Gram
 
   (* 'bitmatch' expressions. *)
   expr: LEVEL ";" [
-    [ "bitmatch"; bs = expr; "with"; OPT "|";
+    [ "bitmatch";
+      bs = expr; "with"; OPT "|";
       cases = LIST1 match_case SEP "|" ->
 	output_bitmatch _loc bs cases
     ]
 
   (* Constructor. *)
-  | [ "BITSTRING";
-      fields = LIST0 field SEP ";" ->
+  | [ "BITSTRING"; "{";
+      fields = LIST0 field SEP ";";
+      "}" ->
 	output_constructor _loc fields
     ]
   ];

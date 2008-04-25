@@ -1,11 +1,11 @@
-$Id: TODO,v 1.1 2008-04-15 13:41:14 rjones Exp $
+$Id: TODO,v 1.2 2008-04-25 11:08:43 rjones Exp $
 Major to-do items.
 
 (1) In bitmatch operator, use patterns not expressions.
 
 (2) Allow matching against strings.
 
-(3) Change the syntax so { ... } surrounds match patterns.
+(3) DONE - Change the syntax so { ... } surrounds match patterns.
 
 (4) Provide UInt32 and UInt64 types.
 
@@ -20,3 +20,11 @@ Major to-do items.
     { start : 16;
       another : 16 : align(32);     (* implicit 16 bit gap before this *)
     }
+
+(7) Assertions:
+
+    { start : 16 : assert (offset = 0); }
+
+   (Q: Are these evaluated at compile time or at run time or selectable?)
+
+(8) Named but unbound patterns to avoid "Warning Y: unused variable".

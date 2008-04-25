@@ -1,5 +1,5 @@
 (* Read in IPv4 and IPv6 ping packets and display them.
- * $Id: 60_ping.ml,v 1.2 2008-04-01 15:22:46 rjones Exp $
+ * $Id: 60_ping.ml,v 1.3 2008-04-25 11:08:43 rjones Exp $
  *)
 
 open Printf
@@ -7,13 +7,13 @@ open Printf
 let display pkt =
   bitmatch pkt with
   (* IPv4 packet header *)
-  | 4 : 4; hdrlen : 4; tos : 8; length : 16;
-    identification : 16; flags : 3; fragoffset : 13;
-    ttl : 8; protocol : 8; checksum : 16;
-    source : 32;
-    dest : 32;
-    options : (hdrlen-5)*32 : bitstring;
-    payload : -1 : bitstring ->
+  | { 4 : 4; hdrlen : 4; tos : 8; length : 16;
+      identification : 16; flags : 3; fragoffset : 13;
+      ttl : 8; protocol : 8; checksum : 16;
+      source : 32;
+      dest : 32;
+      options : (hdrlen-5)*32 : bitstring;
+      payload : -1 : bitstring } ->
 
     printf "IPv4:\n";
     printf "  header length: %d * 32 bit words\n" hdrlen;
@@ -32,11 +32,11 @@ let display pkt =
     Bitmatch.hexdump_bitstring stdout payload
 
   (* IPv6 packet header *)
-  | 6 : 4; tclass : 8; flow : 20;
-    length : 16; nexthdr : 8; ttl : 8;
-    source : 128 : bitstring;
-    dest : 128 : bitstring;
-    payload : -1 : bitstring ->
+  | { 6 : 4; tclass : 8; flow : 20;
+      length : 16; nexthdr : 8; ttl : 8;
+      source : 128 : bitstring;
+      dest : 128 : bitstring;
+      payload : -1 : bitstring } ->
 
     printf "IPv6:\n";
     printf "  traffic class: %d\n" tclass;
@@ -51,11 +51,11 @@ let display pkt =
     printf "packet payload:\n";
     Bitmatch.hexdump_bitstring stdout payload
 
-  | version : 4 ->
+  | { version : 4 } ->
     eprintf "unknown IP version %d\n" version;
     exit 1
 
-  | _ as pkt ->
+  | { _ } as pkt ->
     eprintf "data is smaller than one nibble:\n";
     Bitmatch.hexdump_bitstring stderr pkt;
     exit 1

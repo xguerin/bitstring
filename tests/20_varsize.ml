@@ -1,5 +1,5 @@
 (* Construct and match against random variable sized strings.
- * $Id: 20_varsize.ml,v 1.1 2008-04-01 17:05:37 rjones Exp $
+ * $Id: 20_varsize.ml,v 1.2 2008-04-25 11:08:43 rjones Exp $
  *)
 
 open Printf
@@ -56,11 +56,12 @@ let () =
     (* Construct the bitstring. *)
     let bits =
       try
-	(BITSTRING
-	  n0 : n0sz;
-          n1 : n1sz;
-	  n2 : n2sz;
-	  n3 : n3sz)
+	(BITSTRING {
+	   n0 : n0sz;
+           n1 : n1sz;
+	   n2 : n2sz;
+	   n3 : n3sz
+	 })
       with
 	Bitmatch.Construct_failure (msg, _, _, _) ->
 	  eprintf "FAILED: Construct_failure %s\n%!" msg;
@@ -70,7 +71,7 @@ let () =
 
     let r0, r1, r2, r3 =
       bitmatch bits with
-      | r0 : n0sz; r1 : n1sz; r2 : n2sz; r3 : n3sz; rest : -1 : bitstring ->
+      | { r0 : n0sz; r1 : n1sz; r2 : n2sz; r3 : n3sz; rest : -1 : bitstring } ->
 	  let rest_len = Bitmatch.bitstring_length rest in
           if rest_len <> 0 then (
 	    eprintf "FAILED: rest is not zero length (length = %d)\n%!"
@@ -79,7 +80,7 @@ let () =
 	    exit 2
 	  );
           r0, r1, r2, r3
-      | _ ->
+      | { _ } ->
 	  eprintf "FAILED: bitmatch operator did not match\n%!";
 	  dump n0 n0sz n1 n1sz n2 n2sz n3 n3sz bits 0L 0L 0L 0L;
 	  exit 2 in

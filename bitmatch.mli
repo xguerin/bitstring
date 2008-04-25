@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.mli,v 1.13 2008-04-15 13:40:51 rjones Exp $
+ * $Id: bitmatch.mli,v 1.14 2008-04-25 11:08:43 rjones Exp $
  *)
 
 (**
@@ -55,13 +55,13 @@ let display pkt =
    |                    Options                    |    Padding    |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
   *)
-  | 4 : 4; hdrlen : 4; tos : 8;   length : 16;
-    identification : 16;          flags : 3; fragoffset : 13;
-    ttl : 8; protocol : 8;        checksum : 16;
-    source : 32;
-    dest : 32;
-    options : (hdrlen-5)*32 : bitstring;
-    payload : -1 : bitstring ->
+  | { 4 : 4; hdrlen : 4; tos : 8;   length : 16;
+      identification : 16;          flags : 3; fragoffset : 13;
+      ttl : 8; protocol : 8;        checksum : 16;
+      source : 32;
+      dest : 32;
+      options : (hdrlen-5)*32 : bitstring;
+      payload : -1 : bitstring } ->
 
     printf "IPv4:\n";
     printf "  header length: %d * 32 bit words\n" hdrlen;
@@ -79,11 +79,11 @@ let display pkt =
     printf "  packet payload:\n";
     Bitmatch.hexdump_bitstring stdout payload
 
-  | version : 4 ->
+  | { version : 4 } ->
     eprintf "unknown IP version %d\n" version;
     exit 1
 
-  | _ as pkt ->
+  | { _ } as pkt ->
     eprintf "data is smaller than one nibble:\n";
     Bitmatch.hexdump_bitstring stderr pkt;
     exit 1
@@ -97,22 +97,22 @@ let bits = Bitmatch.bitstring_of_file "tests/ext3_sb"
 
 let () =
   bitmatch bits with
-  | s_inodes_count : 32 : littleendian;       (* Inodes count *)
-    s_blocks_count : 32 : littleendian;       (* Blocks count *)
-    s_r_blocks_count : 32 : littleendian;     (* Reserved blocks count *)
-    s_free_blocks_count : 32 : littleendian;  (* Free blocks count *)
-    s_free_inodes_count : 32 : littleendian;  (* Free inodes count *)
-    s_first_data_block : 32 : littleendian;   (* First Data Block *)
-    s_log_block_size : 32 : littleendian;     (* Block size *)
-    s_log_frag_size : 32 : littleendian;      (* Fragment size *)
-    s_blocks_per_group : 32 : littleendian;   (* # Blocks per group *)
-    s_frags_per_group : 32 : littleendian;    (* # Fragments per group *)
-    s_inodes_per_group : 32 : littleendian;   (* # Inodes per group *)
-    s_mtime : 32 : littleendian;              (* Mount time *)
-    s_wtime : 32 : littleendian;              (* Write time *)
-    s_mnt_count : 16 : littleendian;          (* Mount count *)
-    s_max_mnt_count : 16 : littleendian;      (* Maximal mount count *)
-    0xef53 : 16 : littleendian ->             (* Magic signature *)
+  | { s_inodes_count : 32 : littleendian;       (* Inodes count *)
+      s_blocks_count : 32 : littleendian;       (* Blocks count *)
+      s_r_blocks_count : 32 : littleendian;     (* Reserved blocks count *)
+      s_free_blocks_count : 32 : littleendian;  (* Free blocks count *)
+      s_free_inodes_count : 32 : littleendian;  (* Free inodes count *)
+      s_first_data_block : 32 : littleendian;   (* First Data Block *)
+      s_log_block_size : 32 : littleendian;     (* Block size *)
+      s_log_frag_size : 32 : littleendian;      (* Fragment size *)
+      s_blocks_per_group : 32 : littleendian;   (* # Blocks per group *)
+      s_frags_per_group : 32 : littleendian;    (* # Fragments per group *)
+      s_inodes_per_group : 32 : littleendian;   (* # Inodes per group *)
+      s_mtime : 32 : littleendian;              (* Mount time *)
+      s_wtime : 32 : littleendian;              (* Write time *)
+      s_mnt_count : 16 : littleendian;          (* Mount count *)
+      s_max_mnt_count : 16 : littleendian;      (* Maximal mount count *)
+      0xef53 : 16 : littleendian } ->           (* Magic signature *)
 
     printf "ext3 superblock:\n";
     printf "  s_inodes_count = %ld\n" s_inodes_count;
@@ -120,7 +120,7 @@ let () =
     printf "  s_free_inodes_count = %ld\n" s_free_inodes_count;
     printf "  s_free_blocks_count = %ld\n" s_free_blocks_count
 
-  | _ ->
+  | { _ } ->
     eprintf "not an ext3 superblock!\n%!";
     exit 2
 ]}
@@ -139,10 +139,11 @@ let () =
 *)
 
 let make_message typ subtype param =
-  (BITSTRING
+  (BITSTRING {
      typ : 16;
      subtype : 16;
-     param : 32) ;;
+     param : 32
+   }) ;;
 ]}
 
    {2 Loading, creating bitstrings}
@@ -172,11 +173,11 @@ let make_message typ subtype param =
 
    The general form of [bitmatch] is:
 
-   [bitmatch] {i bitstring-expression} [with]
+   [bitmatch {] {i bitstring-expression} [} with]
 
-   [|] {i pattern} [->] {i code}
+   [| {] {i pattern} [} ->] {i code}
 
-   [|] {i pattern} [->] {i code}
+   [| {] {i pattern} [} ->] {i code}
 
    [|] ...
 
@@ -193,25 +194,25 @@ let make_message typ subtype param =
 {[
 bitmatch bits with
 
-| version : 8; name : 8; param : 8 -> ...
+| { version : 8; name : 8; param : 8 } -> ...
 
    (* Bitstring of at least 3 bytes.  First byte is the version
       number, second byte is a field called name, third byte is
       a field called parameter. *)
 
-| flag : 1 ->
+| { flag : 1 } ->
    printf "flag is %b\n" flag
 
    (* A single flag bit (mapped into an OCaml boolean). *)
 
-| len : 4; data : 1+len ->
+| { len : 4; data : 1+len } ->
    printf "len = %d, data = 0x%Lx\n" len data
 
    (* A 4-bit length, followed by 1-16 bits of data, where the
       length of the data is computed from len. *)
 
-| ipv6_source : 128 : bitstring;
-  ipv6_dest : 128 : bitstring -> ...
+| { ipv6_source : 128 : bitstring;
+    ipv6_dest : 128 : bitstring } -> ...
 
    (* IPv6 source and destination addresses.  Each is 128 bits
       and is mapped into a bitstring type which will be a substring
@@ -221,7 +222,7 @@ bitmatch bits with
    You can also add conditional when-clauses:
 
 {[
-| version : 4
+| { version : 4 }
     when version = 4 || version = 6 -> ...
 
    (* Only match and run the code when version is 4 or 6.  If
@@ -237,8 +238,8 @@ bitmatch bits with
    length is zero in the when-clause:
 
 {[
-| n : 4;
-  rest : -1 : bitstring
+| { n : 4;
+    rest : -1 : bitstring }
     when Bitmatch.bitstring_length rest = 0 -> ...
 
    (* Only matches exactly 4 bits. *)
@@ -248,7 +249,7 @@ bitmatch bits with
    but you can also match a constant, as in:
 
 {[
-| 6 : 4 -> ...
+| { 6 : 4 } -> ...
 
    (* Only matches if the first 4 bits contain the integer 6. *)
 ]}
@@ -302,11 +303,11 @@ bitmatch bits with
    bitstring and/or have a default match case:
 
 {[
-| _ -> ...
+| { _ } -> ...
 
    (* Default match case. *)
 
-| _ as pkt -> ...
+| { _ } as pkt -> ...
 
    (* Default match case, with 'pkt' bound to the whole bitstring. *)
 ]}
@@ -321,9 +322,10 @@ bitmatch bits with
 let version = 1 ;;
 let data = 10 ;;
 let bits =
-  BITSTRING
+  BITSTRING {
     version : 4;
-    data : 12 ;;
+    data : 12
+  } ;;
 
    (* Constructs a 16-bit bitstring with the first four bits containing
       the integer 1, and the following 12 bits containing the integer 10,
@@ -437,8 +439,8 @@ Bitmatch.hexdump_bitstring stdout bits ;;
 
 {[
 bitmatch bits with
-| len : 64;
-  buffer : Int64.to_int len : bitstring ->
+| { len : 64;
+    buffer : Int64.to_int len : bitstring } ->
 ]}
 
    The [len] field can be set arbitrarily large by an attacker, but
@@ -460,8 +462,9 @@ bitmatch bits with
 {[
 let len = read_untrusted_source () in
 let buffer = allocate_bitstring () in
-BITSTRING
+BITSTRING {
   buffer : len : bitstring
+}
 ]}
 
    This code merely causes a check that buffer's length is the same as
