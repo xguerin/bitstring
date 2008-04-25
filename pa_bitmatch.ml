@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: pa_bitmatch.ml,v 1.6 2008-04-02 08:05:58 rjones Exp $
+ * $Id: pa_bitmatch.ml,v 1.7 2008-04-25 10:44:00 rjones Exp $
  *)
 
 open Printf
@@ -175,7 +175,7 @@ let output_constructor _loc fields =
 
   (* Bitstrings are created like the 'Buffer' module (in fact, using
    * the Buffer module), by appending snippets to a growing buffer.
-   * This is reasonable efficient and avoids a lot of garbage.
+   * This is reasonably efficient and avoids a lot of garbage.
    *)
   let buffer = gensym "buffer" in
 
