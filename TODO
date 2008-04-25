@@ -1,9 +1,9 @@
-$Id: TODO,v 1.3 2008-04-25 12:08:51 rjones Exp $
+$Id: TODO,v 1.4 2008-04-25 12:55:39 rjones Exp $
 Major to-do items.
 
 (1) DONE - In bitmatch operator, use patterns not expressions.
 
-(2) Allow matching against strings.
+(2) DONE - Allow matching against strings.
 
 (3) DONE - Change the syntax so { ... } surrounds match patterns.
 
@@ -28,3 +28,7 @@ Major to-do items.
    (Q: Are these evaluated at compile time or at run time or selectable?)
 
 (8) Named but unbound patterns to avoid "Warning Y: unused variable".
+
+(9) DONE -
+    Make the error locations fine-grained, particularly so they point to
+    individual fields, not the whole match.

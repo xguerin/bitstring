@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: pa_bitmatch.ml,v 1.9 2008-04-25 12:08:51 rjones Exp $
+ * $Id: pa_bitmatch.ml,v 1.10 2008-04-25 12:55:39 rjones Exp $
  *)
 
 open Printf
@@ -51,7 +51,7 @@ and fcommon = {
   _loc : Loc.t;				(* location in source code *)
 }
 and endian = BigEndian | LittleEndian | NativeEndian
-and t = Int | Bitstring
+and t = Int | String | Bitstring
 
 (* Generate a fresh, unique symbol each time called. *)
 let gensym =
@@ -124,6 +124,13 @@ and parse_field_common _loc flen qs =
 		  let t = Some Int in
 		  (endian, signed, t)
 		)
+	    | "string" ->
+		if t <> None then
+		  Loc.raise _loc (Failure "a type flag has been set already")
+		else (
+		  let t = Some String in
+		  (endian, signed, t)
+		)
 	    | "bitstring" ->
 		if t <> None then
 		  Loc.raise _loc (Failure "a type flag has been set already")
@@ -135,13 +142,14 @@ and parse_field_common _loc flen qs =
 		Loc.raise _loc (Failure (s ^ ": unknown qualifier"))
 	) (None, None, None) qs in
 
-  (* If type is set to bitstring then endianness and signedness
-   * qualifiers are meaningless and must not be set.
+  (* If type is set to string or bitstring then endianness and
+   * signedness qualifiers are meaningless and must not be set.
    *)
-  if t = Some Bitstring && (endian <> None || signed <> None) then
-    Loc.raise _loc (
-      Failure "bitstring type and endian or signed qualifiers cannot be mixed"
-    );
+  if (t = Some Bitstring || t = Some String)
+    && (endian <> None || signed <> None) then
+      Loc.raise _loc (
+	Failure "string types and endian or signed qualifiers cannot be mixed"
+      );
 
   (* Default endianness, signedness, type. *)
   let endian = match endian with None -> BigEndian | Some e -> e in
@@ -163,6 +171,7 @@ let string_of_endian = function
 
 let string_of_t = function
   | Int -> "int"
+  | String -> "string"
   | Bitstring -> "bitstring"
 
 let rec string_of_patt_field { fpatt = fpatt; fpc = fpc } =
@@ -218,7 +227,8 @@ let output_constructor _loc fields =
 
   (* Convert each field to a simple bitstring-generating expression. *)
   let fields = List.map (
-    fun {fexpr=fexpr; fec={flen=flen; endian=endian; signed=signed; t=t}} ->
+    fun {fexpr=fexpr; fec={flen=flen; endian=endian; signed=signed;
+			   t=t; _loc=_loc}} ->
       (* Is flen an integer constant?  If so, what is it?  This
        * is very simple-minded and only detects simple constants.
        *)
@@ -313,6 +323,63 @@ let output_constructor _loc fields =
 			  $int:loc_line$, $int:loc_char$))
 	    >>
 
+        (* String, constant length > 0, must be a multiple of 8. *)
+	| String, Some i when i > 0 && i land 7 = 0 ->
+	    let bs = gensym "bs" in
+	    <:expr<
+	      let $lid:bs$ = $fexpr$ in
+	      if String.length $lid:bs$ = ($flen$ lsr 3) then
+		Bitmatch.construct_string $lid:buffer$ $lid:bs$
+	      else
+		raise (Bitmatch.Construct_failure
+			 ("length of string does not match declaration",
+			  $str:loc_fname$,
+			  $int:loc_line$, $int:loc_char$))
+	    >>
+
+	(* String, constant length -1, means variable length string
+	 * with no checks.
+	 *)
+	| String, Some (-1) ->
+	    <:expr< Bitmatch.construct_string $lid:buffer$ $fexpr$ >>
+
+	(* String, constant length = 0 is probably an error, and so is
+	 * any other value.
+	 *)
+	| String, Some _ ->
+	    Loc.raise _loc (Failure "length of string must be > 0 and a multiple of 8, or the special value -1")
+
+	(* String, non-constant length.
+	 * We check at runtime that the length is > 0, a multiple of 8,
+	 * and matches the declared length.
+	 *)
+	| String, None ->
+	    let bslen = gensym "bslen" in
+	    let bs = gensym "bs" in
+	    <:expr<
+	      let $lid:bslen$ = $flen$ in
+	      if $lid:bslen$ > 0 then (
+		if $lid:bslen$ land 7 = 0 then (
+		  let $lid:bs$ = $fexpr$ in
+		  if String.length $lid:bs$ = ($lid:bslen$ lsr 3) then
+		    Bitmatch.construct_string $lid:buffer$ $lid:bs$
+		  else
+		    raise (Bitmatch.Construct_failure
+			     ("length of string does not match declaration",
+			      $str:loc_fname$,
+			      $int:loc_line$, $int:loc_char$))
+		) else
+		  raise (Bitmatch.Construct_failure
+			   ("length of string must be a multiple of 8",
+			    $str:loc_fname$,
+			    $int:loc_line$, $int:loc_char$))
+	      ) else
+		raise (Bitmatch.Construct_failure
+			 ("length of string must be > 0",
+			  $str:loc_fname$,
+			  $int:loc_line$, $int:loc_char$))
+	    >>
+
         (* Bitstring, constant length > 0. *)
 	| Bitstring, Some i when i > 0 ->
 	    let bs = gensym "bs" in
@@ -333,7 +400,7 @@ let output_constructor _loc fields =
 	| Bitstring, Some (-1) ->
 	    <:expr< Bitmatch.construct_bitstring $lid:buffer$ $fexpr$ >>
 
-	(* Bitstring, constant length = 0 is probably an error, and so it
+	(* Bitstring, constant length = 0 is probably an error, and so is
 	 * any other value.
 	 *)
 	| Bitstring, Some _ ->
@@ -420,7 +487,8 @@ let output_bitmatch _loc bs cases =
   let rec output_field_extraction inner = function
     | [] -> inner
     | field :: fields ->
-	let {fpatt=fpatt; fpc={flen=flen; endian=endian; signed=signed; t=t}}
+	let {fpatt=fpatt; fpc={flen=flen; endian=endian; signed=signed;
+			       t=t; _loc=_loc}}
 	    = field in
 
 	(* Is flen an integer constant?  If so, what is it?  This
@@ -528,6 +596,84 @@ let output_bitmatch _loc bs cases =
 		  )
 	        >>
 
+          (* String, constant flen > 0. *)
+	  | String, Some i when i > 0 && i land 7 = 0 ->
+	      let bs = gensym "bs" in
+	      if pattern_is_exhaustive fpatt then
+		<:expr<
+		  if $lid:len$ >= $flen$ then (
+		    let $lid:bs$, $lid:off$, $lid:len$ =
+		      Bitmatch.extract_bitstring $lid:data$ $lid:off$ $lid:len$
+			$flen$ in
+		    match Bitmatch.string_of_bitstring $lid:bs$ with
+		    | $fpatt$ -> $inner$
+		  )
+		>>
+	      else
+		<:expr<
+		  if $lid:len$ >= $flen$ then (
+		    let $lid:bs$, $lid:off$, $lid:len$ =
+		      Bitmatch.extract_bitstring $lid:data$ $lid:off$ $lid:len$
+			$flen$ in
+		    match Bitmatch.string_of_bitstring $lid:bs$ with
+		    | $fpatt$ -> $inner$
+		    | _ -> ()
+		  )
+		>>
+
+          (* String, constant flen = -1, means consume all the
+	   * rest of the input.
+	   *)
+	  | String, Some i when i = -1 ->
+	      let bs = gensym "bs" in
+	      if pattern_is_exhaustive fpatt then
+		<:expr<
+		  let $lid:bs$, $lid:off$, $lid:len$ =
+		    Bitmatch.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
+		  match Bitmatch.string_of_bitstring $lid:bs$ with
+		  | $fpatt$ -> $inner$
+		>>
+	      else
+		<:expr<
+		  let $lid:bs$, $lid:off$, $lid:len$ =
+		    Bitmatch.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
+		  match Bitmatch.string_of_bitstring $lid:bs$ with
+		  | $fpatt$ -> $inner$
+		  | _ -> ()
+		>>
+
+	  | String, Some _ ->
+	      Loc.raise _loc (Failure "length of string must be > 0 and a multiple of 8, or the special value -1")
+
+	  (* String field, non-const flen.  We check the flen is > 0
+	   * and a multiple of 8 (-1 is not allowed here), at runtime.
+	   *)
+	  | String, None ->
+	      let bs = gensym "bs" in
+	      if pattern_is_exhaustive fpatt then
+		<:expr<
+		  if $flen$ >= 0 && $flen$ <= $lid:len$
+		    && $flen$ land 7 = 0 then (
+		      let $lid:bs$, $lid:off$, $lid:len$ =
+			Bitmatch.extract_bitstring
+			  $lid:data$ $lid:off$ $lid:len$ $flen$ in
+		      match Bitmatch.string_of_bitstring $lid:bs$ with
+		      | $fpatt$ -> $inner$
+		    )
+		>>
+	      else
+		<:expr<
+		  if $flen$ >= 0 && $flen$ <= $lid:len$
+		    && $flen$ land 7 = 0 then (
+		      let $lid:bs$, $lid:off$, $lid:len$ =
+			Bitmatch.extract_bitstring
+			  $lid:data$ $lid:off$ $lid:len$ $flen$ in
+		      match Bitmatch.string_of_bitstring $lid:bs$ with
+		      | $fpatt$ -> $inner$
+		      | _ -> ()
+		    )
+		>>
+
           (* Bitstring, constant flen >= 0.
 	   * At the moment all we can do is assign the bitstring to an
 	   * identifier.
@@ -536,6 +682,7 @@ let output_bitmatch _loc bs cases =
 	      let ident =
 		match fpatt with
 		| <:patt< $lid:ident$ >> -> ident
+		| <:patt< _ >> -> "_"
 		| _ ->
 		    Loc.raise _loc
 		      (Failure "cannot compare a bitstring to a constant") in

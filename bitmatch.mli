@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.mli,v 1.15 2008-04-25 12:08:51 rjones Exp $
+ * $Id: bitmatch.mli,v 1.16 2008-04-25 12:55:39 rjones Exp $
  *)
 
 (**
@@ -255,6 +255,15 @@ bitmatch bits with
       the integer 4 or the integer 6. *)
 ]}
 
+   One may also match on strings:
+
+{[
+| { "MAGIC" : 5*8 : string } -> ...
+
+   (* Only matches if the string "MAGIC" appears at the start
+      of the input. *)
+]}
+
    {3:patternfieldreference Pattern field reference}
 
    The exact format of each pattern field is:
@@ -285,6 +294,7 @@ bitmatch bits with
    signedness and endianness of the field.  Permissible qualifiers are:
 
    - [int] (field has an integer type)
+   - [string] (field is a string type)
    - [bitstring] (field is a bitstring type)
    - [signed] (field is signed)
    - [unsigned] (field is unsigned)
@@ -433,16 +443,16 @@ Bitmatch.hexdump_bitstring stdout bits ;;
    overflows.  In addition to OCaml's normal bounds checks, we check
    that field lengths are >= 0, and many additional checks.
 
-   Denial of service attacks are more problematic although we still
-   believe that the library is robust.  We only work forwards through
-   the bitstring, thus computation will eventually terminate.  As for
-   computed lengths, code such as this is thought to be secure:
+   Denial of service attacks are more problematic.  We only work
+   forwards through the bitstring, thus computation will eventually
+   terminate.  As for computed lengths, code such as this is thought
+   to be secure:
 
-{[
-bitmatch bits with
-| { len : 64;
-    buffer : Int64.to_int len : bitstring } ->
-]}
+   {[
+   bitmatch bits with
+   | { len : 64;
+       buffer : Int64.to_int len : bitstring } ->
+   ]}
 
    The [len] field can be set arbitrarily large by an attacker, but
    when pattern-matching against the [buffer] field this merely causes
@@ -451,22 +461,28 @@ bitmatch bits with
    allocation of sub-bitstrings is efficient and doesn't involve an
    arbitary-sized allocation or any copying.
 
-   The main protection against attackers should therefore be to ensure
-   that the main program will only read input bitstrings up to a
-   certain length, which is outside the scope of this library.
+   However the above does not necessarily apply to strings used in
+   matching, since they may cause the library to use the
+   {!Bitmatch.string_of_bitstring} function, which allocates a string.
+   So you should take care if you use the [string] type particularly
+   with a computed length that is derived from external input.
+
+   The main protection against attackers should be to ensure that the
+   main program will only read input bitstrings up to a certain
+   length, which is outside the scope of this library.
 
    {3 Security on output}
 
    As with the input side, computed lengths are believed to be
    safe.  For example:
 
-{[
-let len = read_untrusted_source () in
-let buffer = allocate_bitstring () in
-BITSTRING {
-  buffer : len : bitstring
-}
-]}
+   {[
+   let len = read_untrusted_source () in
+   let buffer = allocate_bitstring () in
+   BITSTRING {
+   buffer : len : bitstring
+   }
+   ]}
 
    This code merely causes a check that buffer's length is the same as
    [len].  However the program function [allocate_bitstring] must
@@ -588,10 +604,7 @@ val string_of_bitstring : bitstring -> string
     This function is inefficient.  In the best case when the bitstring
     is nicely byte-aligned we do a [String.sub] operation.  If the
     bitstring isn't aligned then this involves a lot of bit twiddling
-    and is particularly inefficient.
-
-    XXX This function wouldn't be needed so much if the [bitmatch]
-    operator allowed us to pattern-match on strings. *)
+    and is particularly inefficient. *)
 
 (** {3 Bitstring buffer} *)
 

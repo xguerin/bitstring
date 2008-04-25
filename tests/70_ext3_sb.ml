@@ -1,5 +1,5 @@
 (* Parse an ext3 superblock.
- * $Id: 70_ext3_sb.ml,v 1.2 2008-04-25 11:08:43 rjones Exp $
+ * $Id: 70_ext3_sb.ml,v 1.3 2008-04-25 12:55:39 rjones Exp $
  *)
 
 open Printf
@@ -43,14 +43,14 @@ let () =
       s_feature_compat : 32 : littleendian;	(* compatible feature set *)
       s_feature_incompat : 32 : littleendian;	(* incompatible feature set *)
       s_feature_ro_compat : 32 : littleendian;	(* readonly-compatible feature set *)
-      s_uuid : 128 : bitstring;		        (* 128-bit uuid for volume *)
-      s_volume_name : 128 : bitstring;	        (* volume name XXX string *)
-      s_last_mounted : 512 : bitstring;	        (* directory where last mounted XXX string *)
+      s_uuid : 128 : string;		        (* 128-bit uuid for volume *)
+      s_volume_name : 128 : string;	        (* volume name *)
+      s_last_mounted : 512 : string;	        (* directory where last mounted *)
       s_algorithm_usage_bitmap : 32 : littleendian; (* For compression *)
       s_prealloc_blocks : 8;	                (* Nr of blocks to try to preallocate*)
       s_prealloc_dir_blocks : 8;	        (* Nr to preallocate for dirs *)
       s_reserved_gdt_blocks : 16 : littleendian;(* Per group desc for online growth *)
-      s_journal_uuid : 128 : bitstring;	        (* uuid of journal superblock *)
+      s_journal_uuid : 128 : string;	        (* uuid of journal superblock *)
       s_journal_inum : 32 : littleendian;	(* inode number of journal file *)
       s_journal_dev : 32 : littleendian;	(* device number of journal file *)
       s_last_orphan : 32 : littleendian;	(* start of list of inodes to delete *)
@@ -63,13 +63,16 @@ let () =
       s_reserved_word_pad : 16 : littleendian;
       s_default_mount_opts : 32 : littleendian;
       s_first_meta_bg : 32 : littleendian;	(* First metablock block group *)
-      s_reserved : 6080 : bitstring } ->        (* Padding to the end of the block *)
+      _ : 6080 : bitstring } ->                 (* Padding to the end of the block *)
 
     printf "ext3 superblock:\n";
     printf "  s_inodes_count = %ld\n" s_inodes_count;
     printf "  s_blocks_count = %ld\n" s_blocks_count;
     printf "  s_free_inodes_count = %ld\n" s_free_inodes_count;
-    printf "  s_free_blocks_count = %ld\n" s_free_blocks_count
+    printf "  s_free_blocks_count = %ld\n" s_free_blocks_count;
+    printf "  s_uuid = %S\n" s_uuid;
+    printf "  s_volume_name = %S\n" s_volume_name;
+    printf "  s_last_mounted = %S\n" s_last_mounted
 
   | { _ } ->
     eprintf "not an ext3 superblock!\n%!";
