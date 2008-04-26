@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.ml,v 1.9 2008-04-15 13:40:51 rjones Exp $
+ * $Id: bitmatch.ml,v 1.10 2008-04-26 20:35:02 rjones Exp $
  *)
 
 open Printf
@@ -41,6 +41,8 @@ let make_bitstring len c = String.make ((len+7) lsr 3) c, 0, len
 
 let create_bitstring len = make_bitstring len '\000'
 
+let bitstring_of_string str = str, 0, String.length str lsl 3
+
 let bitstring_of_chan chan =
   let tmpsize = 16384 in
   let buf = Buffer.create tmpsize in
@@ -50,6 +52,54 @@ let bitstring_of_chan chan =
     Buffer.add_substring buf tmp 0 !n;
   done;
   Buffer.contents buf, 0, Buffer.length buf lsl 3
+
+let bitstring_of_chan_max chan max =
+  let tmpsize = 16384 in
+  let buf = Buffer.create tmpsize in
+  let tmp = String.create tmpsize in
+  let len = ref 0 in
+  let rec loop () =
+    if !len < max then (
+      let r = min tmpsize (max - !len) in
+      let n = input chan tmp 0 r in
+      if n > 0 then (
+	Buffer.add_substring buf tmp 0 n;
+	len := !len + n;
+	loop ()
+      )
+    )
+  in
+  loop ();
+  Buffer.contents buf, 0, !len lsl 3
+
+let bitstring_of_file_descr fd =
+  let tmpsize = 16384 in
+  let buf = Buffer.create tmpsize in
+  let tmp = String.create tmpsize in
+  let n = ref 0 in
+  while n := Unix.read fd tmp 0 tmpsize; !n > 0 do
+    Buffer.add_substring buf tmp 0 !n;
+  done;
+  Buffer.contents buf, 0, Buffer.length buf lsl 3
+
+let bitstring_of_file_descr_max fd max =
+  let tmpsize = 16384 in
+  let buf = Buffer.create tmpsize in
+  let tmp = String.create tmpsize in
+  let len = ref 0 in
+  let rec loop () =
+    if !len < max then (
+      let r = min tmpsize (max - !len) in
+      let n = Unix.read fd tmp 0 r in
+      if n > 0 then (
+	Buffer.add_substring buf tmp 0 n;
+	len := !len + n;
+	loop ()
+      )
+    )
+  in
+  loop ();
+  Buffer.contents buf, 0, !len lsl 3
 
 let bitstring_of_file fname =
   let chan = open_in_bin fname in

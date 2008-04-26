@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.mli,v 1.16 2008-04-25 12:55:39 rjones Exp $
+ * $Id: bitmatch.mli,v 1.17 2008-04-26 20:35:02 rjones Exp $
  *)
 
 (**
@@ -533,13 +533,15 @@ type bitstring = string * int * int
     The type contains the underlying data (a string),
     the current bit offset within the string and the
     current bit length of the string (counting from the
-    bit offset).  Note that the offsets are bits, not bytes.
+    bit offset).  Note that the offset and length are
+    in {b bits}, not bytes.
 
     Normally you don't need to use the bitstring type
     directly, since there are functions and syntax
     extensions which hide the details.
-    See {!bitstring_of_file}, {!hexdump_bitstring},
-    {!bitstring_length}.
+
+    See also {!bitstring_of_string}, {!bitstring_of_file},
+    {!hexdump_bitstring}, {!bitstring_length}.
 *)
 
 (** {3 Exceptions} *)
@@ -576,22 +578,46 @@ val make_bitstring : int -> char -> bitstring
 
     Note that the length is in bits, not bytes. *)
 
+val bitstring_of_string : string -> bitstring
+(** [bitstring_of_string str] creates a bitstring
+    of length [String.length str * 8] (bits) containing the
+    bits in [str].
+
+    Note that the bitstring uses [str] as the underlying
+    string (see the representation of {!bitstring}) so you
+    should not change [str] after calling this. *)
+
+val bitstring_of_file : string -> bitstring
+(** [bitstring_of_file filename] loads the named file
+    into a bitstring. *)
+
 val bitstring_of_chan : in_channel -> bitstring
 (** [bitstring_of_chan chan] loads the contents of
     the input channel [chan] as a bitstring.
 
     The length of the final bitstring is determined
     by the remaining input in [chan], but will always
-    be a multiple of 8 bits. *)
+    be a multiple of 8 bits.
 
-val bitstring_of_file : string -> bitstring
-(** [bitstring_of_file filename] loads the named file
-    into a bitstring. *)
+    See also {!bitstring_of_chan_max}. *)
 
-val hexdump_bitstring : out_channel -> bitstring -> unit
-(** [hexdump_bitstring chan bitstring] prints the bitstring
-    to the output channel in a format similar to the
-    Unix command [hexdump -C]. *)
+val bitstring_of_chan_max : in_channel -> int -> bitstring
+(** [bitstring_of_chan_max chan max] works like
+    {!bitstring_of_chan} but will only read up to
+    [max] bytes from the channel (or fewer if the end of input
+    occurs before that). *)
+
+val bitstring_of_file_descr : Unix.file_descr -> bitstring
+(** [bitstring_of_file_descr fd] loads the contents of
+    the file descriptor [fd] as a bitstring.
+
+    See also {!bitstring_of_chan}, {!bitstring_of_file_descr_max}. *)
+
+val bitstring_of_file_descr_max : Unix.file_descr -> int -> bitstring
+(** [bitstring_of_file_descr_max fd max] works like
+    {!bitstring_of_file_descr} but will only read up to
+    [max] bytes from the channel (or fewer if the end of input
+    occurs before that). *)
 
 val bitstring_length : bitstring -> int
 (** [bitstring_length bitstring] returns the length of
@@ -605,6 +631,13 @@ val string_of_bitstring : bitstring -> string
     is nicely byte-aligned we do a [String.sub] operation.  If the
     bitstring isn't aligned then this involves a lot of bit twiddling
     and is particularly inefficient. *)
+
+(** {3 Printing bitstrings} *)
+
+val hexdump_bitstring : out_channel -> bitstring -> unit
+(** [hexdump_bitstring chan bitstring] prints the bitstring
+    to the output channel in a format similar to the
+    Unix command [hexdump -C]. *)
 
 (** {3 Bitstring buffer} *)
 
