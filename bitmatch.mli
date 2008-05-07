@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.mli,v 1.17 2008-04-26 20:35:02 rjones Exp $
+ * $Id: bitmatch.mli,v 1.18 2008-05-07 14:37:00 rjones Exp $
  *)
 
 (**
@@ -692,3 +692,5 @@ val construct_char_unsigned : Buffer.t -> int -> int -> exn -> unit
 val construct_int_be_unsigned : Buffer.t -> int -> int -> exn -> unit
 
 val construct_int64_be_unsigned : Buffer.t -> int64 -> int -> exn -> unit
+
+val construct_string : Buffer.t -> string -> unit

@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.ml,v 1.10 2008-04-26 20:35:02 rjones Exp $
+ * $Id: bitmatch.ml,v 1.11 2008-05-07 14:37:00 rjones Exp $
  *)
 
 open Printf
@@ -649,6 +649,13 @@ let construct_int64_be_unsigned buf v flen exn =
   if not (I64.range_unsigned v flen) then raise exn;
   (* Add the bytes. *)
   I64.map_bytes_be (Buffer._add_bits buf) (Buffer.add_byte buf) v flen
+
+(* Construct from a string of bytes, exact multiple of 8 bits
+ * in length of course.
+ *)
+let construct_string buf str =
+  let len = String.length str in
+  Buffer.add_bits buf str (len lsl 3)
 
 (*----------------------------------------------------------------------*)
 (* Extract a string from a bitstring. *)

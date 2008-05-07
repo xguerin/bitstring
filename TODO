@@ -1,4 +1,4 @@
-$Id: TODO,v 1.4 2008-04-25 12:55:39 rjones Exp $
+$Id: TODO,v 1.5 2008-05-07 14:37:00 rjones Exp $
 Major to-do items.
 
 (1) DONE - In bitmatch operator, use patterns not expressions.
@@ -32,3 +32,6 @@ Major to-do items.
 (9) DONE -
     Make the error locations fine-grained, particularly so they point to
     individual fields, not the whole match.
+
+(10) Cross-module, persistent, named patterns, see:
+  http://caml.inria.fr/pub/ml-archives/caml-list/2008/04/25992c9c9fa999fe1d35d961dd9917a2.en.html
