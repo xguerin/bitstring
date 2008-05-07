@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #
-# $Id: Makefile.in,v 1.4 2008-04-02 13:22:46 rjones Exp $
+# $Id: Makefile.in,v 1.5 2008-05-07 14:41:03 rjones Exp $
 
 PACKAGE		= @PACKAGE_NAME@
 VERSION		= @PACKAGE_VERSION@
@@ -54,7 +54,7 @@ test: pa_bitmatch.cmo bitmatch.cma
 	@for f in $(TESTS); do \
 	  echo Test: $$f; \
 	  $(OCAMLFIND) ocamlc $(OCAMLCFLAGS) -pp "camlp4o pa_bitmatch.cmo" \
-	    -I . bitmatch.cma $$f.ml -o $$f; \
+	    -package unix -linkpkg -I . bitmatch.cma $$f.ml -o $$f; \
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	  $$f; \
 	  if [ $$? -ne 0 ]; then exit 1; fi; \

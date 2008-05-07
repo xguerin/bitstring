@@ -1,6 +1,7 @@
 name="bitmatch"
 version="@PACKAGE_VERSION@"
 description="Bitstrings and bitstring matching"
+requires="unix"
 archive(byte)="bitmatch.cma"
 archive(native)="bitmatch.cmxa"
 
