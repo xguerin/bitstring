@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.ml,v 1.11 2008-05-07 14:37:00 rjones Exp $
+ * $Id: bitmatch.ml,v 1.12 2008-05-07 14:56:53 rjones Exp $
  *)
 
 open Printf
@@ -624,7 +624,7 @@ module Buffer = struct
 end
 
 (* Construct a single bit. *)
-let construct_bit buf b _ =
+let construct_bit buf b _ _ =
   Buffer.add_bit buf b
 
 (* Construct a field, flen = [2..8]. *)
@@ -642,6 +642,17 @@ let construct_int_be_unsigned buf v flen exn =
   if not (I.range_unsigned v flen) then raise exn;
   (* Add the bytes. *)
   I.map_bytes_be (Buffer._add_bits buf) (Buffer.add_byte buf) v flen
+
+(* Construct a field of exactly 32 bits. *)
+let construct_int32_be_unsigned buf v flen _ =
+  Buffer.add_byte buf
+    (Int32.to_int (Int32.shift_right_logical v 24));
+  Buffer.add_byte buf
+    (Int32.to_int ((Int32.logand (Int32.shift_right_logical v 16) 0xff_l)));
+  Buffer.add_byte buf
+    (Int32.to_int ((Int32.logand (Int32.shift_right_logical v 8) 0xff_l)));
+  Buffer.add_byte buf
+    (Int32.to_int (Int32.logand v 0xff_l))
 
 (* Construct a field of up to 64 bits. *)
 let construct_int64_be_unsigned buf v flen exn =
