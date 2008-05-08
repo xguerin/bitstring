@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.ml,v 1.12 2008-05-07 14:56:53 rjones Exp $
+ * $Id: bitmatch.ml,v 1.13 2008-05-08 21:28:28 rjones Exp $
  *)
 
 open Printf
@@ -480,6 +480,9 @@ let _make_int64_be c0 c1 c2 c3 c4 c5 c6 c7 =
        (Int64.shift_left c6 8))
     c7
 
+let _make_int64_le c0 c1 c2 c3 c4 c5 c6 c7 =
+  _make_int64_be c7 c6 c5 c4 c3 c2 c1 c0
+
 (* Extract [1..64] bits.  We have to consider endianness and signedness. *)
 let extract_int64_be_unsigned data off len flen =
   let byteoff = off lsr 3 in
@@ -520,6 +523,49 @@ let extract_int64_be_unsigned data off len flen =
 	let c6 = Int64.of_int c6 in
 	let c7 = Int64.of_int c7 in
 	_make_int64_be c0 c1 c2 c3 c4 c5 c6 c7 in
+      Int64.shift_right_logical word (64 - flen)
+    ) in
+  word, off+flen, len-flen
+
+let extract_int64_le_unsigned data off len flen =
+  let byteoff = off lsr 3 in
+
+  let strlen = String.length data in
+
+  let word =
+    (* Optimize the common (byte-aligned) case. *)
+    if off land 7 = 0 then (
+      let word =
+	let c0 = _get_byte64 data byteoff strlen in
+	let c1 = _get_byte64 data (byteoff+1) strlen in
+	let c2 = _get_byte64 data (byteoff+2) strlen in
+	let c3 = _get_byte64 data (byteoff+3) strlen in
+	let c4 = _get_byte64 data (byteoff+4) strlen in
+	let c5 = _get_byte64 data (byteoff+5) strlen in
+	let c6 = _get_byte64 data (byteoff+6) strlen in
+	let c7 = _get_byte64 data (byteoff+7) strlen in
+	_make_int64_le c0 c1 c2 c3 c4 c5 c6 c7 in
+      Int64.shift_right_logical word (64 - flen)
+    ) else (
+      (* Extract the next 64 bits, slow method. *)
+      let word =
+	let c0, off, len = extract_char_unsigned data off len 8 in
+	let c1, off, len = extract_char_unsigned data off len 8 in
+	let c2, off, len = extract_char_unsigned data off len 8 in
+	let c3, off, len = extract_char_unsigned data off len 8 in
+	let c4, off, len = extract_char_unsigned data off len 8 in
+	let c5, off, len = extract_char_unsigned data off len 8 in
+	let c6, off, len = extract_char_unsigned data off len 8 in
+	let c7, _, _ = extract_char_unsigned data off len 8 in
+	let c0 = Int64.of_int c0 in
+	let c1 = Int64.of_int c1 in
+	let c2 = Int64.of_int c2 in
+	let c3 = Int64.of_int c3 in
+	let c4 = Int64.of_int c4 in
+	let c5 = Int64.of_int c5 in
+	let c6 = Int64.of_int c6 in
+	let c7 = Int64.of_int c7 in
+	_make_int64_le c0 c1 c2 c3 c4 c5 c6 c7 in
       Int64.shift_right_logical word (64 - flen)
     ) in
   word, off+flen, len-flen

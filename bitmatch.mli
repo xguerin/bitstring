@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.mli,v 1.19 2008-05-07 14:56:53 rjones Exp $
+ * $Id: bitmatch.mli,v 1.20 2008-05-08 21:28:28 rjones Exp $
  *)
 
 (**
@@ -684,6 +684,8 @@ val extract_int32_be_unsigned : string -> int -> int -> int -> int32 * int * int
 val extract_int32_le_unsigned : string -> int -> int -> int -> int32 * int * int
 
 val extract_int64_be_unsigned : string -> int -> int -> int -> int64 * int * int
+
+val extract_int64_le_unsigned : string -> int -> int -> int -> int64 * int * int
 
 val construct_bit : Buffer.t -> bool -> int -> exn -> unit
 
