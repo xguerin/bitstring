@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.ml,v 1.13 2008-05-08 21:28:28 rjones Exp $
+ * $Id: bitmatch.ml,v 1.14 2008-05-12 20:32:55 rjones Exp $
  *)
 
 open Printf
@@ -545,7 +545,7 @@ let extract_int64_le_unsigned data off len flen =
 	let c6 = _get_byte64 data (byteoff+6) strlen in
 	let c7 = _get_byte64 data (byteoff+7) strlen in
 	_make_int64_le c0 c1 c2 c3 c4 c5 c6 c7 in
-      Int64.shift_right_logical word (64 - flen)
+      Int64.logand word (I64.mask flen)
     ) else (
       (* Extract the next 64 bits, slow method. *)
       let word =
@@ -566,7 +566,7 @@ let extract_int64_le_unsigned data off len flen =
 	let c6 = Int64.of_int c6 in
 	let c7 = Int64.of_int c7 in
 	_make_int64_le c0 c1 c2 c3 c4 c5 c6 c7 in
-      Int64.shift_right_logical word (64 - flen)
+      Int64.logand word (I64.mask flen)
     ) in
   word, off+flen, len-flen
 
