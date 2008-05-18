@@ -671,13 +671,15 @@ module Buffer = struct
 	   *)
 	  let slenbytes = slen lsr 3 in
 	  if slenbytes > 0 then Buffer.add_substring buf str 0 slenbytes;
-	  t.last <- Char.code str.[slenbytes] lsl (8 - (slen land 7))
+	  let last = Char.code str.[slenbytes] in (* last char *)
+	  let mask = 0xff lsl (8 - (slen land 7)) in
+	  t.last <- last land mask
 	);
 	t.len <- len + slen
       ) else (
 	(* Target buffer is unaligned.  Copy whole bytes using
 	 * add_byte which knows how to deal with an unaligned
-	 * target buffer, then call _add_bits for the remaining < 8 bits.
+	 * target buffer, then call add_bit for the remaining < 8 bits.
 	 *
 	 * XXX This is going to be dog-slow.
 	 *)
@@ -686,7 +688,14 @@ module Buffer = struct
 	  let byte = Char.code str.[i] in
 	  add_byte t byte
 	done;
-	_add_bits t (Char.code str.[slenbytes]) (slen - (slenbytes lsl 3))
+	let bitsleft = slen - (slenbytes lsl 3) in
+	if bitsleft > 0 then (
+	  let c = Char.code str.[slenbytes] in
+	  for i = 0 to bitsleft - 1 do
+	    let bit = c land (0x80 lsr i) <> 0 in
+	    add_bit t bit
+	  done
+	)
       );
     )
 end
@@ -771,11 +780,8 @@ let string_of_bitstring (data, off, len) =
 	str.[i] <- Char.chr c;
 	loop data off len (i+1)
       ) else if len > 0 then (
-	(* XXX Is this correct?  It should write into the high bits
-	 * of the last byte.
-	 *)
-	let c, off, len = extract_char_unsigned data off len len in
-	str.[i] <- Char.chr c
+	let c, _, _ = extract_char_unsigned data off len len in
+	str.[i] <- Char.chr (c lsl (8-len))
       )
     in
     loop data off len 0;
