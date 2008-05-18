@@ -1,4 +1,4 @@
-(* Just check that the extension and library load.
+(* Just check that the extension and library load without error.
  * $Id$
  *)
 
