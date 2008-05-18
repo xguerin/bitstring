@@ -10,11 +10,15 @@ To build:
 	./configure
 	make
 
-	make test		# optional, to run tests
+Other make targets:
 
-	make print-tests	# optional, to print expanded test macros
-	make print-examples	# optional, to print expanded example macros
+	make test		# build and run the test suite
 
-To install, run this as root:
+	make examples		# build the examples
+
+	make print-tests	# print expanded test macros
+	make print-examples	# print expanded example macros
+
+To install (as root):
 
 	make install

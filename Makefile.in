@@ -32,7 +32,7 @@ OCAMLOPTPACKAGES =
 
 OCAMLDOCFLAGS	= -html -sort
 
-EXAMPLES	= $(wildcard examples/*.ml)
+EXAMPLES	= $(patsubst %.ml,%,$(wildcard examples/*.ml))
 
 TESTS		= $(patsubst %.ml,%,$(wildcard tests/*.ml))
 
@@ -54,11 +54,20 @@ PP	= -pp "camlp4o bitmatch.cma pa_bitmatch.cmo"
 
 test: pa_bitmatch.cmo bitmatch.cma
 	@for f in $(TESTS); do \
-	  echo Test: $$f; \
+	  echo Building $$f; \
 	  $(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(PP) \
 	    -package unix -linkpkg -I . bitmatch.cma $$f.ml -o $$f; \
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
+	  echo Running $$f; \
 	  $$f; \
+	  if [ $$? -ne 0 ]; then exit 1; fi; \
+	done
+
+examples:
+	@for f in $(EXAMPLES); do \
+	  echo Building $$f; \
+	  $(OCAMLFIND) ocamlc $(OCAMLFLAGS) $(PP) \
+	    -package unix -linkpkg -I . bitmatch.cma $$f.ml -o $$f; \
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	done
 
@@ -72,8 +81,8 @@ print-tests: pa_bitmatch.cmo
 
 print-examples: pa_bitmatch.cmo
 	@for f in $(EXAMPLES); do \
-	  echo Example: $$f; \
-	  camlp4o bitmatch.cma pa_bitmatch.cmo -printer pr_o.cmo $$f; \
+	  echo Example: $$f.ml; \
+	  camlp4o bitmatch.cma pa_bitmatch.cmo -printer pr_o.cmo $$f.ml; \
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	done
 
@@ -82,7 +91,12 @@ print-examples: pa_bitmatch.cmo
 clean:
 	rm -f core *~ *.cmi *.cmo *.cmx *.cma *.cmxa *.a *.o
 	rm -f tests/*~ tests/*.cmi tests/*.cmo $(TESTS)
-	rm -f examples/*~
+	rm -f examples/*~ examples/*.cmi examples/*.cmo $(EXAMPLES)
+
+distclean: clean
+	rm -rf autom4te.cache
+	rm -f config.log config.status
+	rm -f config.h Makefile META bitmatch_config.ml
 
 # Documentation.
 
@@ -139,6 +153,7 @@ check-manifest:
 	rm -f .orig-manifest .check-manifest; \
 	exit $$rv
 
-.PHONY: depend dist check-manifest dpkg doc print-examples print-tests test
+.PHONY: depend dist check-manifest dpkg doc \
+	print-examples print-tests examples test
 
 .SUFFIXES:      .cmo .cmi .cmx .ml .mli .mll
