@@ -68,23 +68,17 @@ let rec expr_is_constant = function
      | _ -> None)
   | _ -> None				(* Anything else is not constant. *)
 
-(* A field when used in a bitmatch (a pattern). *)
-type fpatt = {
-  fpatt : patt;				(* field matching pattern *)
-  fpc : fcommon;
-}
-(* A field when used in a BITSTRING constructor (an expression). *)
-and fexpr = {
-  fexpr : expr;				(* field value *)
-  fec : fcommon;
-}
-
-and fcommon = {
+(* Field.  In bitmatch (patterns) the type is [patt field].  In
+ * BITSTRING (constructor) the type is [expr field].
+ *)
+type 'a field = {
+  field : 'a;				(* field ('a is either patt or expr) *)
   flen : expr;				(* length in bits, may be non-const *)
   endian : endian;			(* endianness *)
   signed : bool;			(* true if signed, false if unsigned *)
   t : t;				(* type *)
   _loc : Loc.t;				(* location in source code *)
+  printer : 'a -> string;		(* turn the field into a string *)
 }
 and endian = BigEndian | LittleEndian | NativeEndian
 and t = Int | String | Bitstring
@@ -96,16 +90,8 @@ let gensym =
     incr i; let i = !i in
     sprintf "__pabitmatch_%s_%d" name i
 
-let rec parse_patt_field _loc fpatt flen qs =
-  let fpc = parse_field_common _loc flen qs in
-  { fpatt = fpatt; fpc = fpc }
-
-and parse_constr_field _loc fexpr flen qs =
-  let fec = parse_field_common _loc flen qs in
-  { fexpr = fexpr; fec = fec }
-
 (* Deal with the qualifiers which appear for a field of both types. *)
-and parse_field_common _loc flen qs =
+let parse_field _loc field flen qs printer =
   let endian, signed, t =
     match qs with
     | None -> (None, None, None)
@@ -188,11 +174,13 @@ and parse_field_common _loc flen qs =
   let t = match t with None -> Int | Some t -> t in
 
   {
+    field = field;
     flen = flen;
     endian = endian;
     signed = signed;
     t = t;
     _loc = _loc;
+    printer = printer;
   }
 
 let string_of_endian = function
@@ -205,25 +193,18 @@ let string_of_t = function
   | String -> "string"
   | Bitstring -> "bitstring"
 
-let rec string_of_patt_field { fpatt = fpatt; fpc = fpc } =
-  let fpc = string_of_field_common fpc in
-  let fpatt =
-    match fpatt with
-    | <:patt< $lid:id$ >> -> id
-    | _ -> "[pattern]" in
-  fpatt ^ " : " ^ fpc
+let patt_printer = function
+  | <:patt< $lid:id$ >> -> id
+  | _ -> "[pattern]"
 
-and string_of_constr_field { fexpr = fexpr; fec = fec } =
-  let fec = string_of_field_common fec in
-  let fexpr =
-    match fexpr with
-    | <:expr< $lid:id$ >> -> id
-    | _ -> "[expression]" in
-  fexpr ^ " : " ^ fec
+let expr_printer = function
+  | <:expr< $lid:id$ >> -> id
+  | _ -> "[expression]"
 
-and string_of_field_common { flen = flen;
-			     endian = endian; signed = signed; t = t;
-			     _loc = _loc } =
+let string_of_field { field = field; flen = flen;
+		      endian = endian; signed = signed; t = t;
+		      _loc = _loc;
+		      printer = printer} =
   let flen =
     match expr_is_constant flen with
     | Some i -> string_of_int i
@@ -235,8 +216,8 @@ and string_of_field_common { flen = flen;
   let loc_line = Loc.start_line _loc in
   let loc_char = Loc.start_off _loc - Loc.start_bol _loc in
 
-  sprintf "%s : %s, %s, %s @ (%S, %d, %d)"
-    flen t endian signed loc_fname loc_line loc_char
+  sprintf "%s : %s : %s, %s, %s @ (%S, %d, %d)"
+    (printer field) flen t endian signed loc_fname loc_line loc_char
 
 (* Generate the code for a constructor, ie. 'BITSTRING ...'. *)
 let output_constructor _loc fields =
@@ -258,8 +239,8 @@ let output_constructor _loc fields =
 
   (* Convert each field to a simple bitstring-generating expression. *)
   let fields = List.map (
-    fun {fexpr=fexpr; fec={flen=flen; endian=endian; signed=signed;
-			   t=t; _loc=_loc}} ->
+    fun {field=fexpr; flen=flen; endian=endian; signed=signed;
+	 t=t; _loc=_loc} ->
       (* Is flen an integer constant?  If so, what is it?  This
        * is very simple-minded and only detects simple constants.
        *)
@@ -515,8 +496,8 @@ let output_bitmatch _loc bs cases =
   let rec output_field_extraction inner = function
     | [] -> inner
     | field :: fields ->
-	let {fpatt=fpatt; fpc={flen=flen; endian=endian; signed=signed;
-			       t=t; _loc=_loc}}
+	let {field=fpatt; flen=flen; endian=endian; signed=signed;
+	     t=t; _loc=_loc}
 	    = field in
 
 	(* Is flen an integer constant?  If so, what is it?  This
@@ -711,7 +692,7 @@ let output_bitmatch _loc bs cases =
 	(* Emit extra debugging code. *)
 	let expr =
 	  if not debug then expr else (
-	    let field = string_of_patt_field field in
+	    let field = string_of_field field in
 
 	    <:expr<
 	      if !Bitmatch.debug then (
@@ -796,7 +777,7 @@ EXTEND Gram
   patt_field: [
     [ fpatt = patt; ":"; len = expr LEVEL "top";
       qs = OPT [ ":"; qs = qualifiers -> qs ] ->
-	parse_patt_field _loc fpatt len qs
+	parse_field _loc fpatt len qs patt_printer
     ]
   ];
 
@@ -816,7 +797,7 @@ EXTEND Gram
   constr_field: [
     [ fexpr = expr LEVEL "top"; ":"; len = expr LEVEL "top";
       qs = OPT [ ":"; qs = qualifiers -> qs ] ->
-	parse_constr_field _loc fexpr len qs
+	parse_field _loc fexpr len qs expr_printer
     ]
   ];
 
