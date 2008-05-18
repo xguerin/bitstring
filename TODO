@@ -46,7 +46,7 @@ Major to-do items.
     There are several protocols around where endianness is only
     determined at runtime, examples are libpcap and TIFF.
 
-(12) More constant field lengths.
+(12) DONE - More constant field lengths.
 
 (13) Implement native endian functions.
 
