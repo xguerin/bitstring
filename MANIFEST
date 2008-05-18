@@ -1,7 +1,6 @@
 aclocal.m4
 bitmatch.ml
 bitmatch.mli
-.cvsignore
 .depend
 configure.ac
 COPYING.LIB
