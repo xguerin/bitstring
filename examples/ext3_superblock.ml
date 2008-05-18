@@ -6,7 +6,7 @@ open Printf
 
 (*let () = Bitmatch.debug := true*)
 
-let bits = Bitmatch.bitstring_of_file "tests/ext3_sb"
+let bits = Bitmatch.bitstring_of_file "ext3_sb"
 
 (* The structure is straight from /usr/include/linux/ext3_fs.h *)
 
