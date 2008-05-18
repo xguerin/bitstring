@@ -61,7 +61,7 @@ let display pkt =
     exit 1
 
 let () =
-  let pkt = Bitmatch.bitstring_of_file "tests/ipv4.ping" in
+  let pkt = Bitmatch.bitstring_of_file "ping.ipv4" in
   display pkt;
-  let pkt = Bitmatch.bitstring_of_file "tests/ipv6.ping" in
+  let pkt = Bitmatch.bitstring_of_file "ping.ipv6" in
   display pkt
