@@ -34,17 +34,16 @@ let () =
       let actual =
 	let rec loop bits =
 	  bitmatch bits with
-	  | { i : bitlen; rest : -1 : bitstring } ->
-	      if Bitmatch.bitstring_length rest > 0 then
-		i :: loop rest
-	      else
-		[i]
+	  | { i : bitlen; rest : -1 : bitstring }
+	      when Bitmatch.bitstring_length rest = 0 -> [i]
+	  | { i : bitlen; rest : -1 : bitstring } -> i :: loop rest
 	  | { _ } ->
 	      failwith (sprintf "loop failed with len = %d, bitlen = %d"
 			  len bitlen)
 	in
 	loop bits in
       if actual <> expected then
-	failwith (sprintf "match bits: failed on 1 bit test, len = %d" len)
+	failwith (sprintf "match ints: failed on test, len = %d, bitlen = %d"
+		    len bitlen)
     done
   done
