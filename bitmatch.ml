@@ -106,9 +106,13 @@ let bitstring_of_file_descr_max fd max =
 
 let bitstring_of_file fname =
   let chan = open_in_bin fname in
-  let bs = bitstring_of_chan chan in
-  close_in chan;
-  bs
+  try
+    let bs = bitstring_of_chan chan in
+    close_in chan;
+    bs
+  with exn ->
+    close_in chan;
+    raise exn
 
 let bitstring_length (_, _, len) = len
 
@@ -767,6 +771,9 @@ let string_of_bitstring (data, off, len) =
 	str.[i] <- Char.chr c;
 	loop data off len (i+1)
       ) else if len > 0 then (
+	(* XXX Is this correct?  It should write into the high bits
+	 * of the last byte.
+	 *)
 	let c, off, len = extract_char_unsigned data off len len in
 	str.[i] <- Char.chr c
       )
@@ -774,6 +781,30 @@ let string_of_bitstring (data, off, len) =
     loop data off len 0;
     str
   )
+
+(* To channel. *)
+
+let bitstring_to_chan ((data, off, len) as bits) chan =
+  (* Fail if the bitstring length isn't a multiple of 8. *)
+  if len land 7 <> 0 then invalid_arg "bitstring_to_chan";
+
+  if off land 7 = 0 then
+    (* Easy case: string is byte-aligned. *)
+    output chan data (off lsr 3) (len lsr 3)
+  else (
+    (* Bit-twiddling case: reuse string_of_bitstring *)
+    let str = string_of_bitstring bits in
+    output_string chan str
+  )
+
+let bitstring_to_file bits filename =
+  let chan = open_out_bin filename in
+  try
+    bitstring_to_chan bits chan;
+    close_out chan
+  with exn ->
+    close_out chan;
+    raise exn
 
 (*----------------------------------------------------------------------*)
 (* Display functions. *)
