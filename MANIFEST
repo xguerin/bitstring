@@ -1,6 +1,8 @@
 aclocal.m4
 bitmatch.ml
 bitmatch.mli
+bitmatch_config.ml.in
+bitmatch_types.ml
 .depend
 configure.ac
 COPYING.LIB

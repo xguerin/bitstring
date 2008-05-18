@@ -1,2 +1,2 @@
-bitmatch.cmo: bitmatch.cmi 
-bitmatch.cmx: bitmatch.cmi 
+bitmatch.cmo: bitmatch_types.cmo bitmatch_config.cmo bitmatch.cmi 
+bitmatch.cmx: bitmatch_types.cmx bitmatch_config.cmx bitmatch.cmi 

@@ -20,6 +20,9 @@
 
 open Printf
 
+include Bitmatch_types
+include Bitmatch_config
+
 (* Enable runtime debug messages.  Must also have been enabled
  * in pa_bitmatch.ml.
  *)
@@ -408,6 +411,11 @@ let extract_int_le_unsigned data off len flen =
   let v = I.byteswap v flen in
   v, off, len
 
+let extract_int_ne_unsigned =
+  if nativeendian = BigEndian
+  then extract_int_be_unsigned
+  else extract_int_le_unsigned
+
 let _make_int32_be c0 c1 c2 c3 =
   Int32.logor
     (Int32.logor
@@ -462,6 +470,11 @@ let extract_int32_le_unsigned data off len flen =
   let v, off, len = extract_int32_be_unsigned data off len flen in
   let v = I32.byteswap v flen in
   v, off, len
+
+let extract_int32_ne_unsigned =
+  if nativeendian = BigEndian
+  then extract_int32_be_unsigned
+  else extract_int32_le_unsigned
 
 let _make_int64_be c0 c1 c2 c3 c4 c5 c6 c7 =
   Int64.logor
@@ -569,6 +582,11 @@ let extract_int64_le_unsigned data off len flen =
       Int64.logand word (I64.mask flen)
     ) in
   word, off+flen, len-flen
+
+let extract_int64_ne_unsigned =
+  if nativeendian = BigEndian
+  then extract_int64_be_unsigned
+  else extract_int64_le_unsigned
 
 (*----------------------------------------------------------------------*)
 (* Constructor functions. *)
@@ -689,6 +707,12 @@ let construct_int_be_unsigned buf v flen exn =
   (* Add the bytes. *)
   I.map_bytes_be (Buffer._add_bits buf) (Buffer.add_byte buf) v flen
 
+let construct_int_ne_unsigned =
+  if nativeendian = BigEndian
+  then construct_int_be_unsigned
+  else (*construct_int_le_unsigned*)
+    fun _ _ _ _ -> failwith "construct_int_le_unsigned"
+
 (* Construct a field of exactly 32 bits. *)
 let construct_int32_be_unsigned buf v flen _ =
   Buffer.add_byte buf
@@ -700,12 +724,24 @@ let construct_int32_be_unsigned buf v flen _ =
   Buffer.add_byte buf
     (Int32.to_int (Int32.logand v 0xff_l))
 
+let construct_int32_ne_unsigned =
+  if nativeendian = BigEndian
+  then construct_int32_be_unsigned
+  else (*construct_int32_le_unsigned*)
+    fun _ _ _ _ -> failwith "construct_int32_le_unsigned"
+
 (* Construct a field of up to 64 bits. *)
 let construct_int64_be_unsigned buf v flen exn =
   (* Check value is within range. *)
   if not (I64.range_unsigned v flen) then raise exn;
   (* Add the bytes. *)
   I64.map_bytes_be (Buffer._add_bits buf) (Buffer.add_byte buf) v flen
+
+let construct_int64_ne_unsigned =
+  if nativeendian = BigEndian
+  then construct_int64_be_unsigned
+  else (*construct_int64_le_unsigned*)
+    fun _ _ _ _ -> failwith "construct_int64_le_unsigned"
 
 (* Construct from a string of bytes, exact multiple of 8 bits
  * in length of course.

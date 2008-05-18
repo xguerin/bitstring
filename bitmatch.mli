@@ -526,6 +526,11 @@ Bitmatch.hexdump_bitstring stdout bits ;;
    {3 Types}
 *)
 
+type endian = BigEndian | LittleEndian | NativeEndian
+
+val string_of_endian : endian -> string
+(** Endianness. *)
+
 type bitstring = string * int * int
 (** [bitstring] is the basic type used to store bitstrings.
 
@@ -654,6 +659,12 @@ end
 
 (** {3 Miscellaneous} *)
 
+val package : string
+(** The package name, always ["ocaml-bitmatch"] *)
+
+val version : string
+(** The package version as a string. *)
+
 val debug : bool ref
 (** Set this variable to true to enable extended debugging.
     This only works if debugging was also enabled in the
@@ -678,13 +689,19 @@ val extract_int_be_unsigned : string -> int -> int -> int -> int * int * int
 
 val extract_int_le_unsigned : string -> int -> int -> int -> int * int * int
 
+val extract_int_ne_unsigned : string -> int -> int -> int -> int * int * int
+
 val extract_int32_be_unsigned : string -> int -> int -> int -> int32 * int * int
 
 val extract_int32_le_unsigned : string -> int -> int -> int -> int32 * int * int
 
+val extract_int32_ne_unsigned : string -> int -> int -> int -> int32 * int * int
+
 val extract_int64_be_unsigned : string -> int -> int -> int -> int64 * int * int
 
 val extract_int64_le_unsigned : string -> int -> int -> int -> int64 * int * int
+
+val extract_int64_ne_unsigned : string -> int -> int -> int -> int64 * int * int
 
 val construct_bit : Buffer.t -> bool -> int -> exn -> unit
 
@@ -692,8 +709,14 @@ val construct_char_unsigned : Buffer.t -> int -> int -> exn -> unit
 
 val construct_int_be_unsigned : Buffer.t -> int -> int -> exn -> unit
 
+val construct_int_ne_unsigned : Buffer.t -> int -> int -> exn -> unit
+
 val construct_int32_be_unsigned : Buffer.t -> int32 -> int -> exn -> unit
 
+val construct_int32_ne_unsigned : Buffer.t -> int32 -> int -> exn -> unit
+
 val construct_int64_be_unsigned : Buffer.t -> int64 -> int -> exn -> unit
+
+val construct_int64_ne_unsigned : Buffer.t -> int64 -> int -> exn -> unit
 
 val construct_string : Buffer.t -> string -> unit

@@ -36,24 +36,26 @@ EXAMPLES	= $(wildcard examples/*.ml)
 
 TESTS		= $(patsubst %.ml,%,$(wildcard tests/*.ml))
 
-all:	pa_bitmatch.cmo bitmatch.cma bitmatch.cmxa
+all:	bitmatch.cma bitmatch.cmxa pa_bitmatch.cmo
 
-pa_bitmatch.cmo: pa_bitmatch.ml
-	$(OCAMLFIND) ocamlc -I +camlp4 camlp4lib.cma \
-	  -pp camlp4of.opt -c $< -o $@
-
-bitmatch.cma: bitmatch.cmo
+bitmatch.cma: bitmatch_types.cmo bitmatch_config.cmo bitmatch.cmo
 	$(OCAMLFIND) ocamlc -a -o $@ $^
 
-bitmatch.cmxa: bitmatch.cmx
+bitmatch.cmxa: bitmatch_types.cmx bitmatch_config.cmx bitmatch.cmx
 	$(OCAMLFIND) ocamlopt -a -o $@ $^
 
+pa_bitmatch.cmo: pa_bitmatch.ml bitmatch.cma
+	$(OCAMLFIND) ocamlc bitmatch.cma -I +camlp4 camlp4lib.cma \
+	  -pp camlp4of.opt -c $< -o $@
+
 # Tests and examples.
+
+PP	= -pp "camlp4o bitmatch.cma pa_bitmatch.cmo"
 
 test: pa_bitmatch.cmo bitmatch.cma
 	@for f in $(TESTS); do \
 	  echo Test: $$f; \
-	  $(OCAMLFIND) ocamlc $(OCAMLCFLAGS) -pp "camlp4o pa_bitmatch.cmo" \
+	  $(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(PP) \
 	    -package unix -linkpkg -I . bitmatch.cma $$f.ml -o $$f; \
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	  $$f; \
@@ -63,7 +65,7 @@ test: pa_bitmatch.cmo bitmatch.cma
 print-tests: pa_bitmatch.cmo
 	@for f in $(TESTS); do \
 	  echo Test: $$f.ml; \
-	  cmd="camlp4o pa_bitmatch.cmo -printer pr_o.cmo $$f.ml"; \
+	  cmd="camlp4o bitmatch.cma pa_bitmatch.cmo -printer pr_o.cmo $$f.ml"; \
 	  echo $$cmd; \
 	  $$cmd; \
 	done
@@ -71,7 +73,7 @@ print-tests: pa_bitmatch.cmo
 print-examples: pa_bitmatch.cmo
 	@for f in $(EXAMPLES); do \
 	  echo Example: $$f; \
-	  camlp4o pa_bitmatch.cmo -printer pr_o.cmo $$f; \
+	  camlp4o bitmatch.cma pa_bitmatch.cmo -printer pr_o.cmo $$f; \
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	done
 

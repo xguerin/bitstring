@@ -29,6 +29,14 @@ test "x$U" != "x" && AC_MSG_ERROR(Compiler not ANSI compliant)
 
 AC_PROG_CC_C_O
 
+dnl Check for endianness.
+AC_C_BIGENDIAN(
+  [NATIVEENDIAN=BigEndian],
+  [NATIVEENDIAN=LittleEndian],
+  [AC_MSG_ERROR([Machine endianness could not be determined])]
+)
+AC_SUBST(NATIVEENDIAN)
+
 dnl Check for basic OCaml environment & findlib.
 AC_PROG_OCAML
 AC_PROG_FINDLIB
@@ -45,5 +53,5 @@ fi
 
 dnl Produce output files.
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_FILES([Makefile META])
+AC_CONFIG_FILES([Makefile META bitmatch_config.ml])
 AC_OUTPUT

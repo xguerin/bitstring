@@ -74,13 +74,12 @@ let rec expr_is_constant = function
 type 'a field = {
   field : 'a;				(* field ('a is either patt or expr) *)
   flen : expr;				(* length in bits, may be non-const *)
-  endian : endian;			(* endianness *)
+  endian : Bitmatch.endian;		(* endianness *)
   signed : bool;			(* true if signed, false if unsigned *)
   t : t;				(* type *)
   _loc : Loc.t;				(* location in source code *)
   printer : 'a -> string;		(* turn the field into a string *)
 }
-and endian = BigEndian | LittleEndian | NativeEndian
 and t = Int | String | Bitstring
 
 (* Generate a fresh, unique symbol each time called. *)
@@ -103,21 +102,21 @@ let parse_field _loc field flen qs printer =
 		if endian <> None then
 		  Loc.raise _loc (Failure "an endian flag has been set already")
 		else (
-		  let endian = Some BigEndian in
+		  let endian = Some Bitmatch.BigEndian in
 		  (endian, signed, t)
 		)
 	    | "littleendian" ->
 		if endian <> None then
 		  Loc.raise _loc (Failure "an endian flag has been set already")
 		else (
-		  let endian = Some LittleEndian in
+		  let endian = Some Bitmatch.LittleEndian in
 		  (endian, signed, t)
 		)
 	    | "nativeendian" ->
 		if endian <> None then
 		  Loc.raise _loc (Failure "an endian flag has been set already")
 		else (
-		  let endian = Some NativeEndian in
+		  let endian = Some Bitmatch.NativeEndian in
 		  (endian, signed, t)
 		)
 	    | "signed" ->
@@ -169,7 +168,7 @@ let parse_field _loc field flen qs printer =
       );
 
   (* Default endianness, signedness, type. *)
-  let endian = match endian with None -> BigEndian | Some e -> e in
+  let endian = match endian with None -> Bitmatch.BigEndian | Some e -> e in
   let signed = match signed with None -> false | Some s -> s in
   let t = match t with None -> Int | Some t -> t in
 
@@ -182,11 +181,6 @@ let parse_field _loc field flen qs printer =
     _loc = _loc;
     printer = printer;
   }
-
-let string_of_endian = function
-  | BigEndian -> "bigendian"
-  | LittleEndian -> "littleendian"
-  | NativeEndian -> "nativeendian"
 
 let string_of_t = function
   | Int -> "int"
@@ -209,7 +203,7 @@ let string_of_field { field = field; flen = flen;
     match expr_is_constant flen with
     | Some i -> string_of_int i
     | None -> "[non-const-len]" in
-  let endian = string_of_endian endian in
+  let endian = Bitmatch.string_of_endian endian in
   let signed = if signed then "signed" else "unsigned" in
   let t = string_of_t t in
   let loc_fname = Loc.file_name _loc in
@@ -257,36 +251,42 @@ let output_constructor _loc fields =
 	| (1, _, _) -> "construct_bit"
 	| ((2|3|4|5|6|7|8), _, false) -> "construct_char_unsigned"
 	| ((2|3|4|5|6|7|8), _, true) -> "construct_char_signed"
-	| (i, BigEndian, false) when i <= 31 -> "construct_int_be_unsigned"
-	| (i, BigEndian, true) when i <= 31 -> "construct_int_be_signed"
-	| (i, LittleEndian, false) when i <= 31 -> "construct_int_le_unsigned"
-	| (i, LittleEndian, true) when i <= 31 -> "construct_int_le_signed"
-	| (i, NativeEndian, false) when i <= 31 -> "construct_int_ne_unsigned"
-	| (i, NativeEndian, true) when i <= 31 -> "construct_int_ne_signed"
-	| (32, BigEndian, false) -> "construct_int32_be_unsigned"
-	| (32, BigEndian, true) -> "construct_int32_be_signed"
-	| (32, LittleEndian, false) -> "construct_int32_le_unsigned"
-	| (32, LittleEndian, true) -> "construct_int32_le_signed"
-	| (32, NativeEndian, false) -> "construct_int32_ne_unsigned"
-	| (32, NativeEndian, true) -> "construct_int32_ne_signed"
-	| (_, BigEndian, false) -> "construct_int64_be_unsigned"
-	| (_, BigEndian, true) -> "construct_int64_be_signed"
-	| (_, LittleEndian, false) -> "construct_int64_le_unsigned"
-	| (_, LittleEndian, true) -> "construct_int64_le_signed"
-	| (_, NativeEndian, false) -> "construct_int64_ne_unsigned"
-	| (_, NativeEndian, true) -> "construct_int64_ne_signed"
+	| (i, Bitmatch.BigEndian, false) when i <= 31 ->
+	    "construct_int_be_unsigned"
+	| (i, Bitmatch.BigEndian, true) when i <= 31 ->
+	    "construct_int_be_signed"
+	| (i, Bitmatch.LittleEndian, false) when i <= 31 ->
+	    "construct_int_le_unsigned"
+	| (i, Bitmatch.LittleEndian, true) when i <= 31 ->
+	    "construct_int_le_signed"
+	| (i, Bitmatch.NativeEndian, false) when i <= 31 ->
+	    "construct_int_ne_unsigned"
+	| (i, Bitmatch.NativeEndian, true) when i <= 31 ->
+	    "construct_int_ne_signed"
+	| (32, Bitmatch.BigEndian, false) -> "construct_int32_be_unsigned"
+	| (32, Bitmatch.BigEndian, true) -> "construct_int32_be_signed"
+	| (32, Bitmatch.LittleEndian, false) -> "construct_int32_le_unsigned"
+	| (32, Bitmatch.LittleEndian, true) -> "construct_int32_le_signed"
+	| (32, Bitmatch.NativeEndian, false) -> "construct_int32_ne_unsigned"
+	| (32, Bitmatch.NativeEndian, true) -> "construct_int32_ne_signed"
+	| (_, Bitmatch.BigEndian, false) -> "construct_int64_be_unsigned"
+	| (_, Bitmatch.BigEndian, true) -> "construct_int64_be_signed"
+	| (_, Bitmatch.LittleEndian, false) -> "construct_int64_le_unsigned"
+	| (_, Bitmatch.LittleEndian, true) -> "construct_int64_le_signed"
+	| (_, Bitmatch.NativeEndian, false) -> "construct_int64_ne_unsigned"
+	| (_, Bitmatch.NativeEndian, true) -> "construct_int64_ne_signed"
       in
       let name_of_int_construct = function
 	  (* XXX As an enhancement we should allow users to
 	   * specify that a field length can fit into a char/int/int32
 	   * (of course, this would have to be checked at runtime).
 	   *)
-	| (BigEndian, false) -> "construct_int64_be_unsigned"
-	| (BigEndian, true) -> "construct_int64_be_signed"
-	| (LittleEndian, false) -> "construct_int64_le_unsigned"
-	| (LittleEndian, true) -> "construct_int64_le_signed"
-	| (NativeEndian, false) -> "construct_int64_ne_unsigned"
-	| (NativeEndian, true) -> "construct_int64_ne_signed"
+	| (Bitmatch.BigEndian, false) -> "construct_int64_be_unsigned"
+	| (Bitmatch.BigEndian, true) -> "construct_int64_be_signed"
+	| (Bitmatch.LittleEndian, false) -> "construct_int64_le_unsigned"
+	| (Bitmatch.LittleEndian, true) -> "construct_int64_le_signed"
+	| (Bitmatch.NativeEndian, false) -> "construct_int64_ne_unsigned"
+	| (Bitmatch.NativeEndian, true) -> "construct_int64_ne_signed"
       in
 
       let expr =
@@ -516,36 +516,42 @@ let output_bitmatch _loc bs cases =
 	  | (1, _, _) -> "extract_bit"
 	  | ((2|3|4|5|6|7|8), _, false) -> "extract_char_unsigned"
 	  | ((2|3|4|5|6|7|8), _, true) -> "extract_char_signed"
-	  | (i, BigEndian, false) when i <= 31 -> "extract_int_be_unsigned"
-	  | (i, BigEndian, true) when i <= 31 -> "extract_int_be_signed"
-	  | (i, LittleEndian, false) when i <= 31 -> "extract_int_le_unsigned"
-	  | (i, LittleEndian, true) when i <= 31 -> "extract_int_le_signed"
-	  | (i, NativeEndian, false) when i <= 31 -> "extract_int_ne_unsigned"
-	  | (i, NativeEndian, true) when i <= 31 -> "extract_int_ne_signed"
-	  | (32, BigEndian, false) -> "extract_int32_be_unsigned"
-	  | (32, BigEndian, true) -> "extract_int32_be_signed"
-	  | (32, LittleEndian, false) -> "extract_int32_le_unsigned"
-	  | (32, LittleEndian, true) -> "extract_int32_le_signed"
-	  | (32, NativeEndian, false) -> "extract_int32_ne_unsigned"
-	  | (32, NativeEndian, true) -> "extract_int32_ne_signed"
-	  | (_, BigEndian, false) -> "extract_int64_be_unsigned"
-	  | (_, BigEndian, true) -> "extract_int64_be_signed"
-	  | (_, LittleEndian, false) -> "extract_int64_le_unsigned"
-	  | (_, LittleEndian, true) -> "extract_int64_le_signed"
-	  | (_, NativeEndian, false) -> "extract_int64_ne_unsigned"
-	  | (_, NativeEndian, true) -> "extract_int64_ne_signed"
+	  | (i, Bitmatch.BigEndian, false) when i <= 31 ->
+	      "extract_int_be_unsigned"
+	  | (i, Bitmatch.BigEndian, true) when i <= 31 ->
+	      "extract_int_be_signed"
+	  | (i, Bitmatch.LittleEndian, false) when i <= 31 ->
+	      "extract_int_le_unsigned"
+	  | (i, Bitmatch.LittleEndian, true) when i <= 31 ->
+	      "extract_int_le_signed"
+	  | (i, Bitmatch.NativeEndian, false) when i <= 31 ->
+	      "extract_int_ne_unsigned"
+	  | (i, Bitmatch.NativeEndian, true) when i <= 31 ->
+	      "extract_int_ne_signed"
+	  | (32, Bitmatch.BigEndian, false) -> "extract_int32_be_unsigned"
+	  | (32, Bitmatch.BigEndian, true) -> "extract_int32_be_signed"
+	  | (32, Bitmatch.LittleEndian, false) -> "extract_int32_le_unsigned"
+	  | (32, Bitmatch.LittleEndian, true) -> "extract_int32_le_signed"
+	  | (32, Bitmatch.NativeEndian, false) -> "extract_int32_ne_unsigned"
+	  | (32, Bitmatch.NativeEndian, true) -> "extract_int32_ne_signed"
+	  | (_, Bitmatch.BigEndian, false) -> "extract_int64_be_unsigned"
+	  | (_, Bitmatch.BigEndian, true) -> "extract_int64_be_signed"
+	  | (_, Bitmatch.LittleEndian, false) -> "extract_int64_le_unsigned"
+	  | (_, Bitmatch.LittleEndian, true) -> "extract_int64_le_signed"
+	  | (_, Bitmatch.NativeEndian, false) -> "extract_int64_ne_unsigned"
+	  | (_, Bitmatch.NativeEndian, true) -> "extract_int64_ne_signed"
 	in
 	let name_of_int_extract = function
 	    (* XXX As an enhancement we should allow users to
 	     * specify that a field length can fit into a char/int/int32
 	     * (of course, this would have to be checked at runtime).
 	     *)
-	  | (BigEndian, false) -> "extract_int64_be_unsigned"
-	  | (BigEndian, true) -> "extract_int64_be_signed"
-	  | (LittleEndian, false) -> "extract_int64_le_unsigned"
-	  | (LittleEndian, true) -> "extract_int64_le_signed"
-	  | (NativeEndian, false) -> "extract_int64_ne_unsigned"
-	  | (NativeEndian, true) -> "extract_int64_ne_signed"
+	  | (Bitmatch.BigEndian, false) -> "extract_int64_be_unsigned"
+	  | (Bitmatch.BigEndian, true) -> "extract_int64_be_signed"
+	  | (Bitmatch.LittleEndian, false) -> "extract_int64_le_unsigned"
+	  | (Bitmatch.LittleEndian, true) -> "extract_int64_le_signed"
+	  | (Bitmatch.NativeEndian, false) -> "extract_int64_ne_unsigned"
+	  | (Bitmatch.NativeEndian, true) -> "extract_int64_ne_signed"
 	in
 
 	let expr =
