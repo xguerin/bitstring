@@ -22,5 +22,9 @@ META.in
 README
 pa_bitmatch.ml
 tests/01_load.ml
+tests/02_run.ml
+tests/10_match_bits.ml
+tests/11_match_ints.ml
 tests/20_varsize.ml
+tests/30_bitbuffer.ml
 TODO
