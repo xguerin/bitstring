@@ -14,8 +14,8 @@ let fragoffset = 0
 let ttl = 255
 let protocol = 17			(* UDP *)
 let checksum = 0
-let source = 0xc0a80202			(* 192.168.2.2 *)
-let dest = 0xc0a80201			(* 192.168.2.1 *)
+let source = 0xc0a80202_l		(* 192.168.2.2 *)
+let dest = 0xc0a80201_l			(* 192.168.2.1 *)
 let options = Bitmatch.empty_bitstring
 let payload_length = (length - hdrlen*4) * 8
 let payload = Bitmatch.create_bitstring payload_length
@@ -26,9 +26,12 @@ let header =
     identification : 16; flags : 3; fragoffset : 13;
     ttl : 8; protocol : 8; checksum : 16;
     source : 32;
-    dest : 32;
-    options : -1, bitstring;
-    payload : payload_length, bitstring
+    dest : 32
+(*
+  Not implemented at the moment XXX
+    options : -1 : bitstring;
+    payload : payload_length : bitstring
+*)
   }
 
-let () = Bitmatch.file_of_bitstring header "ipv4_header_out.dat"
+let () = Bitmatch.bitstring_to_file header "ipv4_header_out.dat"
