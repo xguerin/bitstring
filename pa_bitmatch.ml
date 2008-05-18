@@ -32,6 +32,42 @@ open Ast
  *)
 let debug = false
 
+(* Work out if an expression is an integer constant.
+ *
+ * Returns [Some i] if so (where i is the integer value), else [None].
+ *
+ * Fairly simplistic algorithm: we can only detect simple constant
+ * expressions such as [k], [k+c], [k-c] etc.
+ *)
+let rec expr_is_constant = function
+  | <:expr< $int:i$ >> ->		(* Literal integer constant. *)
+    Some (int_of_string i)
+  | <:expr< $a$ + $b$ >> ->		(* Addition of constants. *)
+    (match expr_is_constant a, expr_is_constant b with
+     | Some a, Some b -> Some (a+b)
+     | _ -> None)
+  | <:expr< $a$ - $b$ >> ->		(* Subtraction. *)
+    (match expr_is_constant a, expr_is_constant b with
+     | Some a, Some b -> Some (a-b)
+     | _ -> None)
+  | <:expr< $a$ * $b$ >> ->	        (* Multiplication. *)
+    (match expr_is_constant a, expr_is_constant b with
+     | Some a, Some b -> Some (a*b)
+     | _ -> None)
+  | <:expr< $a$ / $b$ >> ->	        (* Division. *)
+    (match expr_is_constant a, expr_is_constant b with
+     | Some a, Some b -> Some (a/b)
+     | _ -> None)
+  | <:expr< $a$ lsl $b$ >> ->	        (* Shift left. *)
+    (match expr_is_constant a, expr_is_constant b with
+     | Some a, Some b -> Some (a lsl b)
+     | _ -> None)
+  | <:expr< $a$ lsr $b$ >> ->	        (* Shift right. *)
+    (match expr_is_constant a, expr_is_constant b with
+     | Some a, Some b -> Some (a lsr b)
+     | _ -> None)
+  | _ -> None				(* Anything else is not constant. *)
+
 (* A field when used in a bitmatch (a pattern). *)
 type fpatt = {
   fpatt : patt;				(* field matching pattern *)
@@ -189,9 +225,9 @@ and string_of_field_common { flen = flen;
 			     endian = endian; signed = signed; t = t;
 			     _loc = _loc } =
   let flen =
-    match flen with
-    | <:expr< $int:i$ >> -> i
-    | _ -> "[non-const-len]" in
+    match expr_is_constant flen with
+    | Some i -> string_of_int i
+    | None -> "[non-const-len]" in
   let endian = string_of_endian endian in
   let signed = if signed then "signed" else "unsigned" in
   let t = string_of_t t in
@@ -227,10 +263,7 @@ let output_constructor _loc fields =
       (* Is flen an integer constant?  If so, what is it?  This
        * is very simple-minded and only detects simple constants.
        *)
-      let flen_is_const =
-	match flen with
-	| <:expr< $int:i$ >> -> Some (int_of_string i)
-	| _ -> None in
+      let flen_is_const = expr_is_constant flen in
 
       let name_of_int_construct_const = function
 	  (* XXX As an enhancement we should allow a 64-bit-only
@@ -489,10 +522,7 @@ let output_bitmatch _loc bs cases =
 	(* Is flen an integer constant?  If so, what is it?  This
 	 * is very simple-minded and only detects simple constants.
 	 *)
-	let flen_is_const =
-	  match flen with
-	  | <:expr< $int:i$ >> -> Some (int_of_string i)
-	  | _ -> None in
+	let flen_is_const = expr_is_constant flen in
 
 	let name_of_int_extract_const = function
 	    (* XXX As an enhancement we should allow a 64-bit-only

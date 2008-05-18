@@ -29,7 +29,7 @@
    this module to both parse and generate binary formats, for
    example, communications protocols, disk formats and binary files.
 
-   {{:http://et.redhat.com/~rjones/bitmatch/}OCaml bitmatch website}
+   {{:http://code.google.com/p/bitmatch/}OCaml bitmatch website}
 
    {2 Examples}
 
@@ -186,7 +186,7 @@ let make_message typ subtype param =
    match then the standard library [Match_failure] exception is
    thrown.
 
-   Patterns look a bit different from normal match patterns.  The
+   Patterns look a bit different from normal match patterns.  They
    consist of a list of bitfields separated by [;] where each bitfield
    contains a bind variable, the width (in bits) of the field, and
    other information.  Some example patterns:
@@ -381,9 +381,8 @@ Bitmatch.hexdump_bitstring stdout bits ;;
    computed expression.
 
    Detection of compile-time constants is quite simplistic so only an
-   immediate, simple integer is recognised as a constant and anything
-   else is considered a computed expression, even expressions such as
-   [5-2] which are obviously (to our eyes) constant.
+   simple integer literals and simple expressions (eg. [5*8]) are
+   recognized as constants.
 
    In any case the bit size of an integer is limited to the range
    \[1..64\].  This is detected as a compile-time error if that is
