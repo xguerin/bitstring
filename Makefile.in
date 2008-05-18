@@ -63,7 +63,7 @@ test: pa_bitmatch.cmo bitmatch.cma
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	done
 
-examples:
+examples: pa_bitmatch.cmo bitmatch.cma
 	@for f in $(EXAMPLES); do \
 	  echo Building $$f; \
 	  $(OCAMLFIND) ocamlc $(OCAMLFLAGS) $(PP) \
