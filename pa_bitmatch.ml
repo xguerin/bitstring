@@ -657,6 +657,7 @@ let output_bitmatch _loc bs cases =
 	      let ident =
 		match fpatt with
 		| <:patt< $lid:ident$ >> -> ident
+		| <:patt< _ >> -> "_"
 		| _ ->
 		    Loc.raise _loc
 		      (Failure "cannot compare a bitstring to a constant") in
@@ -676,6 +677,7 @@ let output_bitmatch _loc bs cases =
 	      let ident =
 		match fpatt with
 		| <:patt< $lid:ident$ >> -> ident
+		| <:patt< _ >> -> "_"
 		| _ ->
 		    Loc.raise _loc
 		      (Failure "cannot compare a bitstring to a constant") in
