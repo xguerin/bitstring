@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: bitmatch.mli,v 1.20 2008-05-08 21:28:28 rjones Exp $
+ * $Id$
  *)
 
 (**

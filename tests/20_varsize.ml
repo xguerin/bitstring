@@ -1,5 +1,5 @@
 (* Construct and match against random variable sized strings.
- * $Id: 20_varsize.ml,v 1.2 2008-04-25 11:08:43 rjones Exp $
+ * $Id$
  *)
 
 open Printf

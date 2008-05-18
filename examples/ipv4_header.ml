@@ -1,5 +1,5 @@
 (* Parse and display an IPv4 header from a file.
- * $Id: ipv4_header.ml,v 1.2 2008-04-01 17:31:12 rjones Exp $
+ * $Id$
  *)
 
 open Printf

@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id: pa_bitmatch.ml,v 1.11 2008-04-25 14:57:11 rjones Exp $
+ * $Id$
  *)
 
 open Printf

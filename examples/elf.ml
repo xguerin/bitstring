@@ -1,5 +1,5 @@
 (* Read an ELF (Linux binary) header.
- * $Id: 60_ping.ml,v 1.3 2008-04-25 11:08:43 rjones Exp $
+ * $Id$
  *)
 
 open Printf

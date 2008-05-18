@@ -1,4 +1,4 @@
-$Id: TODO,v 1.5 2008-05-07 14:37:00 rjones Exp $
+$Id$
 Major to-do items.
 
 (1) DONE - In bitmatch operator, use patterns not expressions.

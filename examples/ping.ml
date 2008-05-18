@@ -1,5 +1,5 @@
 (* Read in IPv4 and IPv6 ping packets and display them.
- * $Id: 60_ping.ml,v 1.3 2008-04-25 11:08:43 rjones Exp $
+ * $Id$
  *)
 
 open Printf

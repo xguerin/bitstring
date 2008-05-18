@@ -1,5 +1,5 @@
 (* Parse an ext3 superblock.
- * $Id: 70_ext3_sb.ml,v 1.3 2008-04-25 12:55:39 rjones Exp $
+ * $Id$
  *)
 
 open Printf
