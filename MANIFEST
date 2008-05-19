@@ -11,6 +11,7 @@ examples/ext3_sb
 examples/ext3_superblock.ml
 examples/gif.ml
 examples/ipv4_header.ml
+examples/libpcap.ml
 examples/make_ipv4_header.ml
 examples/ping.ipv4
 examples/ping.ipv6
