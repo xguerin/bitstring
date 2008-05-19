@@ -303,7 +303,7 @@ let output_constructor _loc fields =
 	    exn_used := true;
 
 	    <:expr<
-	      Bitmatch.$lid:construct_func$ $lid:buffer$ $fexpr$ $flen$
+	      Bitmatch.$lid:construct_func$ $lid:buffer$ $fexpr$ $`int:i$
 	        $lid:exn$
 	    >>
 
@@ -335,9 +335,10 @@ let output_constructor _loc fields =
         (* String, constant length > 0, must be a multiple of 8. *)
 	| String, Some i when i > 0 && i land 7 = 0 ->
 	    let bs = gensym "bs" in
+	    let j = i lsr 3 in
 	    <:expr<
 	      let $lid:bs$ = $fexpr$ in
-	      if String.length $lid:bs$ = ($flen$ lsr 3) then
+	      if String.length $lid:bs$ = $`int:j$ then
 		Bitmatch.construct_string $lid:buffer$ $lid:bs$
 	      else
 		raise (Bitmatch.Construct_failure
@@ -394,7 +395,7 @@ let output_constructor _loc fields =
 	    let bs = gensym "bs" in
 	    <:expr<
 	      let $lid:bs$ = $fexpr$ in
-	      if Bitmatch.bitstring_length $lid:bs$ = $flen$ then
+	      if Bitmatch.bitstring_length $lid:bs$ = $`int:i$ then
 		Bitmatch.construct_bitstring $lid:buffer$ $lid:bs$
 	      else
 		raise (Bitmatch.Construct_failure
@@ -561,10 +562,10 @@ let output_bitmatch _loc bs cases =
 	      let extract_func = name_of_int_extract_const (i,endian,signed) in
 	      let v = gensym "val" in
 	      <:expr<
-		if $lid:len$ >= $flen$ then (
+		if $lid:len$ >= $`int:i$ then (
 		  let $lid:v$, $lid:off$, $lid:len$ =
 		    Bitmatch.$lid:extract_func$ $lid:data$ $lid:off$ $lid:len$
-		      $flen$ in
+		      $`int:i$ in
 		  match $lid:v$ with $fpatt$ when true -> $inner$ | _ -> ()
 		)
 	      >>
@@ -592,10 +593,10 @@ let output_bitmatch _loc bs cases =
 	  | String, Some i when i > 0 && i land 7 = 0 ->
 	      let bs = gensym "bs" in
 	      <:expr<
-		if $lid:len$ >= $flen$ then (
+		if $lid:len$ >= $`int:i$ then (
 		  let $lid:bs$, $lid:off$, $lid:len$ =
 		    Bitmatch.extract_bitstring $lid:data$ $lid:off$ $lid:len$
-		      $flen$ in
+		      $`int:i$ in
 		  match Bitmatch.string_of_bitstring $lid:bs$ with
 		  | $fpatt$ when true -> $inner$
 		  | _ -> ()
@@ -648,10 +649,10 @@ let output_bitmatch _loc bs cases =
 		    Loc.raise _loc
 		      (Failure "cannot compare a bitstring to a constant") in
 	      <:expr<
-		if $lid:len$ >= $flen$ then (
+		if $lid:len$ >= $`int:i$ then (
 		  let $lid:ident$, $lid:off$, $lid:len$ =
 		    Bitmatch.extract_bitstring $lid:data$ $lid:off$ $lid:len$
-		      $flen$ in
+		      $`int:i$ in
 		  $inner$
 		)
 	      >>
