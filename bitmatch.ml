@@ -420,6 +420,11 @@ let extract_int_ne_unsigned =
   then extract_int_be_unsigned
   else extract_int_le_unsigned
 
+let extract_int_ee_unsigned = function
+  | BigEndian -> extract_int_be_unsigned
+  | LittleEndian -> extract_int_le_unsigned
+  | NativeEndian -> extract_int_ne_unsigned
+
 let _make_int32_be c0 c1 c2 c3 =
   Int32.logor
     (Int32.logor
@@ -479,6 +484,11 @@ let extract_int32_ne_unsigned =
   if nativeendian = BigEndian
   then extract_int32_be_unsigned
   else extract_int32_le_unsigned
+
+let extract_int32_ee_unsigned = function
+  | BigEndian -> extract_int32_be_unsigned
+  | LittleEndian -> extract_int32_le_unsigned
+  | NativeEndian -> extract_int32_ne_unsigned
 
 let _make_int64_be c0 c1 c2 c3 c4 c5 c6 c7 =
   Int64.logor
@@ -591,6 +601,11 @@ let extract_int64_ne_unsigned =
   if nativeendian = BigEndian
   then extract_int64_be_unsigned
   else extract_int64_le_unsigned
+
+let extract_int64_ee_unsigned = function
+  | BigEndian -> extract_int64_be_unsigned
+  | LittleEndian -> extract_int64_le_unsigned
+  | NativeEndian -> extract_int64_ne_unsigned
 
 (*----------------------------------------------------------------------*)
 (* Constructor functions. *)
@@ -726,6 +741,12 @@ let construct_int_ne_unsigned =
   else (*construct_int_le_unsigned*)
     fun _ _ _ _ -> failwith "construct_int_le_unsigned"
 
+let construct_int_ee_unsigned = function
+  | BigEndian -> construct_int_be_unsigned
+  | LittleEndian -> (*construct_int_le_unsigned*)
+      (fun _ _ _ _ -> failwith "construct_int_le_unsigned")
+  | NativeEndian -> construct_int_ne_unsigned
+
 (* Construct a field of exactly 32 bits. *)
 let construct_int32_be_unsigned buf v flen _ =
   Buffer.add_byte buf
@@ -737,11 +758,25 @@ let construct_int32_be_unsigned buf v flen _ =
   Buffer.add_byte buf
     (Int32.to_int (Int32.logand v 0xff_l))
 
+let construct_int32_le_unsigned buf v flen _ =
+  Buffer.add_byte buf
+    (Int32.to_int (Int32.logand v 0xff_l));
+  Buffer.add_byte buf
+    (Int32.to_int ((Int32.logand (Int32.shift_right_logical v 8) 0xff_l)));
+  Buffer.add_byte buf
+    (Int32.to_int ((Int32.logand (Int32.shift_right_logical v 16) 0xff_l)));
+  Buffer.add_byte buf
+    (Int32.to_int (Int32.shift_right_logical v 24))
+
 let construct_int32_ne_unsigned =
   if nativeendian = BigEndian
   then construct_int32_be_unsigned
-  else (*construct_int32_le_unsigned*)
-    fun _ _ _ _ -> failwith "construct_int32_le_unsigned"
+  else construct_int32_le_unsigned
+
+let construct_int32_ee_unsigned = function
+  | BigEndian -> construct_int32_be_unsigned
+  | LittleEndian -> construct_int32_le_unsigned
+  | NativeEndian -> construct_int32_ne_unsigned
 
 (* Construct a field of up to 64 bits. *)
 let construct_int64_be_unsigned buf v flen exn =
@@ -755,6 +790,12 @@ let construct_int64_ne_unsigned =
   then construct_int64_be_unsigned
   else (*construct_int64_le_unsigned*)
     fun _ _ _ _ -> failwith "construct_int64_le_unsigned"
+
+let construct_int64_ee_unsigned = function
+  | BigEndian -> construct_int64_be_unsigned
+  | LittleEndian -> (*construct_int64_le_unsigned*)
+      (fun _ _ _ _ -> failwith "construct_int64_le_unsigned")
+  | NativeEndian -> construct_int64_ne_unsigned
 
 (* Construct from a string of bytes, exact multiple of 8 bits
  * in length of course.

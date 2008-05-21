@@ -9,9 +9,7 @@
  * The file format is documented here:
  *   http://wiki.wireshark.org/Development/LibpcapFileFormat
  *
- * libpcap endianness is determined at runtime.  Currently we don't
- * handle this well - we need to write the match code out twice.
- * Runtime endianness setting will solve this.  See TODO list, item 11.
+ * libpcap endianness is determined at runtime.
  *)
 
 open Printf
@@ -31,59 +29,40 @@ let rec main () =
   with
     End_of_file -> ()
 
+(* Determine the endianness (at runtime) from the magic number. *)
+and endian_of = function
+  | 0xa1b2c3d4_l -> Bitmatch.BigEndian
+  | 0xd4c3b2a1_l -> Bitmatch.LittleEndian
+  | _ -> assert false
+
 and libpcap_header bits =
   bitmatch bits with
-  | { 0xd4c3b2a1_l : 32;		(* writer was little endian *)
-      major : 16 : littleendian;	(* version *)
-      minor : 16 : littleendian;
-      timezone : 32 : littleendian;	(* timezone correction (seconds) *)
-      _ : 32 : littleendian;		(* always 0 apparently *)
-      snaplen : 32 : littleendian;	(* max length of captured packets *)
-      network : 32 : littleendian;	(* data link layer type *)
+  | { ((0xa1b2c3d4_l|0xd4c3b2a1_l) as magic) : 32; (* magic number *)
+      major : 16 : endian (endian_of magic);	 (* version *)
+      minor : 16 : endian (endian_of magic);
+      timezone : 32 : endian (endian_of magic);	 (* timezone correction (secs)*)
+      _ : 32 : endian (endian_of magic); (* always 0 apparently *)
+      snaplen : 32 : endian (endian_of magic);	(* max length of capt pckts *)
+      network : 32 : endian (endian_of magic);	(* data link layer type *)
       rest : -1 : bitstring
     } ->
-      Bitmatch.LittleEndian, (major, minor, timezone, snaplen, network), rest
-
-  | { 0xa1b2c3d4_l : 32;		(* writer was big endian *)
-      major : 16;			(* version *)
-      minor : 16;
-      timezone : 32;		        (* timezone correction (seconds) *)
-      _ : 32;				(* always 0 apparently *)
-      snaplen : 32;		        (* max length of captured packets *)
-      network : 32;			(* data link layer type *)
-      rest : -1 : bitstring
-    } ->
-      Bitmatch.BigEndian, (major, minor, timezone, snaplen, network), rest
+      endian_of magic, (major, minor, timezone, snaplen, network), rest
 
   | { _ } ->
       failwith "not a libpcap/tcpdump packet capture file"
 
-and libpcap_packet endian file_header bits =
-  if endian = Bitmatch.LittleEndian then (
-    bitmatch bits with
-    | { ts_sec : 32 : littleendian;	(* packet timestamp seconds *)
-	ts_usec : 32 : littleendian;	(* packet timestamp microseconds *)
-	incl_len : 32 : littleendian;   (* packet length saved in this file *)
-	orig_len : 32 : littleendian;   (* packet length originally on wire *)
-	pkt_data : Int32.to_int incl_len*8 : bitstring;
-	rest : -1 : bitstring
-      } ->
-	(ts_sec, ts_usec, incl_len, orig_len), pkt_data, rest
+and libpcap_packet e file_header bits =
+  bitmatch bits with
+  | { ts_sec : 32 : endian (e);	(* packet timestamp seconds *)
+      ts_usec : 32 : endian (e);  (* packet timestamp microseconds *)
+      incl_len : 32 : endian (e); (* packet length saved in this file *)
+      orig_len : 32 : endian (e); (* packet length originally on wire *)
+      pkt_data : Int32.to_int incl_len*8 : bitstring;
+      rest : -1 : bitstring
+    } ->
+      (ts_sec, ts_usec, incl_len, orig_len), pkt_data, rest
 
     | { _ } -> raise End_of_file
-  ) else (
-    bitmatch bits with
-    | { ts_sec : 32;			(* packet timestamp seconds *)
-	ts_usec : 32;		        (* packet timestamp microseconds *)
-	incl_len : 32;		        (* packet length saved in this file *)
-	orig_len : 32;		        (* packet length originally on wire *)
-	pkt_data : Int32.to_int incl_len*8 : bitstring;
-	rest : -1 : bitstring
-      } ->
-	(ts_sec, ts_usec, incl_len, orig_len), pkt_data, rest
-
-    | { _ } -> raise End_of_file
-  )
 
 and decode_and_print_packet file_header pkt_header pkt_data =
   let (ts_sec, ts_usec, _, orig_len) = pkt_header in

@@ -36,12 +36,13 @@ Major to-do items.
 (10) Cross-module, persistent, named patterns, see:
   http://caml.inria.fr/pub/ml-archives/caml-list/2008/04/25992c9c9fa999fe1d35d961dd9917a2.en.html
 
-(11) Runtime endiannness expressions.  The suggested syntax is:
+(11) DONE -
+     Runtime endiannness expressions.  The suggested syntax is:
 
-    { field : len : endianness(expr) }
+    { field : len : endian (expr) }
 
-    where expr would evaluate to something like `BigEndian or
-    `LittleEndian.
+    where expr would evaluate to something like BigEndian or
+    LittleEndian.
 
     There are several protocols around where endianness is only
     determined at runtime, examples are libpcap and TIFF.

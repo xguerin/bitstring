@@ -290,17 +290,21 @@ bitmatch bits with
    A bitstring field of length 0 matches an empty bitstring
    (occasionally useful when matching optional subfields).
 
-   Qualifiers are a list of identifiers which control the type,
+   Qualifiers are a list of identifiers/expressions which control the type,
    signedness and endianness of the field.  Permissible qualifiers are:
 
-   - [int] (field has an integer type)
-   - [string] (field is a string type)
-   - [bitstring] (field is a bitstring type)
-   - [signed] (field is signed)
-   - [unsigned] (field is unsigned)
-   - [bigendian] (field is big endian - a.k.a network byte order)
-   - [littleendian] (field is little endian - a.k.a Intel byte order)
-   - [nativeendian] (field is same endianness as the machine)
+   - [int]: field has an integer type
+   - [string]: field is a string type
+   - [bitstring]: field is a bitstring type
+   - [signed]: field is signed
+   - [unsigned]: field is unsigned
+   - [bigendian]: field is big endian - a.k.a network byte order
+   - [littleendian]: field is little endian - a.k.a Intel byte order
+   - [nativeendian]: field is same endianness as the machine
+   - [endian (expr)]: [expr] should be an expression which evaluates to
+       a {!endian} type, ie. [LittleEndian], [BigEndian] or [NativeEndian].
+       The expression is an arbitrary OCaml expression and can use the
+       value of earlier fields in the bitmatch.
 
    The default settings are [int], [unsigned], [bigendian].
 
@@ -719,17 +723,23 @@ val extract_int_le_unsigned : string -> int -> int -> int -> int * int * int
 
 val extract_int_ne_unsigned : string -> int -> int -> int -> int * int * int
 
+val extract_int_ee_unsigned : endian -> string -> int -> int -> int -> int * int * int
+
 val extract_int32_be_unsigned : string -> int -> int -> int -> int32 * int * int
 
 val extract_int32_le_unsigned : string -> int -> int -> int -> int32 * int * int
 
 val extract_int32_ne_unsigned : string -> int -> int -> int -> int32 * int * int
 
+val extract_int32_ee_unsigned : endian -> string -> int -> int -> int -> int32 * int * int
+
 val extract_int64_be_unsigned : string -> int -> int -> int -> int64 * int * int
 
 val extract_int64_le_unsigned : string -> int -> int -> int -> int64 * int * int
 
 val extract_int64_ne_unsigned : string -> int -> int -> int -> int64 * int * int
+
+val extract_int64_ee_unsigned : endian -> string -> int -> int -> int -> int64 * int * int
 
 val construct_bit : Buffer.t -> bool -> int -> exn -> unit
 
@@ -739,12 +749,18 @@ val construct_int_be_unsigned : Buffer.t -> int -> int -> exn -> unit
 
 val construct_int_ne_unsigned : Buffer.t -> int -> int -> exn -> unit
 
+val construct_int_ee_unsigned : endian -> Buffer.t -> int -> int -> exn -> unit
+
 val construct_int32_be_unsigned : Buffer.t -> int32 -> int -> exn -> unit
 
 val construct_int32_ne_unsigned : Buffer.t -> int32 -> int -> exn -> unit
 
+val construct_int32_ee_unsigned : endian -> Buffer.t -> int32 -> int -> exn -> unit
+
 val construct_int64_be_unsigned : Buffer.t -> int64 -> int -> exn -> unit
 
 val construct_int64_ne_unsigned : Buffer.t -> int64 -> int -> exn -> unit
+
+val construct_int64_ee_unsigned : endian -> Buffer.t -> int64 -> int -> exn -> unit
 
 val construct_string : Buffer.t -> string -> unit
