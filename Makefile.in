@@ -142,6 +142,7 @@ dist:
 	tar -cf - -T MANIFEST | tar -C $(PACKAGE)-$(VERSION) -xf -
 	$(INSTALL) -m 0755 configure $(PACKAGE)-$(VERSION)/
 	$(INSTALL) -m 0644 config.h.in $(PACKAGE)-$(VERSION)/
+	svn log -v > $(PACKAGE)-$(VERSION)/CHANGES
 	tar zcf $(PACKAGE)-$(VERSION).tar.gz $(PACKAGE)-$(VERSION)
 	rm -rf $(PACKAGE)-$(VERSION)
 	ls -l $(PACKAGE)-$(VERSION).tar.gz
