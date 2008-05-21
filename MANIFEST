@@ -28,4 +28,5 @@ tests/10_match_bits.ml
 tests/11_match_ints.ml
 tests/20_varsize.ml
 tests/30_bitbuffer.ml
+tests/40_endianexpr.ml
 TODO
