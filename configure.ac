@@ -29,7 +29,7 @@ test "x$U" != "x" && AC_MSG_ERROR(Compiler not ANSI compliant)
 
 AC_PROG_CC_C_O
 
-dnl Check for endianness.
+dnl Check for native endianness.
 AC_C_BIGENDIAN(
   [NATIVEENDIAN=BigEndian],
   [NATIVEENDIAN=LittleEndian],
@@ -51,7 +51,11 @@ if test "x$CAMLP4OF" = "xno"; then
     AC_MSG_ERROR([You must have camlp4 installed])
 fi
 
+dnl Check for CIL (optional)
+AC_CHECK_OCAML_PKG(cil)
+AC_SUBST(pkg_cil)
+
 dnl Produce output files.
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_FILES([Makefile META bitmatch_config.ml])
+AC_CONFIG_FILES([Makefile META bitmatch_config.ml cil-tools/Makefile])
 AC_OUTPUT

@@ -1,0 +1,82 @@
+# Bitmatch syntax extension.
+# Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+#
+# $Id: Makefile.in 81 2008-05-21 09:59:21Z richard.wm.jones $
+
+PACKAGE		= @PACKAGE_NAME@
+VERSION		= @PACKAGE_VERSION@
+
+OCAMLFIND	= @OCAMLFIND@
+OCAMLMKLIB	= @OCAMLMKLIB@
+OCAMLDOC	= @OCAMLDOC@
+INSTALL		= @INSTALL@
+
+OCAMLCFLAGS	= -g
+OCAMLCPACKAGES	= -package unix,str,extlib,cil -I ..
+OCAMLCLIBS	= $(OCAMLCPACKAGES) -linkpkg ../bitmatch.cma
+OCAMLOPTFLAGS	=
+OCAMLOPTPACKAGES = $(OCAMLCPACKAGES)
+OCAMLOPTLIBS	= $(OCAMLOPTPACKAGES) -linkpkg ../bitmatch.cmxa
+
+OCAMLDOCFLAGS	= -html -sort
+
+all:		bitmatch-import-c bitmatch-import-c.opt
+
+bitmatch-import-c: bitmatch_import_c.cmo
+	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCLIBS) $< -o $@
+
+bitmatch-import-c.opt: bitmatch_import_c.cmx
+	$(OCAMLFIND) ocamlopt $(OCAMLOPTFLAGS) $(OCAMLOPTLIBS) $< -o $@
+
+test:
+
+examples:
+
+# Clean.
+
+clean:
+	rm -f core *~ *.cmi *.cmo *.cmx *.cma *.cmxa *.a *.o
+
+distclean: clean
+
+# Install.
+
+install:
+
+# Standard rules.
+
+.mli.cmi:
+	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) -c $<
+.ml.cmo:
+	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) -c $<
+.ml.cmx:
+	$(OCAMLFIND) ocamlopt $(OCAMLOPTFLAGS) $(OCAMLOPTPACKAGES) -c $<
+
+depend: .depend
+
+.depend: $(wildcard *.ml) $(wildcard *.mli)
+	rm -f .depend
+	$(OCAMLFIND) ocamldep $(OCAMLCPACKAGES) $^ > $@
+
+ifeq ($(wildcard .depend),.depend)
+include .depend
+endif
+
+.PHONY: depend dist check-manifest dpkg doc \
+	print-examples print-tests examples test
+
+.SUFFIXES:      .cmo .cmi .cmx .ml .mli .mll
