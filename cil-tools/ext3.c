@@ -1,7 +1,7 @@
 /* This is an example import file, showing how to import the ext3
  * superblock automatically from Linux header files.
  *
- * Use: bitmatch-import-c ext3.c
+ * Use: bitmatch-import-c ext3.c > ext3_stubs.ml
  *
  * Tip: Add the --debug flag to that command line to see what's going on.
  */

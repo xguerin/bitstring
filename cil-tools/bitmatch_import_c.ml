@@ -21,6 +21,7 @@
 open Printf
 open ExtList
 open ExtString
+
 open Cil
 
 let () =
@@ -31,14 +32,24 @@ let () =
     printf "bitmatch-import-c %s" Bitmatch.version;
     exit 1
   in
+  let cpp_args = ref [] in
+  let cpp_arg2 name value =
+    cpp_args := (name ^ value) :: !cpp_args
+  in
 
   let argspec = Arg.align [
     "--debug", Arg.Set debug,
       " Debug messages";
-    "-save-temps", Arg.Set save_temps,
-      " Save temporary files";
     "--version", Arg.Unit version,
       " Display version and exit";
+    "-save-temps", Arg.Set save_temps,
+      " Save temporary files";
+    "-I", Arg.String (cpp_arg2 "-I"),
+      "dir Specify extra include directory for cpp";
+    "-D", Arg.String (cpp_arg2 "-D"),
+      "name=value Define value in cpp";
+    "-U", Arg.String (cpp_arg2 "-U"),
+      "name Undefine value in cpp";
   ] in
 
   let input_file = ref None in
@@ -67,6 +78,7 @@ OPTIONS" in
     | None ->
 	eprintf "bitmatch-import-c: no input file specified\n";
 	exit 1 in
+  let cpp_args = List.rev !cpp_args in
 
   (* Grab the file and pass it to the preprocessor, and then read the
    * C code into memory using CIL.
@@ -85,7 +97,8 @@ OPTIONS" in
     ) in
 
   let cmd =
-    sprintf "cpp -include bitmatch-import-prefix.h %s > %s"
+    sprintf "cpp %s -include bitmatch-import-prefix.h %s > %s"
+      (String.concat " " (List.map Filename.quote cpp_args))
       (Filename.quote input_file) (Filename.quote tmp) in
   if debug then prerr_endline cmd;
   if Sys.command cmd <> 0 then (
@@ -148,3 +161,182 @@ OPTIONS" in
     ) structs;
   );
 
+  (* Output constants. *)
+  List.iter (
+    fun (vname, vinit, loc) ->
+      printf "let %s = 0x%LX\n" vname vinit
+  ) constants;
+
+  (* Output structures. *)
+  List.iter (
+    fun (tname, ttype, loc) ->
+      (* Uncomment the next line if you want to really print the
+       * complete CIL structure of the type (for debugging etc.).
+       * The ASTs printed here are usually quite large.
+       *)
+      (*Errormsg.log "%a: %s %a\n" d_loc loc tname d_plaintype ttype;*)
+
+      (* Match on the type of this structure, and from it generate
+       * a single parsing function.
+       *)
+      match ttype with
+	(* struct or union *)
+      | TComp ({ cdefined = true; cname = cname }, _) ->
+	  printf "let %s_of_bitstring bits =\n" tname;
+	  printf "  bitmatch bits with\n";
+	  printf "  | {\n";
+	  (*output_struct [] NoOffset None ttype;*)
+	  printf "    } ->\n";
+	  printf "    Some (...)\n";
+	  printf "  | { _ } -> None\n\n"
+
+      (* An undefined struct or union -- means one which was only ever
+       * defined with 'struct foo;'.  This is an error.
+       *)
+      | TComp ({ cdefined = false; cname = cname }, _) ->
+	  Errormsg.error
+	    "%a: struct or union has no definition: %s" d_loc loc cname
+
+      (* Types which are not allowed, eg. void, int, arrays. *)
+      | TVoid _ | TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _
+      | TNamed _ | TBuiltin_va_list _ ->
+	  Errormsg.error
+	    "%a: not a struct or union: %a" d_loc loc d_type ttype
+
+      (* Types which we might implement in the future.
+       * For enum we should probably split out enums separately
+       * from structs above, since enums are more like constants.
+       *)
+      | TEnum ({ ename = ename }, _) ->
+	  Errormsg.unimp "%a: %a" d_loc loc d_type ttype
+(*
+      let rec to_fields names offset endian = function
+	  (* Some types contain attributes to indicate their
+	   * endianness.  See many examples from <linux/types.h>.
+	   *)
+	| (TNamed ({ tname = tname;
+		     ttype = TNamed (_, attrs) },
+		   _) as t)
+	    when hasAttribute "bitwise" attrs ->
+	    let endian =
+	      if String.starts_with tname "__le" then
+		Some Bitmatch.LittleEndian
+	      else if String.starts_with tname "__be" then
+		Some Bitmatch.BigEndian
+	      else (
+		Errormsg.warn "%a: unknown bitwise attribute typename: %s\n"
+		  d_loc loc tname;
+		endian
+	      ) in
+	    to_fields names offset endian (unrollType t)
+
+        (* See into named types. *)
+	| (TNamed _ as t) ->
+	    to_fields names offset endian (unrollType t)
+
+	(* struct or union *)
+	| TComp ({ cdefined = true; cfields = cfields }, _) ->
+	    let cfields =
+	      List.map (
+		fun ({ fname = fname; ftype = ftype } as finfo) ->
+		  let offset = Field (finfo, offset) in
+		  let names = fname :: names in
+		  to_fields names offset endian ftype
+	      ) cfields in
+	    List.flatten cfields
+
+	(* int array with constant length *)
+	| TArray (basetype, (Some _ as len), _)
+	    when isIntegralType basetype ->
+	    let len = lenOfArray len in
+	    let bitsoffset, totalwidth = bitsOffset ttype offset in
+	    let bitswidth = totalwidth / len (* of the element *) in
+	    (*if debug then (
+	      let name = String.concat "." (List.rev names) in
+	      Errormsg.log "%s: int array: %d, %d, len %d\n"
+		name bitsoffset bitswidth len
+	    );*)
+	    let basetype = unrollType basetype in
+	    let ikind =
+	      match basetype with
+	      | TInt (ikind, _) -> ikind
+	      | t ->
+		  Errormsg.unimp "%a: unhandled type: %a" d_loc loc d_type t;
+		  IInt in
+	    let field =
+	      to_int_field "" bitsoffset bitswidth ikind endian in
+	    let fname = String.concat "_" (List.rev names) in
+	    let byteoffset = bitsoffset lsr 3 in
+	    let bytetotalwidth = totalwidth lsr 3 in
+	    printf "--> array %s: byteoffset=%d bytetotalwidth=%d len=%d\n"
+	      fname byteoffset bytetotalwidth len (* field *);
+	    []
+
+	(* basic integer type *)
+	| TInt (ikind, _) ->
+	    let bitsoffset, bitswidth = bitsOffset ttype offset in
+	    (*if debug then (
+	      let name = String.concat "." (List.rev names) in
+	      Errormsg.log "%s: int: %d, %d\n" name bitsoffset bitswidth
+	    );*)
+	    let fname = String.concat "_" (List.rev names) in
+	    let field =
+	      to_int_field fname bitsoffset bitswidth ikind endian in
+	    [field]
+
+	(* a pointer - in this mapping we assume this is an address
+	 * (endianness and wordsize come from function parameters),
+	 * in other words we DON'T try to follow pointers, we just
+	 * note that they are there.
+	 *)
+	| TPtr _ ->
+	    let bitsoffset, bitswidth = bitsOffset ttype offset in
+	    let fname = String.concat "_" (List.rev names) in
+	    printf "--> pointer %s: bitsoffset=%d bitswidth=%d\n"
+	      fname bitsoffset bitswidth;
+	    []
+
+	| t ->
+	    Errormsg.unimp "to_fields: %a: unhandled type: %a"
+	      d_loc loc d_type t;
+	    []
+
+      and to_int_field fname bitsoffset bitswidth ikind endian =
+	let byteoffset = bitsoffset lsr 3 in
+	let bytewidth = bitswidth lsr 3 in
+	let signed = isSigned ikind in
+
+	if bitsoffset land 7 = 0 && bitswidth land 7 = 0 then (
+	  (* Not a bitfield. *)
+	  match bitswidth with
+	  | 8 ->
+	      printf "--> byte %s: byteoffset=%d bytewidth=%d signed=%b\n"
+		fname byteoffset bytewidth signed
+	  | 16 ->
+	      printf "--> short %s: byteoffset=%d bytewidth=%d signed=%b endian=%s\n"
+		fname byteoffset bytewidth signed (Option.map_default Bitmatch.string_of_endian "None" endian)
+	  | 32 ->
+	      printf "--> int %s: byteoffset=%d bytewidth=%d signed=%b endian=%s\n"
+		fname byteoffset bytewidth signed (Option.map_default Bitmatch.string_of_endian "None" endian)
+	  | 64 ->
+	      printf "--> long %s: byteoffset=%d bytewidth=%d signed=%b endian=%s\n"
+		fname byteoffset bytewidth signed (Option.map_default Bitmatch.string_of_endian "None" endian)
+	  | _ ->
+	      Errormsg.unimp "%s: unhandled integer width: %d bits"
+		fname bitswidth
+	) else (
+	  (* It's a bitfield if either the offset or width isn't
+	   * byte-aligned.
+	   *)
+	  let bitsoffset = bitsoffset land 7 in
+	  printf "--> bitfield %s: byteoffset=%d bytewidth=%d signed=%b endian=%s bitsoffset=%d bitswidth=%d\n"
+	    fname byteoffset bytewidth
+	    signed (Option.map_default Bitmatch.string_of_endian "None" endian) bitsoffset bitswidth
+	)
+      in
+*)
+  ) structs;
+
+  if !Errormsg.hadErrors then exit 1;
+
+  exit 0
