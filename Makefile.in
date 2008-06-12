@@ -41,24 +41,44 @@ EXAMPLES	= $(patsubst %.ml,%,$(wildcard examples/*.ml))
 
 TESTS		= $(patsubst %.ml,%,$(wildcard tests/*.ml))
 
-all:	bitmatch.cma bitmatch.cmxa pa_bitmatch.cmo
+all:	bitmatch.cma bitmatch_persistent.cma \
+	bitmatch.cmxa bitmatch_persistent.cmxa \
+	pa_bitmatch.cmo
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
 bitmatch.cma: bitmatch_types.cmo bitmatch_config.cmo bitmatch.cmo
 	$(OCAMLFIND) ocamlc -a -o $@ $^
 
+bitmatch_persistent.cma: bitmatch_persistent.cmo
+	$(OCAMLFIND) ocamlc -a -o $@ $^
+
+bitmatch_persistent.cmo: bitmatch_persistent.ml
+	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) \
+	  -I +camlp4 -pp camlp4of -c $<
+
 bitmatch.cmxa: bitmatch_types.cmx bitmatch_config.cmx bitmatch.cmx
 	$(OCAMLFIND) ocamlopt -a -o $@ $^
 
-pa_bitmatch.cmo: pa_bitmatch.ml bitmatch.cma
+bitmatch_persistent.cmxa: bitmatch_persistent.cmx
+	$(OCAMLFIND) ocamlopt -a -o $@ $^
+
+bitmatch_persistent.cmx: bitmatch_persistent.ml
+	$(OCAMLFIND) ocamlopt $(OCAMLOPTFLAGS) $(OCAMLOPTPACKAGES) \
+	  -I +camlp4 -pp camlp4of -c $<
+
+bitmatch_persistent.cmi: bitmatch_persistent.mli
+	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) \
+	  -I +camlp4 -pp camlp4of -c $<
+
+pa_bitmatch.cmo: pa_bitmatch.ml bitmatch.cma bitmatch_persistent.cma
 	$(OCAMLFIND) ocamlc bitmatch.cma -I +camlp4 camlp4lib.cma \
-	  -pp camlp4of.opt -c $< -o $@
+	  -pp camlp4of -c $< -o $@
 
 # Tests and examples.
 
-PP	= -pp "camlp4o bitmatch.cma pa_bitmatch.cmo"
+PP	= -pp "camlp4o bitmatch.cma bitmatch_persistent.cma pa_bitmatch.cmo"
 
-test: pa_bitmatch.cmo bitmatch.cma
+test: pa_bitmatch.cmo bitmatch.cma bitmatch_persistent.cma
 	@for f in $(TESTS); do \
 	  echo Building $$f; \
 	  $(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(PP) \
@@ -70,7 +90,7 @@ test: pa_bitmatch.cmo bitmatch.cma
 	done
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
-examples: pa_bitmatch.cmo bitmatch.cma
+examples: pa_bitmatch.cmo bitmatch.cma bitmatch_persistent.cma
 	@for f in $(EXAMPLES); do \
 	  echo Building $$f; \
 	  $(OCAMLFIND) ocamlc $(OCAMLFLAGS) $(PP) \
@@ -79,10 +99,11 @@ examples: pa_bitmatch.cmo bitmatch.cma
 	done
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
-print-tests: pa_bitmatch.cmo
+print-tests: pa_bitmatch.cmo bitmatch_persistent.cma
 	@for f in $(TESTS); do \
 	  echo Test: $$f.ml; \
-	  cmd="camlp4o bitmatch.cma pa_bitmatch.cmo -printer pr_o.cmo $$f.ml"; \
+	  cmd="camlp4o bitmatch.cma bitmatch_persistent.cma pa_bitmatch.cmo \
+	    -printer pr_o.cmo $$f.ml"; \
 	  echo $$cmd; \
 	  $$cmd; \
 	done
@@ -90,7 +111,8 @@ print-tests: pa_bitmatch.cmo
 print-examples: pa_bitmatch.cmo
 	@for f in $(EXAMPLES); do \
 	  echo Example: $$f.ml; \
-	  camlp4o bitmatch.cma pa_bitmatch.cmo -printer pr_o.cmo $$f.ml; \
+	  camlp4o bitmatch.cma bitmatch_persistent.cma pa_bitmatch.cmo \
+	    -printer pr_o.cmo $$f.ml; \
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	done
 
@@ -114,7 +136,8 @@ ifneq ($(OCAMLDOC),)
 doc:
 	rm -rf html
 	mkdir html
-	$(OCAMLDOC) $(OCAMLDOCFLAGS) -d html bitmatch.mli bitmatch.ml
+	$(OCAMLDOC) $(OCAMLDOCFLAGS) -d html bitmatch.mli bitmatch.ml \
+	  bitmatch_persistent.mli bitmatch_persistent.ml
 endif
 
 # Install.
@@ -122,6 +145,7 @@ endif
 install:
 	ocamlfind install bitmatch META *.mli *.cmx *.cma *.cmxa *.a \
 		bitmatch.cmi \
+		bitmatch_persistent.cmi \
 		pa_bitmatch.cmo
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
@@ -137,9 +161,11 @@ install:
 depend: .depend
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
-.depend: bitmatch.ml bitmatch.mli
+.depend: bitmatch.ml bitmatch.mli bitmatch_persistent.ml bitmatch_persistent.mli
 	rm -f .depend
-	$(OCAMLFIND) ocamldep $(OCAMLCPACKAGES) $^ > $@
+	$(OCAMLFIND) ocamldep $(OCAMLCPACKAGES) bitmatch.ml bitmatch.mli >> $@
+	$(OCAMLFIND) ocamldep $(OCAMLCPACKAGES) -pp camlp4of \
+	  bitmatch_persistent.ml bitmatch_persistent.mli >> $@
 
 ifeq ($(wildcard .depend),.depend)
 include .depend

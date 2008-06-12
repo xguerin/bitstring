@@ -1,2 +1,5 @@
 bitmatch.cmo: bitmatch_types.cmo bitmatch_config.cmo bitmatch.cmi 
 bitmatch.cmx: bitmatch_types.cmx bitmatch_config.cmx bitmatch.cmi 
+bitmatch_persistent.cmo: bitmatch.cmi bitmatch_persistent.cmi 
+bitmatch_persistent.cmx: bitmatch.cmx bitmatch_persistent.cmi 
+bitmatch_persistent.cmi: bitmatch.cmi 
