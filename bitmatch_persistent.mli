@@ -74,10 +74,10 @@ v}
    link to camlp4.  Since camlp4 in OCaml >= 3.10 is rather large, we
    have placed this code into this separate submodule, so that
    programs which just use bitmatch don't need to pull in the whole of
-   camlp4.  This restriction does not apply to generated code which
-   only uses persistent patterns.  If the distinction isn't clear,
-   use [ocamlobjinfo] to look at the dependencies of your [*.cmo]
-   files.
+   camlp4.  This restriction does not apply to code which only uses
+   persistent patterns but does not generate them.  If the distinction
+   isn't clear, use [ocamlobjinfo] to look at the dependencies of your
+   [*.cmo] files.
 
    Persistent patterns can be generated in several ways, but they
    can only be {i used} by the [pa_bitmatch] syntax extension.
@@ -185,18 +185,18 @@ v}
    the file that your tool reads for input.  By convention,
    locations are bound to name [_loc]:
 
-{v
+   {v
    let _loc = Loc.move_line 42 (Loc.mk "input.xml")
-v}
+   v}
 
    Create a pattern field representing a length field which is 8 bits wide,
    bound to the identifier [len]:
 
-{v
+   {v
    let len_field = create_pattern_field _loc
    let len_field = set_length_int len_field 8
    let len_field = set_lident_patt len_field "len"
-v}
+   v}
 
    Create a pattern field representing a string of [len*8] bits.
    Note that the use of [<:expr< >>] quotation requires
@@ -204,37 +204,37 @@ v}
    (see {{:http://brion.inria.fr/gallium/index.php/Reflective_OCaml}this
    page on Reflective OCaml}).
 
-{v
+   {v
    let str_field = create_pattern_field _loc
    let str_field = set_length str_field <:expr< len*8 >>
    let str_field = set_lident_patt str_field "str"
    let str_field = set_type_string str_field
-v}
+   v}
 
    Join the two fields together and name it:
 
-{v
+   {v
    let pattern = [len_field; str_field]
    let named_pattern = "pascal_string", Pattern pattern
-v}
+   v}
 
    Save it to a file:
 
-{v
+   {v
    let chan = open_out "output.bmpp" in
    named_to_channel chan named_pattern;
    close_out chan
-v}
+   v}
 
    You can now use this pattern in another program like this:
 
-{v
+   {v
    open bitmatch "output.bmpp" ;;
    let parse_pascal_string bits =
-     bitmatch bits with
-     | \{ :pascal_string } -> str, len
-     | \{ _ } -> invalid_arg "not a Pascal string"
-v}
+   bitmatch bits with
+   | \{ :pascal_string } -> str, len
+   | \{ _ } -> invalid_arg "not a Pascal string"
+   v}
 
    You can write more than one named pattern to the output file, and
    they will all be loaded at the same time by [open bitmatch ".."]
