@@ -53,6 +53,19 @@ let is_pascal_string bits =
       str strlen
 v}
 
+   or:
+
+{v
+(* Load a persistent pattern from a file. *)
+open bitmatch "pascal.bmpp"
+
+let is_pascal_string bits =
+  bitmatch bits with
+  | \{ :pascal_string } ->
+    printf "matches a Pascal string %s, len %d bytes\n"
+      str strlen
+v}
+
    {3 Important notes}
 
    There are some important things you should know about
@@ -99,7 +112,7 @@ v}
 
    [bitmatch bits with { :name } -> ...]
 
-   You can use named patterns within named patterns.
+   You can nest named patterns within named patterns to any depth.
 
    Currently the use of named patterns is somewhat limited.
    The restrictions are:
