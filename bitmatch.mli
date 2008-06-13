@@ -173,7 +173,7 @@ let make_message typ subtype param =
 
    The general form of [bitmatch] is:
 
-   [bitmatch {] {i bitstring-expression} [} with]
+   [bitmatch] {i bitstring-expression} [with]
 
    [| {] {i pattern} [} ->] {i code}
 
@@ -384,7 +384,7 @@ Bitmatch.hexdump_bitstring stdout bits ;;
    length expression in the field is a compile-time constant or a
    computed expression.
 
-   Detection of compile-time constants is quite simplistic so only an
+   Detection of compile-time constants is quite simplistic so only
    simple integer literals and simple expressions (eg. [5*8]) are
    recognized as constants.
 
@@ -427,7 +427,8 @@ Bitmatch.hexdump_bitstring stdout bits ;;
 
    {v
    ocamlc -I +bitmatch \
-     -pp "camlp4o `ocamlc -where`/bitmatch/pa_bitmatch.cmo" \
+     -pp "camlp4o bitmatch.cma bitmatch_persistent.cma \
+            `ocamlc -where`/bitmatch/pa_bitmatch.cmo" \
      bitmatch.cma test.ml -o test
    v}
 
@@ -487,7 +488,7 @@ Bitmatch.hexdump_bitstring stdout bits ;;
    let len = read_untrusted_source () in
    let buffer = allocate_bitstring () in
    BITSTRING {
-   buffer : len : bitstring
+     buffer : len : bitstring
    }
    ]}
 
