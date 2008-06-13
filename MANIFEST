@@ -2,10 +2,20 @@ aclocal.m4
 bitmatch.ml
 bitmatch.mli
 bitmatch_config.ml.in
+bitmatch_objinfo.ml
+bitmatch_persistent.ml
+bitmatch_persistent.mli
 bitmatch_types.ml
 .depend
+cil-tools/bitmatch_import_c.ml
+cil-tools/bitmatch-import-prefix.h
+cil-tools/.depend
+cil-tools/ext3.c
+cil-tools/Makefile.in
+cil-tools/task_struct.c
 configure.ac
 COPYING.LIB
+create_test_pattern.ml
 examples/elf.ml
 examples/ext3_sb
 examples/ext3_superblock.ml
@@ -29,4 +39,6 @@ tests/11_match_ints.ml
 tests/20_varsize.ml
 tests/30_bitbuffer.ml
 tests/40_endianexpr.ml
+tests/50_named_pattern.ml
+tests/51_open_pattern.ml
 TODO
