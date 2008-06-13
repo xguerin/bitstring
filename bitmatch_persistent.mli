@@ -235,6 +235,11 @@ v}
      | \{ _ } -> invalid_arg "not a Pascal string"
 v}
 
+   You can write more than one named pattern to the output file, and
+   they will all be loaded at the same time by [open bitmatch ".."]
+   (obviously you should give each pattern a different name).  To do
+   this, just call {!named_to_channel} as many times as needed.
+
    {2:reference Reference}
 
    {3 Types}
