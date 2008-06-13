@@ -35,6 +35,9 @@ module P = Bitmatch_persistent
  *)
 let debug = false
 
+(* Hashtable storing named persistent patterns. *)
+let pattern_hash : (string, P.pattern) Hashtbl.t = Hashtbl.create 13
+
 (* Work out if an expression is an integer constant.
  *
  * Returns [Some i] if so (where i is the integer value), else [None].
@@ -798,8 +801,51 @@ let output_bitmatch _loc bs cases =
 				    $int:loc_line$, $int:loc_char$))
   >>
 
+(* Add a named pattern. *)
+let add_named_pattern _loc name pattern =
+  Hashtbl.add pattern_hash name pattern
+
+(* Expand a named pattern from the pattern_hash. *)
+let expand_named_pattern _loc name =
+  try Hashtbl.find pattern_hash name
+  with Not_found ->
+    Loc.raise _loc (Failure (sprintf "named pattern not found: %s" name))
+
+(* Add named patterns from a file.  See the documentation on the
+ * directory search path in bitmatch_persistent.mli
+ *)
+let load_patterns_from_file _loc filename =
+  let chan =
+    if Filename.is_relative filename && Filename.is_implicit filename then (
+      (* Try current directory. *)
+      try open_in filename
+      with _ ->
+	(* Try OCaml library directory. *)
+	try open_in (Filename.concat Bitmatch_config.ocamllibdir filename)
+	with exn -> Loc.raise _loc exn
+    ) else (
+      try open_in filename
+      with exn -> Loc.raise _loc exn
+    ) in
+  let names = ref [] in
+  (try
+     let rec loop () =
+       let name = P.named_from_channel chan in
+       names := name :: !names
+     in
+     loop ()
+   with End_of_file -> ()
+  );
+  close_in chan;
+  let names = List.rev !names in
+  List.iter (
+    function
+    | name, P.Pattern patt -> add_named_pattern _loc name patt
+    | _, P.Constructor _ -> () (* just ignore these for now *)
+  ) names
+
 EXTEND Gram
-  GLOBAL: expr;
+  GLOBAL: expr str_item;
 
   (* Qualifiers are a list of identifiers ("string", "bigendian", etc.)
    * followed by an optional expression (used in certain cases).  Note
@@ -812,22 +858,33 @@ EXTEND Gram
 	SEP "," ]
   ];
 
-  (* Field used in the bitmatch operator (a pattern). *)
+  (* Field used in the bitmatch operator (a pattern).  This can actually
+   * return multiple fields, in the case where the 'field' is a named
+   * persitent pattern.
+   *)
   patt_field: [
     [ fpatt = patt; ":"; len = expr LEVEL "top";
       qs = OPT [ ":"; qs = qualifiers -> qs ] ->
 	let field = P.create_pattern_field _loc in
 	let field = P.set_patt field fpatt in
 	let field = P.set_length field len in
-	parse_field _loc field qs
+	[parse_field _loc field qs]	(* Normal, single field. *)
+    | ":"; name = LIDENT ->
+	expand_named_pattern _loc name (* Named -> list of fields. *)
     ]
   ];
 
   (* Case inside bitmatch operator. *)
-  match_case: [
+  patt_fields: [
     [ "{";
       fields = LIST0 patt_field SEP ";";
-      "}";
+      "}" ->
+	List.concat fields
+    ]
+  ];
+
+  patt_case: [
+    [ fields = patt_fields;
       bind = OPT [ "as"; name = LIDENT -> name ];
       whenclause = OPT [ "when"; e = expr -> e ]; "->";
       code = expr ->
@@ -846,19 +903,45 @@ EXTEND Gram
     ]
   ];
 
+  constr_fields: [
+    [ "{";
+      fields = LIST0 constr_field SEP ";";
+      "}" ->
+	fields
+    ]
+  ];
+
   (* 'bitmatch' expressions. *)
   expr: LEVEL ";" [
     [ "bitmatch";
       bs = expr; "with"; OPT "|";
-      cases = LIST1 match_case SEP "|" ->
+      cases = LIST1 patt_case SEP "|" ->
 	output_bitmatch _loc bs cases
     ]
 
   (* Constructor. *)
-  | [ "BITSTRING"; "{";
-      fields = LIST0 constr_field SEP ";";
-      "}" ->
+  | [ "BITSTRING";
+      fields = constr_fields ->
 	output_constructor _loc fields
+    ]
+  ];
+
+  (* Named persistent patterns.
+   *
+   * NB: Currently only allowed at the top level.  We can probably lift
+   * this restriction later if necessary.  We only deal with patterns
+   * at the moment, not constructors, but the infrastructure to do
+   * constructors is in place.
+   *)
+  str_item: LEVEL "top" [
+    [ "let"; "bitmatch";
+      name = LIDENT; "="; fields = patt_fields ->
+	add_named_pattern _loc name fields;
+        (* The statement disappears, but we still need a str_item so ... *)
+        <:str_item< >>
+    | "open"; "bitmatch"; filename = STRING ->
+	load_patterns_from_file _loc filename;
+	<:str_item< >>
     ]
   ];
 

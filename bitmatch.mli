@@ -417,6 +417,10 @@ Bitmatch.hexdump_bitstring stdout bits ;;
    still need to be a runtime check to enforce the
    size).
 
+   {2 Named patterns and persistent patterns}
+
+   Please see {!Bitmatch_persistent} for documentation on this subject.
+
    {2 Compiling}
 
    Using the compiler directly you can do:

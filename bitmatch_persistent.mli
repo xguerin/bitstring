@@ -19,6 +19,10 @@
  *)
 
 (**
+   {b Warning:} This documentation is for ADVANCED USERS ONLY.
+   If you are not an advanced user, you are probably looking
+   for {{:Bitmatch.html}the Bitmatch documentation}.
+
    {{:#reference}Jump straight to the reference section for
    documentation on types and functions}.
 
@@ -26,8 +30,8 @@
 
    Bitmatch allows you to name sets of fields and reuse them
    elsewhere.  For example if you frequently need to parse
-   Pascal-style strings in the form [length byte + string], then you
-   could name the [{ strlen : 8 : int; str : strlen*8 : string}]
+   Pascal-style strings in the form length byte + string, then you
+   could name the [{ strlen : 8 : int; str : strlen*8 : string }]
    pattern and reuse it everywhere by name.
 
    These are called {b persistent patterns}.
@@ -35,16 +39,16 @@
    The basic usage is:
 
 {v
-(* Create a persistent pattern called 'pascal' which
+(* Create a persistent pattern called 'pascal_string' which
  * matches Pascal-style strings (length byte + string).
  *)
-bitmatch pascal =
-  { strlen : 8 : int;
+let bitmatch pascal_string =
+  \{ strlen : 8 : int;
     str : strlen*8 : string }
 
 let is_pascal_string bits =
   bitmatch bits with
-  | { pascal } ->
+  | \{ :pascal_string } ->
     printf "matches a Pascal string %s, len %d bytes\n"
       str strlen
 v}
@@ -82,43 +86,191 @@ v}
    patterns (not unless your program runs [ocamlc] to make a [*.cmo]
    file then dynamically links to the [*.cmo] file).
 
+   {2 Named patterns}
 
+   A named pattern is a way to name a pattern and use it later
+   in the same source file.  To name a pattern, use:
 
+   [let bitmatch name = { fields ... } ;;]
 
+   and you can then use the name later on inside another pattern,
+   by prefixing the name with a colon.
+   For example:
 
+   [bitmatch bits with { :name } -> ...]
 
+   You can use named patterns within named patterns.
 
+   Currently the use of named patterns is somewhat limited.
+   The restrictions are:
 
+   Named patterns can only be used within the same source file, and
+   the names occupy a completely separate namespace from anything
+   else in the source file.
 
+   The [let bitmatch] syntax only works at the top level.  We may
+   add a [let bitmatch ... in] for inner levels later.
+
+   Because you cannot rename the bound identifiers in named
+   patterns, you can effectively only use them once in a
+   pattern.  For example, [{ :name; :name }] is legal, but
+   any bindings in the first name would be overridden by
+   the second name.
+
+   There are no "named constructors" yet, but the machinery
+   is in place to do this, and we may add them later.
+
+   {2 Persistent patterns in files}
+
+   More useful than just naming patterns, you can load
+   persistent patterns from external files.  The patterns
+   in these external files can come from a variety of sources:
+   for example, in the [cil-tools] subdirectory are some
+   {{:http://cil.sf.net/}Cil-based} tools for importing C
+   structures from header files.  You can also generate
+   your own files or write your own tools, as described below.
+
+   To use the persistent pattern(s) from a file do:
+
+   [open bitmatch "filename.bmpp" ;;]
+
+   A list of zero or more {!named} patterns are read from the file
+   and each is bound to a name (as contained in the file),
+   and then the patterns can be used with the usual [:name]
+   syntax described above.
+
+   {3 Extension}
+
+   The standard extension is [.bmpp].  This is just a convention
+   and you can use any extension you want.
+
+   {3 Directory search order}
+
+   If the filename is an absolute or explicit path, then we try to
+   load it from that path and stop if it fails.  See the [Filename]
+   module in the standard OCaml library for the definitions of
+   "absolute path" and "explicit path".  Otherwise we use the
+   following directory search order:
+
+   - Relative to the current directory
+   - Relative to the OCaml library directory
+
+   {3 bitmatch-objinfo}
+
+   The [bitmatch-objinfo] command can be run on a file in order
+   to print out the patterns in the file.
+
+   {3 Constructors}
+
+   We haven't implemented persistent constructors yet, although
+   the machinery is in place to make this happen.  Any constructors
+   found in the file are ignored.
+
+   {2 Creating your own persistent patterns}
+
+   If you want to write a tool to import bitstrings from an
+   exotic location or markup language, you will need
+   to use the functions found in the {{:#reference}reference section}.
+
+   I will describe using an example here of how you would
+   programmatically create a persistent pattern which
+   matches Pascal-style "length byte + data" strings.
+   Firstly note that there are two fields, so our pattern
+   will be a list of length 2 and type {!pattern}.
+
+   You will need to create a camlp4 location object ([Loc.t])
+   describing the source file.  This source file is used
+   to generate useful error messages for the user, so
+   you may want to set it to be the name and location in
+   the file that your tool reads for input.  By convention,
+   locations are bound to name [_loc]:
+
+{v
+   let _loc = Loc.move_line 42 (Loc.mk "input.xml")
+v}
+
+   Create a pattern field representing a length field which is 8 bits wide,
+   bound to the identifier [len]:
+
+{v
+   let len_field = create_pattern_field _loc
+   let len_field = set_length_int len_field 8
+   let len_field = set_lident_patt len_field "len"
+v}
+
+   Create a pattern field representing a string of [len*8] bits.
+   Note that the use of [<:expr< >>] quotation requires
+   you to preprocess your source with [camlp4of]
+   (see {{:http://brion.inria.fr/gallium/index.php/Reflective_OCaml}this
+   page on Reflective OCaml}).
+
+{v
+   let str_field = create_pattern_field _loc
+   let str_field = set_length str_field <:expr< len*8 >>
+   let str_field = set_lident_patt str_field "str"
+   let str_field = set_type_string str_field
+v}
+
+   Join the two fields together and name it:
+
+{v
+   let named_pattern = "pascal_string", Pattern [len_field; str_field]
+v}
+
+   Save it to a file:
+
+{v
+   let chan = open_out "output.bmpp" in
+   named_to_channel chan named_pattern;
+   close_out chan
+v}
+
+   You can now use this pattern in another program like this:
+
+{v
+   open bitmatch "output.bmpp" ;;
+   let parse_pascal_string bits =
+     bitmatch bits with
+     | \{ :pascal_string } -> str, len
+     | \{ _ } -> invalid_arg "not a Pascal string"
+v}
 
    {2:reference Reference}
 
-   {3 Internal}
+   {3 Types}
 *)
 
 type patt = Camlp4.PreCast.Syntax.Ast.patt
 type expr = Camlp4.PreCast.Syntax.Ast.expr
 type loc_t = Camlp4.PreCast.Syntax.Ast.Loc.t
-
-(** {3 Types} *)
+(** Just short names for the camlp4 types. *)
 
 type 'a field
 (** A field in a persistent pattern or persistent constructor. *)
 
 type pattern = patt field list
-(** A persistent pattern (used in [bitmatch] operator), is just a list
-    of pattern fields. *)
+(** A persistent pattern (used in [bitmatch] operator), is just a
+    list of pattern fields. *)
 
 type constructor = expr field list
 (** A persistent constructor (used in [BITSTRING] operator), is just a
     list of constructor fields. *)
+
+type named = string * alt
+and alt =
+  | Pattern of pattern			(** Pattern *)
+  | Constructor of constructor		(** Constructor *)
+(** A named pattern or constructor.
+
+    The name is used when binding a pattern from a file, but
+    is otherwise ignored. *)
 
 (** {3 Printers} *)
 
 val string_of_pattern : pattern -> string
 val string_of_constructor : constructor -> string
 val string_of_field : 'a field -> string
-(** Convert patterns, constructors, or individual fields
+(** Convert patterns, constructors or individual fields
     into printable strings for debugging purposes.
 
     The strings look similar to the syntax used by bitmatch, but
@@ -126,28 +278,23 @@ val string_of_field : 'a field -> string
 
 (** {3 Persistence} *)
 
-val pattern_to_channel : out_channel -> pattern -> unit
-val constructor_to_channel : out_channel -> constructor -> unit
+val named_to_channel : out_channel -> named -> unit
 (** Save a pattern/constructor to an output channel. *)
 
-val pattern_to_string : pattern -> string
-val constructor_to_string : constructor -> string
+val named_to_string : named -> string
 (** Serialize a pattern/constructor to a string. *)
 
-val pattern_to_buffer : string -> int -> int -> pattern -> int
-val constructor_to_buffer : string -> int -> int -> constructor -> int
+val named_to_buffer : string -> int -> int -> named -> int
 (** Serialize a pattern/constructor to part of a string, return the length. *)
 
-val pattern_from_channel : in_channel -> pattern
-val constructor_from_channel : in_channel -> constructor
+val named_from_channel : in_channel -> named
 (** Load a pattern/constructor from an output channel.
 
     Note: This is not type safe.  The pattern/constructor must
     have been written out under the same version of OCaml and
     the same version of bitmatch. *)
 
-val pattern_from_string : string -> int -> pattern
-val constructor_from_string : string -> int -> constructor
+val named_from_string : string -> int -> named
 (** Load a pattern/constructor from a string at offset within the string.
 
     Note: This is not type safe.  The pattern/constructor must

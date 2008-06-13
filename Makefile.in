@@ -43,7 +43,8 @@ TESTS		= $(patsubst %.ml,%,$(wildcard tests/*.ml))
 
 all:	bitmatch.cma bitmatch_persistent.cma \
 	bitmatch.cmxa bitmatch_persistent.cmxa \
-	pa_bitmatch.cmo
+	pa_bitmatch.cmo \
+	bitmatch-objinfo
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
 bitmatch.cma: bitmatch_types.cmo bitmatch_config.cmo bitmatch.cmo
@@ -74,11 +75,16 @@ pa_bitmatch.cmo: pa_bitmatch.ml bitmatch.cma bitmatch_persistent.cma
 	$(OCAMLFIND) ocamlc bitmatch.cma -I +camlp4 camlp4lib.cma \
 	  -pp camlp4of -c $< -o $@
 
+bitmatch-objinfo: bitmatch_objinfo.cmo bitmatch.cma bitmatch_persistent.cma
+	$(OCAMLFIND) ocamlc -I +camlp4 unix.cma camlp4lib.cma \
+	  bitmatch.cma bitmatch_persistent.cma \
+	  $< -o $@
+
 # Tests and examples.
 
 PP	= -pp "camlp4o bitmatch.cma bitmatch_persistent.cma pa_bitmatch.cmo"
 
-test: pa_bitmatch.cmo bitmatch.cma bitmatch_persistent.cma
+test: pa_bitmatch.cmo bitmatch.cma bitmatch_persistent.cma tests/test.bmpp
 	@for f in $(TESTS); do \
 	  echo Building $$f; \
 	  $(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(PP) \
@@ -90,10 +96,24 @@ test: pa_bitmatch.cmo bitmatch.cma bitmatch_persistent.cma
 	done
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
+tests/test.bmpp: create_test_pattern
+	./$< $@.new
+	mv $@.new $@
+
+create_test_pattern: create_test_pattern.cmo
+	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) -pp camlp4of \
+	  unix.cma -I +camlp4 camlp4lib.cma \
+	  -I . bitmatch.cma bitmatch_persistent.cma $< -o $@
+
+create_test_pattern.cmo: create_test_pattern.ml
+	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) -pp camlp4of \
+	  unix.cma -I +camlp4 \
+	  -I . -c $< -o $@
+
 examples: pa_bitmatch.cmo bitmatch.cma bitmatch_persistent.cma
 	@for f in $(EXAMPLES); do \
 	  echo Building $$f; \
-	  $(OCAMLFIND) ocamlc $(OCAMLFLAGS) $(PP) \
+	  $(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(PP) \
 	    -package unix -linkpkg -I . bitmatch.cma $$f.ml -o $$f; \
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	done
@@ -136,8 +156,8 @@ ifneq ($(OCAMLDOC),)
 doc:
 	rm -rf html
 	mkdir html
-	$(OCAMLDOC) $(OCAMLDOCFLAGS) -d html bitmatch.mli bitmatch.ml \
-	  bitmatch_persistent.mli bitmatch_persistent.ml
+	$(OCAMLDOC) $(OCAMLDOCFLAGS) -d html -I +camlp4 \
+	  bitmatch.mli bitmatch_persistent.mli
 endif
 
 # Install.

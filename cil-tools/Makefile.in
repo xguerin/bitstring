@@ -15,7 +15,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 #
-# $Id: Makefile.in 81 2008-05-21 09:59:21Z richard.wm.jones $
+# $Id$
 
 PACKAGE		= @PACKAGE_NAME@
 VERSION		= @PACKAGE_VERSION@
@@ -27,10 +27,10 @@ INSTALL		= @INSTALL@
 
 OCAMLCFLAGS	= -g
 OCAMLCPACKAGES	= -package unix,str,extlib,cil -I ..
-OCAMLCLIBS	= $(OCAMLCPACKAGES) -linkpkg ../bitmatch.cma
+OCAMLCLIBS	= $(OCAMLCPACKAGES) -linkpkg ../bitmatch.cma ../bitmatch_persistent.cma
 OCAMLOPTFLAGS	=
 OCAMLOPTPACKAGES = $(OCAMLCPACKAGES)
-OCAMLOPTLIBS	= $(OCAMLOPTPACKAGES) -linkpkg ../bitmatch.cmxa
+OCAMLOPTLIBS	= $(OCAMLOPTPACKAGES) -linkpkg ../bitmatch.cmxa ../bitmatch_persistent.cmxa
 
 OCAMLDOCFLAGS	= -html -sort
 

@@ -1,7 +1,5 @@
-(* Bitmatch library.
+(* Bitmatch syntax extension.
  * Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
- *
- * @configure_input@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,12 +18,33 @@
  * $Id$
  *)
 
-(* This file contains general configuration settings, set by the
- * configure script.
- *)
+open Printf
 
-let nativeendian = Bitmatch_types.@NATIVEENDIAN@
+open Bitmatch
+module P = Bitmatch_persistent
 
-let package = "@PACKAGE_NAME@"
-let version = "@PACKAGE_VERSION@"
-let ocamllibdir = "@OCAMLLIB@"
+let () =
+  if Array.length Sys.argv <= 1 then
+    failwith "bitmatch_objinfo filename.bmpp";
+  let filename = Sys.argv.(1) in
+  let chan = open_in filename in
+  let names = ref [] in
+  (try
+     let rec loop () =
+       let name = P.named_from_channel chan in
+       names := name :: !names
+     in
+     loop ()
+   with End_of_file -> ()
+  );
+  close_in chan;
+  let names = List.rev !names in
+  List.iter (
+    function
+    | name, P.Pattern patt ->
+	printf "let bitmatch %s =\n%s\n"
+	  name (P.string_of_pattern patt)
+    | name, P.Constructor cons ->
+	printf "let BITSTRING %s =\n%s\n"
+	  name (P.string_of_constructor cons)
+  ) names

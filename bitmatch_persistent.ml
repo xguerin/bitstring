@@ -38,16 +38,28 @@ type 'a field = {
   signed : bool;			(* true if signed, false if unsigned *)
   t : field_type;			(* type *)
   _loc : Loc.t;				(* location in source code *)
-  printer : 'a -> string;		(* turn the field into a string *)
+
+  (* Turn the field into a string.  This used to be a function,
+   * but that would prevent this structure from being marshalled.
+   * This is unsatisfactory at the moment because it means we
+   * can't print out the 'a field.
+   *)
+  printer : printer_t;
 }
 and field_type = Int | String | Bitstring (* field type *)
 and endian_expr =
   | ConstantEndian of Bitmatch.endian	(* a constant little/big/nativeendian *)
   | EndianExpr of expr			(* an endian expression *)
+and printer_t = PattPrinter | ExprPrinter | NoPrinter
 
 type pattern = patt field list
 
 type constructor = expr field list
+
+type named = string * alt
+and alt =
+  | Pattern of pattern
+  | Constructor of constructor
 
 (* Work out if an expression is an integer constant.
  *
@@ -118,31 +130,24 @@ let string_of_field { field = field; flen = flen;
   let loc_line = Loc.start_line _loc in
   let loc_char = Loc.start_off _loc - Loc.start_bol _loc in
 
-  sprintf "%s : %s : %s, %s, %s @ (%S, %d, %d)"
-    (printer field) flen t endian signed loc_fname loc_line loc_char
+  sprintf "[field] : %s : %s, %s, %s @ (%S, %d, %d)"
+    (*printer field*) flen t endian signed loc_fname loc_line loc_char
 
 let string_of_pattern pattern =
-  "{ " ^ String.concat "; " (List.map string_of_field pattern) ^ " }"
+  "{ " ^ String.concat ";\n  " (List.map string_of_field pattern) ^ " }\n"
 
 let string_of_constructor constructor =
-  "{ " ^ String.concat "; " (List.map string_of_field constructor) ^ " }"
+  "{ " ^ String.concat ";\n  " (List.map string_of_field constructor) ^ " }\n"
 
-let pattern_to_channel chan patt = Marshal.to_channel chan patt []
-let constructor_to_channel chan cons = Marshal.to_channel chan cons []
+let named_to_channel chan n = Marshal.to_channel chan n []
 
-let pattern_to_string patt = Marshal.to_string patt []
-let constructor_to_string cons = Marshal.to_string cons []
+let named_to_string n = Marshal.to_string n []
 
-let pattern_to_buffer str ofs len patt =
-  Marshal.to_buffer str ofs len patt []
-let constructor_to_buffer str ofs len cons =
-  Marshal.to_buffer str ofs len cons []
+let named_to_buffer str ofs len n = Marshal.to_buffer str ofs len n []
 
-let pattern_from_channel = Marshal.from_channel
-let constructor_from_channel = Marshal.from_channel
+let named_from_channel = Marshal.from_channel
 
-let pattern_from_string = Marshal.from_string
-let constructor_from_string = Marshal.from_string
+let named_from_string = Marshal.from_string
 
 let create_pattern_field _loc =
   {
@@ -152,7 +157,7 @@ let create_pattern_field _loc =
     signed = false;
     t = Int;
     _loc = _loc;
-    printer = patt_printer;
+    printer = PattPrinter;
   }
 
 let set_lident_patt field id =
@@ -188,7 +193,7 @@ let create_constructor_field _loc =
     signed = false;
     t = Int;
     _loc = _loc;
-    printer = expr_printer;
+    printer = ExprPrinter;
   }
 
 let set_lident_expr field id =
