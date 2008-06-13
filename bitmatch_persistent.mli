@@ -214,7 +214,8 @@ v}
    Join the two fields together and name it:
 
 {v
-   let named_pattern = "pascal_string", Pattern [len_field; str_field]
+   let pattern = [len_field; str_field]
+   let named_pattern = "pascal_string", Pattern pattern
 v}
 
    Save it to a file:
