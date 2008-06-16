@@ -39,19 +39,11 @@ type 'a field = {
   t : field_type;			(* type *)
   _loc : Loc.t;				(* location in source code *)
   offset : expr option;			(* offset expression *)
-
-  (* Turn the field into a string.  This used to be a function,
-   * but that would prevent this structure from being marshalled.
-   * This is unsatisfactory at the moment because it means we
-   * can't print out the 'a field.
-   *)
-  printer : printer_t;
 }
 and field_type = Int | String | Bitstring (* field type *)
 and endian_expr =
   | ConstantEndian of Bitmatch.endian	(* a constant little/big/nativeendian *)
   | EndianExpr of expr			(* an endian expression *)
-and printer_t = PattPrinter | ExprPrinter | NoPrinter
 
 type pattern = patt field list
 
@@ -113,10 +105,10 @@ let expr_printer = function
   | <:expr< $int:i$ >> -> i
   | _ -> "[expression]"
 
-let string_of_field { field = field; flen = flen;
-		      endian = endian; signed = signed; t = t;
-		      _loc = _loc;
-		      printer = printer} =
+let _string_of_field { flen = flen;
+		       endian = endian; signed = signed; t = t;
+		       _loc = _loc;
+		       offset = offset } =
   let flen =
     match expr_is_constant flen with
     | Some i -> string_of_int i
@@ -124,21 +116,40 @@ let string_of_field { field = field; flen = flen;
   let endian =
     match endian with
     | ConstantEndian endian -> Bitmatch.string_of_endian endian
-    | EndianExpr _ -> "endian [expr]" in
+    | EndianExpr _ -> "endian([expr])" in
   let signed = if signed then "signed" else "unsigned" in
   let t = string_of_field_type t in
+
+  let offset =
+    match offset with
+    | None -> ""
+    | Some expr ->
+	match expr_is_constant expr with
+	| Some i -> sprintf ", offset(%d)" i
+	| None -> sprintf ", offset([expr])" in
+
   let loc_fname = Loc.file_name _loc in
   let loc_line = Loc.start_line _loc in
   let loc_char = Loc.start_off _loc - Loc.start_bol _loc in
 
-  sprintf "[field] : %s : %s, %s, %s @ (%S, %d, %d)"
-    (*printer field*) flen t endian signed loc_fname loc_line loc_char
+  sprintf "%s : %s, %s, %s%s (* %S:%d %d *)"
+    flen t endian signed offset loc_fname loc_line loc_char
+
+let rec string_of_pattern_field ({ field = patt } as field) =
+  sprintf "%s : %s" (patt_printer patt) (_string_of_field field)
+
+and string_of_constructor_field ({ field = expr } as field) =
+  sprintf "%s : %s" (expr_printer expr) (_string_of_field field)
 
 let string_of_pattern pattern =
-  "{ " ^ String.concat ";\n  " (List.map string_of_field pattern) ^ " }\n"
+  "{ " ^
+    String.concat ";\n  " (List.map string_of_pattern_field pattern) ^
+    " }\n"
 
 let string_of_constructor constructor =
-  "{ " ^ String.concat ";\n  " (List.map string_of_field constructor) ^ " }\n"
+  "{ " ^
+    String.concat ";\n  " (List.map string_of_constructor_field constructor) ^
+    " }\n"
 
 let named_to_channel chan n = Marshal.to_channel chan n []
 
@@ -158,7 +169,6 @@ let create_pattern_field _loc =
     signed = false;
     t = Int;
     _loc = _loc;
-    printer = PattPrinter;
     offset = None;
   }
 
@@ -200,7 +210,6 @@ let create_constructor_field _loc =
     signed = false;
     t = Int;
     _loc = _loc;
-    printer = ExprPrinter;
     offset = None;
   }
 

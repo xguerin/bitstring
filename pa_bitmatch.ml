@@ -860,7 +860,7 @@ let output_bitmatch _loc bs cases =
 	(* Emit extra debugging code. *)
 	let expr =
 	  if not debug then expr else (
-	    let field = P.string_of_field field in
+	    let field = P.string_of_pattern_field field in
 
 	    <:expr<
 	      if !Bitmatch.debug then (

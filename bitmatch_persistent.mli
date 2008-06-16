@@ -288,7 +288,8 @@ and alt =
 
 val string_of_pattern : pattern -> string
 val string_of_constructor : constructor -> string
-val string_of_field : 'a field -> string
+val string_of_pattern_field : patt field -> string
+val string_of_constructor_field : expr field -> string
 (** Convert patterns, constructors or individual fields
     into printable strings for debugging purposes.
 
