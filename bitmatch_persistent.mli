@@ -329,7 +329,7 @@ val create_pattern_field : loc_t -> patt field
 
     The pattern is unbound, the type is set to [int], bit length to [32],
     endianness to [BigEndian], signedness to unsigned ([false]),
-    and source code location to the [_loc] parameter.
+    source code location to the [_loc] parameter, and no offset expression.
 
     To create a complete field you need to call the [set_*]
     functions.  For example, to create [{ len : 8 : int }]
@@ -422,6 +422,23 @@ val set_location : 'a field -> loc_t -> 'a field
 (** Sets the source code location of a field.  This is used when
     pa_bitmatch displays error messages. *)
 
+val set_offset_int : 'a field -> int -> 'a field
+(** Set the offset expression for a field to the given number.
+
+    The effect is that the field [{ _ : 8 : offset(160) }] could
+    be created by calling [set_offset_int field 160]. *)
+
+val set_offset : 'a field -> expr -> 'a field
+(** Set the offset expression for a field to the given expression.
+
+    The effect is that the field [{ _ : 8 : offset(160) }] could
+    be created by calling [set_offset_int field <:expr< 160 >>]. *)
+
+val set_no_offset : 'a field -> 'a field
+(** Remove the offset expression from a field.  The field will
+    follow the previous field, or if it is the first field will
+    be at offset zero. *)
+
 (** {3 Create constructor fields}
 
     These fields are used in constructors ([BITSTRING]). *)
@@ -485,3 +502,6 @@ val get_type : 'a field -> field_type
 
 val get_location : 'a field -> loc_t
 (** Get the source code location of a field. *)
+
+val get_offset : 'a field -> expr option
+(** Get the offset expression of a field, or [None] if there is none. *)

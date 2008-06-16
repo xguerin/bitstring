@@ -38,6 +38,7 @@ type 'a field = {
   signed : bool;			(* true if signed, false if unsigned *)
   t : field_type;			(* type *)
   _loc : Loc.t;				(* location in source code *)
+  offset : expr option;			(* offset expression *)
 
   (* Turn the field into a string.  This used to be a function,
    * but that would prevent this structure from being marshalled.
@@ -158,6 +159,7 @@ let create_pattern_field _loc =
     t = Int;
     _loc = _loc;
     printer = PattPrinter;
+    offset = None;
   }
 
 let set_lident_patt field id =
@@ -184,6 +186,11 @@ let set_type_int field = { field with t = Int }
 let set_type_string field = { field with t = String }
 let set_type_bitstring field = { field with t = Bitstring }
 let set_location field loc = { field with _loc = loc }
+let set_offset_int field i =
+  let _loc = field._loc in
+  { field with offset = Some <:expr< $`int:i$ >> }
+let set_offset field expr = { field with offset = Some expr }
+let set_no_offset field = { field with offset = None }
 
 let create_constructor_field _loc =
   {
@@ -194,6 +201,7 @@ let create_constructor_field _loc =
     t = Int;
     _loc = _loc;
     printer = ExprPrinter;
+    offset = None;
   }
 
 let set_lident_expr field id =
@@ -216,3 +224,4 @@ let get_endian field = field.endian
 let get_signed field = field.signed
 let get_type field = field.t
 let get_location field = field._loc
+let get_offset field = field.offset
