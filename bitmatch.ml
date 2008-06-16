@@ -40,9 +40,18 @@ type bitstring = string * int * int
 (* Functions to create and load bitstrings. *)
 let empty_bitstring = "", 0, 0
 
-let make_bitstring len c = String.make ((len+7) lsr 3) c, 0, len
+let make_bitstring len c =
+  if len >= 0 then String.make ((len+7) lsr 3) c, 0, len
+  else
+    invalid_arg (
+      sprintf "make_bitstring/create_bitstring: len %d < 0" len
+    )
 
 let create_bitstring len = make_bitstring len '\000'
+
+let zeroes_bitstring = create_bitstring
+
+let ones_bitstring len = make_bitstring len '\xff'
 
 let bitstring_of_string str = str, 0, String.length str lsl 3
 
@@ -803,6 +812,33 @@ let construct_int64_ee_unsigned = function
 let construct_string buf str =
   let len = String.length str in
   Buffer.add_bits buf str (len lsl 3)
+
+(* Construct from a bitstring. *)
+let construct_bitstring buf (data, off, len) =
+  (* Add individual bits until we get to the next byte boundary of
+   * the underlying string.
+   *)
+  let blen = 7 - ((off + 7) land 7) in
+  let blen = min blen len in
+  let rec loop off len blen =
+    if blen = 0 then (off, len)
+    else (
+      let b, off, len = extract_bit data off len 1 in
+      Buffer.add_bit buf b;
+      loop off len (blen-1)
+    )
+  in
+  let off, len = loop off len blen in
+  assert (len = 0 || (off land 7) = 0);
+
+  (* Add the remaining 'len' bits. *)
+  let data =
+    let off = off lsr 3 in
+    (* XXX dangerous allocation *)
+    if off = 0 then data
+    else String.sub data off (String.length data - off) in
+
+  Buffer.add_bits buf data len
 
 (*----------------------------------------------------------------------*)
 (* Extract a string from a bitstring. *)
