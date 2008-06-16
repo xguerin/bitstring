@@ -17,8 +17,10 @@
  * interested in.
  */
 #include <linux/magic.h>
-#include <linux/ext3_fs.h>
+//#include <linux/ext3_fs.h>
+#include <linux/ext2_fs.h>
 
 /* This tells the importer program what structures and constants to import. */
-typedef struct ext3_super_block BITMATCH_IMPORT(ext3_super_block);
+//typedef struct ext3_super_block BITMATCH_IMPORT(ext3_super_block);
+typedef struct ext2_super_block BITMATCH_IMPORT(ext2_super_block);
 BITMATCH_CONSTANT_INT32 (ext3_super_magic, EXT3_SUPER_MAGIC);

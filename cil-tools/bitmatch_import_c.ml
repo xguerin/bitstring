@@ -24,6 +24,8 @@ open ExtString
 
 open Cil
 
+module P = Bitmatch_persistent
+
 let () =
   (* Parse command line arguments. *)
   let debug = ref false in
@@ -161,11 +163,15 @@ OPTIONS" in
     ) structs;
   );
 
-  (* Output constants. *)
+(*
+  (* Output constants.
+   * XXX Disabled at the moment until we work out where to put them XXX
+   *)
   List.iter (
     fun (vname, vinit, loc) ->
       printf "let %s = 0x%LX\n" vname vinit
   ) constants;
+*)
 
   (* Output structures. *)
   List.iter (
@@ -176,19 +182,155 @@ OPTIONS" in
        *)
       (*Errormsg.log "%a: %s %a\n" d_loc loc tname d_plaintype ttype;*)
 
+      (* Recursive function to generate a persistent pattern from a
+       * C struct or union.  Quite a few limitations at the moment:
+       *   (1) Structure elements must be in order.
+       *   (2) Doesn't really work with unions [XXX].
+       *
+       * Parameters:
+       *   ?names   List of names of parent structs.  Used in the
+       *              recursive case for nested structs.
+       *   ?offset  Offset of struct within parent, usually NoOffset.  Used
+       *              in the recursive case for nested structs.
+       *   ?endian  Inherited endianness, usually None.  Used for C
+       *                __attribute__((bitwise)).
+       *   ttype    CIL type of struct.
+       * Returns:
+       *   pattern  A bitmatch persistent pattern.
+       *)
+      let rec pattern_of_struct ?(names=[]) ?(offset=NoOffset) ?(endian=None)
+	  ttype =
+	match ttype with
+	(* Some types contain attributes to indicate their
+	 * endianness.  See many examples from <linux/types.h>.
+	 *)
+	| (TNamed ({ tname = tname;
+		     ttype = TNamed (_, attrs) },
+		   _) as t)
+	    when hasAttribute "bitwise" attrs ->
+	    let endian =
+	      if String.starts_with tname "__le" then
+		Some Bitmatch.LittleEndian
+	      else if String.starts_with tname "__be" then
+		Some Bitmatch.BigEndian
+	      else (
+		Errormsg.warn "%a: unknown bitwise attribute typename: %s\n"
+		  d_loc loc tname;
+		endian
+	      ) in
+	    pattern_of_struct ~names ~offset ~endian (unrollType t)
+
+        (* See into named types. *)
+	| (TNamed _ as t) ->
+	    pattern_of_struct ~names ~offset ~endian (unrollType t)
+
+	(* struct or union *)
+	| TComp ({ cdefined = true; cfields = cfields }, _) ->
+	    let cfields =
+	      List.map (
+		fun ({ fname = fname; ftype = ftype } as finfo) ->
+		  let offset = Field (finfo, offset) in
+		  let names = fname :: names in
+		  pattern_of_struct ~names ~offset ~endian ftype
+	      ) cfields in
+	    List.flatten cfields
+
+	(* int array with constant length *)
+	| TArray (basetype, (Some _ as len), _) when isIntegralType basetype ->
+	    let len = lenOfArray len in
+	    let bitsoffset, totalwidth = bitsOffset ttype offset in
+	    let bitswidth = totalwidth / len (* of the element *) in
+	    (*if debug then (
+	      let name = String.concat "." (List.rev names) in
+	      Errormsg.log "%s: int array: %d, %d, len %d\n"
+		name bitsoffset bitswidth len
+	    );*)
+	    let basetype = unrollType basetype in
+	    let ikind =
+	      match basetype with
+	      | TInt (ikind, _) -> ikind
+	      | t ->
+		  Errormsg.unimp "%a: unhandled type: %a" d_loc loc d_type t;
+		  IInt in
+	    let field =
+	      pattern_field_of_int "" bitsoffset bitswidth ikind endian in
+	    let fname = String.concat "_" (List.rev names) in
+	    let byteoffset = bitsoffset lsr 3 in
+	    let bytetotalwidth = totalwidth lsr 3 in
+(*
+	    printf "--> array %s: byteoffset=%d bytetotalwidth=%d len=%d\n"
+	      fname byteoffset bytetotalwidth len (* field *);
+*)
+	    [] (* XXX *)
+
+	(* basic integer type *)
+	| TInt (ikind, _) ->
+	    let bitsoffset, bitswidth = bitsOffset ttype offset in
+	    (*if debug then (
+	      let name = String.concat "." (List.rev names) in
+	      Errormsg.log "%s: int: %d, %d\n" name bitsoffset bitswidth
+	    );*)
+	    let fname = String.concat "_" (List.rev names) in
+	    let field =
+	      pattern_field_of_int fname bitsoffset bitswidth ikind endian in
+	    [field]
+
+	(* a pointer - in this mapping we assume this is an address
+	 * (endianness and wordsize come from function parameters),
+	 * in other words we DON'T try to follow pointers, we just
+	 * note that they are there.
+	 *)
+	| TPtr _ ->
+	    let bitsoffset, bitswidth = bitsOffset ttype offset in
+	    let fname = String.concat "_" (List.rev names) in
+(*
+	    printf "--> pointer %s: bitsoffset=%d bitswidth=%d\n"
+	      fname bitsoffset bitswidth;
+*)
+	    [] (* XXX *)
+
+	| t ->
+	    Errormsg.unimp "to_fields: %a: unhandled type: %a"
+	      d_loc loc d_type t;
+	    []
+
+      (* Convert a single int field into a pattern field.
+       * Could be a bitfield, byte, short, etc.
+       *)
+      and pattern_field_of_int fname bitsoffset bitswidth ikind endian =
+	let signed = isSigned ikind in
+	let _loc = camlp4_loc_of_cil_loc loc in
+
+	let field = P.create_pattern_field _loc in
+	let field = P.set_lident_patt field fname in
+	let field = P.set_type_int field in
+	let field = P.set_length_int field bitswidth in
+	let field = P.set_offset_int field bitsoffset in
+	let field = P.set_signed field signed in
+	let field =
+	  match endian with
+	  | Some endian -> P.set_endian field endian
+	  | None -> P.set_endian field Bitmatch.NativeEndian in
+
+	field
+
+      (* Convert a CIL location into a camlp4 location.  Grrr these
+       * should be compatible!
+       *)
+      and camlp4_loc_of_cil_loc loc =
+	let _loc = Camlp4.PreCast.Syntax.Ast.Loc.mk loc.file in
+	Camlp4.PreCast.Syntax.Ast.Loc.move_line loc.line _loc
+      in
+
       (* Match on the type of this structure, and from it generate
        * a single parsing function.
        *)
       match ttype with
-	(* struct or union *)
+      (* struct or union *)
       | TComp ({ cdefined = true; cname = cname }, _) ->
-	  printf "let %s_of_bitstring bits =\n" tname;
-	  printf "  bitmatch bits with\n";
-	  printf "  | {\n";
-	  (*output_struct [] NoOffset None ttype;*)
-	  printf "    } ->\n";
-	  printf "    Some (...)\n";
-	  printf "  | { _ } -> None\n\n"
+	  let pattern = pattern_of_struct ttype in
+	  let named_pattern = cname, P.Pattern pattern in
+	  P.named_to_channel stdout named_pattern
 
       (* An undefined struct or union -- means one which was only ever
        * defined with 'struct foo;'.  This is an error.
@@ -209,132 +351,7 @@ OPTIONS" in
        *)
       | TEnum ({ ename = ename }, _) ->
 	  Errormsg.unimp "%a: %a" d_loc loc d_type ttype
-(*
-      let rec to_fields names offset endian = function
-	  (* Some types contain attributes to indicate their
-	   * endianness.  See many examples from <linux/types.h>.
-	   *)
-	| (TNamed ({ tname = tname;
-		     ttype = TNamed (_, attrs) },
-		   _) as t)
-	    when hasAttribute "bitwise" attrs ->
-	    let endian =
-	      if String.starts_with tname "__le" then
-		Some Bitmatch.LittleEndian
-	      else if String.starts_with tname "__be" then
-		Some Bitmatch.BigEndian
-	      else (
-		Errormsg.warn "%a: unknown bitwise attribute typename: %s\n"
-		  d_loc loc tname;
-		endian
-	      ) in
-	    to_fields names offset endian (unrollType t)
 
-        (* See into named types. *)
-	| (TNamed _ as t) ->
-	    to_fields names offset endian (unrollType t)
-
-	(* struct or union *)
-	| TComp ({ cdefined = true; cfields = cfields }, _) ->
-	    let cfields =
-	      List.map (
-		fun ({ fname = fname; ftype = ftype } as finfo) ->
-		  let offset = Field (finfo, offset) in
-		  let names = fname :: names in
-		  to_fields names offset endian ftype
-	      ) cfields in
-	    List.flatten cfields
-
-	(* int array with constant length *)
-	| TArray (basetype, (Some _ as len), _)
-	    when isIntegralType basetype ->
-	    let len = lenOfArray len in
-	    let bitsoffset, totalwidth = bitsOffset ttype offset in
-	    let bitswidth = totalwidth / len (* of the element *) in
-	    (*if debug then (
-	      let name = String.concat "." (List.rev names) in
-	      Errormsg.log "%s: int array: %d, %d, len %d\n"
-		name bitsoffset bitswidth len
-	    );*)
-	    let basetype = unrollType basetype in
-	    let ikind =
-	      match basetype with
-	      | TInt (ikind, _) -> ikind
-	      | t ->
-		  Errormsg.unimp "%a: unhandled type: %a" d_loc loc d_type t;
-		  IInt in
-	    let field =
-	      to_int_field "" bitsoffset bitswidth ikind endian in
-	    let fname = String.concat "_" (List.rev names) in
-	    let byteoffset = bitsoffset lsr 3 in
-	    let bytetotalwidth = totalwidth lsr 3 in
-	    printf "--> array %s: byteoffset=%d bytetotalwidth=%d len=%d\n"
-	      fname byteoffset bytetotalwidth len (* field *);
-	    []
-
-	(* basic integer type *)
-	| TInt (ikind, _) ->
-	    let bitsoffset, bitswidth = bitsOffset ttype offset in
-	    (*if debug then (
-	      let name = String.concat "." (List.rev names) in
-	      Errormsg.log "%s: int: %d, %d\n" name bitsoffset bitswidth
-	    );*)
-	    let fname = String.concat "_" (List.rev names) in
-	    let field =
-	      to_int_field fname bitsoffset bitswidth ikind endian in
-	    [field]
-
-	(* a pointer - in this mapping we assume this is an address
-	 * (endianness and wordsize come from function parameters),
-	 * in other words we DON'T try to follow pointers, we just
-	 * note that they are there.
-	 *)
-	| TPtr _ ->
-	    let bitsoffset, bitswidth = bitsOffset ttype offset in
-	    let fname = String.concat "_" (List.rev names) in
-	    printf "--> pointer %s: bitsoffset=%d bitswidth=%d\n"
-	      fname bitsoffset bitswidth;
-	    []
-
-	| t ->
-	    Errormsg.unimp "to_fields: %a: unhandled type: %a"
-	      d_loc loc d_type t;
-	    []
-
-      and to_int_field fname bitsoffset bitswidth ikind endian =
-	let byteoffset = bitsoffset lsr 3 in
-	let bytewidth = bitswidth lsr 3 in
-	let signed = isSigned ikind in
-
-	if bitsoffset land 7 = 0 && bitswidth land 7 = 0 then (
-	  (* Not a bitfield. *)
-	  match bitswidth with
-	  | 8 ->
-	      printf "--> byte %s: byteoffset=%d bytewidth=%d signed=%b\n"
-		fname byteoffset bytewidth signed
-	  | 16 ->
-	      printf "--> short %s: byteoffset=%d bytewidth=%d signed=%b endian=%s\n"
-		fname byteoffset bytewidth signed (Option.map_default Bitmatch.string_of_endian "None" endian)
-	  | 32 ->
-	      printf "--> int %s: byteoffset=%d bytewidth=%d signed=%b endian=%s\n"
-		fname byteoffset bytewidth signed (Option.map_default Bitmatch.string_of_endian "None" endian)
-	  | 64 ->
-	      printf "--> long %s: byteoffset=%d bytewidth=%d signed=%b endian=%s\n"
-		fname byteoffset bytewidth signed (Option.map_default Bitmatch.string_of_endian "None" endian)
-	  | _ ->
-	      Errormsg.unimp "%s: unhandled integer width: %d bits"
-		fname bitswidth
-	) else (
-	  (* It's a bitfield if either the offset or width isn't
-	   * byte-aligned.
-	   *)
-	  let bitsoffset = bitsoffset land 7 in
-	  printf "--> bitfield %s: byteoffset=%d bytewidth=%d signed=%b endian=%s bitsoffset=%d bitswidth=%d\n"
-	    fname byteoffset bytewidth
-	    signed (Option.map_default Bitmatch.string_of_endian "None" endian) bitsoffset bitswidth
-	)
-      in
-*)
   ) structs;
 
   if !Errormsg.hadErrors then exit 1;
