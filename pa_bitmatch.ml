@@ -83,81 +83,88 @@ let gensym =
 
 (* Deal with the qualifiers which appear for a field of both types. *)
 let parse_field _loc field qs =
-  let endian_set, signed_set, type_set, field =
+  let endian_set, signed_set, type_set, offset_set, field =
     match qs with
-    | None -> (false, false, false, field)
+    | None -> (false, false, false, false, field)
     | Some qs ->
 	List.fold_left (
-	  fun (endian_set, signed_set, type_set, field) qual_expr ->
+	  fun (endian_set, signed_set, type_set, offset_set, field) qual_expr ->
 	    match qual_expr with
 	    | "bigendian", None ->
 		if endian_set then
 		  Loc.raise _loc (Failure "an endian flag has been set already")
 		else (
 		  let field = P.set_endian field BigEndian in
-		  (true, signed_set, type_set, field)
+		  (true, signed_set, type_set, offset_set, field)
 		)
 	    | "littleendian", None ->
 		if endian_set then
 		  Loc.raise _loc (Failure "an endian flag has been set already")
 		else (
 		  let field = P.set_endian field LittleEndian in
-		  (true, signed_set, type_set, field)
+		  (true, signed_set, type_set, offset_set, field)
 		)
 	    | "nativeendian", None ->
 		if endian_set then
 		  Loc.raise _loc (Failure "an endian flag has been set already")
 		else (
 		  let field = P.set_endian field NativeEndian in
-		  (true, signed_set, type_set, field)
+		  (true, signed_set, type_set, offset_set, field)
 		)
 	    | "endian", Some expr ->
 		if endian_set then
 		  Loc.raise _loc (Failure "an endian flag has been set already")
 		else (
 		  let field = P.set_endian_expr field expr in
-		  (true, signed_set, type_set, field)
+		  (true, signed_set, type_set, offset_set, field)
 		)
 	    | "signed", None ->
 		if signed_set then
 		  Loc.raise _loc (Failure "a signed flag has been set already")
 		else (
 		  let field = P.set_signed field true in
-		  (endian_set, true, type_set, field)
+		  (endian_set, true, type_set, offset_set, field)
 		)
 	    | "unsigned", None ->
 		if signed_set then
 		  Loc.raise _loc (Failure "a signed flag has been set already")
 		else (
 		  let field = P.set_signed field false in
-		  (endian_set, true, type_set, field)
+		  (endian_set, true, type_set, offset_set, field)
 		)
 	    | "int", None ->
 		if type_set then
 		  Loc.raise _loc (Failure "a type flag has been set already")
 		else (
 		  let field = P.set_type_int field in
-		  (endian_set, signed_set, true, field)
+		  (endian_set, signed_set, true, offset_set, field)
 		)
 	    | "string", None ->
 		if type_set then
 		  Loc.raise _loc (Failure "a type flag has been set already")
 		else (
 		  let field = P.set_type_string field in
-		  (endian_set, signed_set, true, field)
+		  (endian_set, signed_set, true, offset_set, field)
 		)
 	    | "bitstring", None ->
 		if type_set then
 		  Loc.raise _loc (Failure "a type flag has been set already")
 		else (
 		  let field = P.set_type_bitstring field in
-		  (endian_set, signed_set, true, field)
+		  (endian_set, signed_set, true, offset_set, field)
+		)
+	    | "offset", Some expr ->
+		if offset_set then
+		  Loc.raise _loc (Failure "an offset has been set already")
+		else (
+		  let field = P.set_offset field expr in
+		  (endian_set, signed_set, type_set, true, field)
 		)
 	    | s, Some _ ->
 		Loc.raise _loc (Failure (s ^ ": unknown qualifier, or qualifier should not be followed by an expression"))
 	    | s, None ->
 		Loc.raise _loc (Failure (s ^ ": unknown qualifier, or qualifier should be followed by an expression"))
-	) (false, false, false, field) qs in
+	) (false, false, false, false, field) qs in
 
   (* If type is set to string or bitstring then endianness and
    * signedness qualifiers are meaningless and must not be set.
@@ -203,6 +210,18 @@ let output_constructor _loc fields =
       let signed = P.get_signed field in
       let t = P.get_type field in
       let _loc = P.get_location field in
+      let offset = P.get_offset field in
+
+      (* offset() not supported in constructors.  Implementation of
+       * forward-only offsets is fairly straightforward: we would
+       * need to just calculate the length of padding here and add
+       * it to what has been constructed.  For general offsets,
+       * including going backwards, that would require a rethink in
+       * how we construct bitstrings.
+       *)
+      if offset <> None then (
+	Loc.raise _loc (Failure "offset expressions are not supported in BITSTRING constructors")
+      );
 
       (* Is flen an integer constant?  If so, what is it?  This
        * is very simple-minded and only detects simple constants.
@@ -386,8 +405,8 @@ let output_constructor _loc fields =
 			  $int:loc_line$, $int:loc_char$))
 	    >>
 
-        (* Bitstring, constant length > 0. *)
-	| P.Bitstring, Some i when i > 0 ->
+        (* Bitstring, constant length >= 0. *)
+	| P.Bitstring, Some i when i >= 0 ->
 	    let bs = gensym "bs" in
 	    <:expr<
 	      let $lid:bs$ = $fexpr$ in
@@ -406,16 +425,14 @@ let output_constructor _loc fields =
 	| P.Bitstring, Some (-1) ->
 	    <:expr< Bitmatch.construct_bitstring $lid:buffer$ $fexpr$ >>
 
-	(* Bitstring, constant length = 0 is probably an error, and so is
-	 * any other value.
-	 *)
+	(* Bitstring, constant length < -1 is an error. *)
 	| P.Bitstring, Some _ ->
 	    Loc.raise _loc
 	      (Failure
-		 "length of bitstring must be > 0 or the special value -1")
+		 "length of bitstring must be >= 0 or the special value -1")
 
 	(* Bitstring, non-constant length.
-	 * We check at runtime that the length is > 0 and matches
+	 * We check at runtime that the length is >= 0 and matches
 	 * the declared length.
 	 *)
 	| P.Bitstring, None ->
@@ -423,7 +440,7 @@ let output_constructor _loc fields =
 	    let bs = gensym "bs" in
 	    <:expr<
 	      let $lid:bslen$ = $flen$ in
-	      if $lid:bslen$ > 0 then (
+	      if $lid:bslen$ >= 0 then (
 		let $lid:bs$ = $fexpr$ in
 		if Bitmatch.bitstring_length $lid:bs$ = $lid:bslen$ then
 		  Bitmatch.construct_bitstring $lid:buffer$ $lid:bs$
@@ -481,9 +498,9 @@ let output_bitmatch _loc bs cases =
   let result = gensym "result" in
 
   (* This generates the field extraction code for each
-   * field a single case.  Each field must be wider than
-   * the minimum permitted for the type and there must be
-   * enough remaining data in the bitstring to satisfy it.
+   * field in a single case.  There must be enough remaining data
+   * in the bitstring to satisfy the field.
+   *
    * As we go through the fields, symbols 'data', 'off' and 'len'
    * track our position and remaining length in the bitstring.
    *
@@ -499,9 +516,11 @@ let output_bitmatch _loc bs cases =
 	let signed = P.get_signed field in
 	let t = P.get_type field in
 	let _loc = P.get_location field in
+	let offset = P.get_offset field in
 
-	(* Is flen an integer constant?  If so, what is it?  This
-	 * is very simple-minded and only detects simple constants.
+	(* Is flen (field len) an integer constant?  If so, what is it?
+	 * This will be [Some i] if it's a constant or [None] if it's
+	 * non-constant or we couldn't determine.
 	 *)
 	let flen_is_const = expr_is_constant flen in
 
@@ -723,6 +742,120 @@ let output_bitmatch _loc bs cases =
 		)
 	      >>
 	in
+
+	(* Computed offset: only offsets forward are supported.
+	 *
+	 * We try hard to optimize this based on what we know.  Are
+	 * we at a predictable offset now?  (Look at the outer 'fields'
+	 * list and see if they all have constant field length starting
+	 * at some constant offset).  Is this offset constant?
+	 *
+	 * Based on this we can do a lot of the computation at
+	 * compile time, or defer it to runtime only if necessary.
+	 *
+	 * In all cases, the off and len fields get updated.
+	 *)
+	let expr =
+	  match offset with
+	  | None -> expr (* common case: there was no offset expression *)
+	  | Some offset_expr ->
+	      (* This will be [Some i] if offset is a constant expression
+	       * or [None] if it's a non-constant.
+	       *)
+	      let requested_offset = expr_is_constant offset_expr in
+
+	      (* This will be [Some i] if our current offset is known
+	       * at compile time, or [None] if we can't determine it.
+	       *)
+	      let current_offset =
+		let has_constant_offset field =
+		  match P.get_offset field with
+		  | None -> false
+		  | Some expr ->
+		      match expr_is_constant expr with
+		      | None -> false
+		      | Some i -> true
+		in
+		let get_constant_offset field =
+		  match P.get_offset field with
+		  | None -> assert false
+		  | Some expr ->
+		      match expr_is_constant expr with
+		      | None -> assert false
+		      | Some i -> i
+		in
+
+		let has_constant_len field =
+		  match expr_is_constant (P.get_length field) with
+		  | None -> false
+		  | Some i when i > 0 -> true
+		  | Some _ -> false
+		in
+		let get_constant_len field =
+		  match expr_is_constant (P.get_length field) with
+		  | None -> assert false
+		  | Some i when i > 0 -> i
+		  | Some _ -> assert false
+		in
+
+		let rec loop = function
+		  (* first field has constant offset 0 *)
+		  | [] -> Some 0
+		  (* field with constant offset & length *)
+		  | field :: _
+		      when has_constant_offset field &&
+			has_constant_len field ->
+		      Some (get_constant_offset field + get_constant_len field)
+		  (* field with no offset & constant length *)
+		  | field :: fields
+		      when P.get_offset field = None &&
+			has_constant_len field ->
+		      (match loop fields with
+		       | None -> None
+		       | Some offset -> Some (offset + get_constant_len field))
+		  (* else, can't work out the offset *)
+		  | _ -> None
+		in
+		loop fields in
+
+              (* Look at the current offset and requested offset cases and
+	       * determine what code to generate.
+	       *)
+	      match current_offset, requested_offset with
+		(* This is the good case: both the current offset and
+		 * the requested offset are constant, so we can remove
+		 * almost all the runtime checks.
+		 *)
+	      | Some current_offset, Some requested_offset ->
+		  let move = requested_offset - current_offset in
+		  if move < 0 then
+		    Loc.raise _loc (Failure (sprintf "requested offset is less than the current offset (%d < %d)" requested_offset current_offset));
+		  (* Add some code to move the offset and length by a
+		   * constant amount, and a runtime test that len >= 0
+		   * (XXX possibly the runtime test is unnecessary?)
+		   *)
+		  <:expr<
+		    let $lid:off$ = $lid:off$ + $`int:move$ in
+		    let $lid:len$ = $lid:len$ - $`int:move$ in
+		    if $lid:len$ >= 0 then $expr$
+		  >>
+	      (* In any other case, we need to use runtime checks.
+	       *
+	       * XXX It's not clear if a backwards move detected at runtime
+	       * is merely a match failure, or a runtime error.  At the
+	       * moment it's just a match failure since bitmatch generally
+	       * doesn't raise runtime errors.
+	       *)
+	      | _ ->
+		  let move = gensym "move" in
+		  <:expr<
+		    let $lid:move$ = $offset_expr$ - $lid:off$ in
+		    if $lid:move$ >= 0 then (
+		      let $lid:off$ = $lid:off$ + $lid:move$ in
+		      let $lid:len$ = $lid:len$ - $lid:move$ in
+		      if $lid:len$ >= 0 then $expr$
+		    )
+		  >> in (* end of computed offset code *)
 
 	(* Emit extra debugging code. *)
 	let expr =
