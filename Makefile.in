@@ -181,11 +181,17 @@ install:
 depend: .depend
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
-.depend: bitmatch.ml bitmatch.mli bitmatch_persistent.ml bitmatch_persistent.mli
+.depend: bitmatch.ml bitmatch.mli \
+	  bitmatch_persistent.ml bitmatch_persistent.mli \
+	  bitmatch_objinfo.ml \
+	  create_test_pattern.ml
 	rm -f .depend
-	$(OCAMLFIND) ocamldep $(OCAMLCPACKAGES) bitmatch.ml bitmatch.mli >> $@
+	$(OCAMLFIND) ocamldep $(OCAMLCPACKAGES) \
+	  bitmatch.ml bitmatch.mli \
+	  bitmatch_objinfo.ml >> $@
 	$(OCAMLFIND) ocamldep $(OCAMLCPACKAGES) -pp camlp4of \
-	  bitmatch_persistent.ml bitmatch_persistent.mli >> $@
+	  bitmatch_persistent.ml bitmatch_persistent.mli \
+	  create_test_pattern.ml >> $@
 
 ifeq ($(wildcard .depend),.depend)
 include .depend
