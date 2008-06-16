@@ -305,8 +305,9 @@ bitmatch bits with
        a {!endian} type, ie. [LittleEndian], [BigEndian] or [NativeEndian].
        The expression is an arbitrary OCaml expression and can use the
        value of earlier fields in the bitmatch.
+   - [offset (expr)]: see {{:#computedoffsets}computed offsets} below.
 
-   The default settings are [int], [unsigned], [bigendian].
+   The default settings are [int], [unsigned], [bigendian], no offset.
 
    Note that many of these qualifiers cannot be used together,
    eg. bitstrings do not have endianness.  The syntax extension should
@@ -416,6 +417,31 @@ Bitmatch.hexdump_bitstring stdout bits ;;
    used.  (Of course under such circumstances there would
    still need to be a runtime check to enforce the
    size).
+
+   {2:computedoffsets Computed offsets}
+
+   You can add an [offset(..)] qualifier to bitmatch patterns in order
+   to move the current offset within the bitstring forwards.
+
+   For example:
+
+{[
+bitmatch bits with
+| { field1 : 8;
+    field2 : 8 : offset(160) } -> ...
+]}
+
+   matches [field1] at the start of the bitstring and [field2]
+   at 160 bits into the bitstring.  The middle 152 bits go
+   unmatched (ie. can be anything).
+
+   The generated code is efficient.  If field lengths and offsets
+   are known to be constant at compile time, then almost all
+   runtime checks are avoided.  Non-constant field lengths and/or
+   non-constant offsets can result in more runtime checks being added.
+
+   Note that moving the offset backwards, and moving the offset in
+   [BITSTRING] constructors, are both not supported at present.
 
    {2 Named patterns and persistent patterns}
 
@@ -589,7 +615,16 @@ val make_bitstring : int -> char -> bitstring
     For example, [make_bitstring 16 '\x5a'] will create
     the bitstring [0x5a5a] or in binary [0101 1010 0101 1010].
 
-    Note that the length is in bits, not bytes. *)
+    Note that the length is in bits, not bytes.  The length does NOT
+    need to be a multiple of 8. *)
+
+val zeroes_bitstring : int -> bitstring
+(** [zeroes_bitstring] creates an [n] bit bitstring of all 0's.
+
+    Actually this is the same as {!create_bitstring}. *)
+
+val ones_bitstring : int -> bitstring
+(** [ones_bitstring] creates an [n] bit bitstring of all 1's. *)
 
 val bitstring_of_string : string -> bitstring
 (** [bitstring_of_string str] creates a bitstring
@@ -769,3 +804,5 @@ val construct_int64_ne_unsigned : Buffer.t -> int64 -> int -> exn -> unit
 val construct_int64_ee_unsigned : endian -> Buffer.t -> int64 -> int -> exn -> unit
 
 val construct_string : Buffer.t -> string -> unit
+
+val construct_bitstring : Buffer.t -> bitstring -> unit
