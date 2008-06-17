@@ -9,7 +9,7 @@ Major to-do items.
 
 (4) Provide UInt32 and UInt64 types.
 
-(5) Allow for specific offsets and alignment.  Something like this:
+(5) DONE - Allow for specific offsets and alignment.  Something like this:
 
     { start : 16;
       another : 16 : offset(256);   (* location would be 256 bits from start *)
@@ -51,9 +51,15 @@ Major to-do items.
 
 (13) Implement native endian functions.
 
-(14) A proper test suite.
+(14) PARTLY DONE - A proper test suite.
 
-(15) More examples:
+(15) DONE - More examples:
 
     ELF binaries
     GIF images
+
+(16) We now know the offset of the current field relative to the
+     whole match.  This may allow more efficient aligned versions
+     of functions to be called (at compile time).  However do note
+     that the offset in the bitstring is usually not known.
+
