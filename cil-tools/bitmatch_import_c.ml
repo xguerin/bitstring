@@ -237,14 +237,9 @@ OPTIONS" in
 
 	(* int array with constant length *)
 	| TArray (basetype, (Some _ as len), _) when isIntegralType basetype ->
-	    let len = lenOfArray len in
+	    let nr_elems = lenOfArray len in
 	    let bitsoffset, totalwidth = bitsOffset ttype offset in
-	    let bitswidth = totalwidth / len (* of the element *) in
-	    (*if debug then (
-	      let name = String.concat "." (List.rev names) in
-	      Errormsg.log "%s: int array: %d, %d, len %d\n"
-		name bitsoffset bitswidth len
-	    );*)
+	    let bitswidth = totalwidth / nr_elems (* of the element *) in
 	    let basetype = unrollType basetype in
 	    let ikind =
 	      match basetype with
@@ -252,16 +247,25 @@ OPTIONS" in
 	      | t ->
 		  Errormsg.unimp "%a: unhandled type: %a" d_loc loc d_type t;
 		  IInt in
-	    let field =
-	      pattern_field_of_int "" bitsoffset bitswidth ikind endian in
 	    let fname = String.concat "_" (List.rev names) in
-	    let byteoffset = bitsoffset lsr 3 in
-	    let bytetotalwidth = totalwidth lsr 3 in
-(*
-	    printf "--> array %s: byteoffset=%d bytetotalwidth=%d len=%d\n"
-	      fname byteoffset bytetotalwidth len (* field *);
-*)
-	    [] (* XXX *)
+
+	    (* If the base type is 8 bits then we always translate this to
+	     * a string (whether the C type is signed or unsigned).  There
+	     * is no endianness in bytes so ignore that.
+	     *)
+	    if bitswidth = 8 then
+	      [pattern_field_of_string fname bitsoffset nr_elems]
+	    else (
+	      (* XXX Realistically we don't handle arrays well at
+	       * the moment.  Perhaps we should give up and match
+	       * this to a bitstring?
+	       *)
+	      let signed = isSigned ikind in
+	      if debug then
+		eprintf "--> array %s: nr_elems=%d signed=%b\n"
+		  fname nr_elems signed;
+	      [] (* XXX *)
+	    )
 
 	(* basic integer type *)
 	| TInt (ikind, _) ->
@@ -283,10 +287,9 @@ OPTIONS" in
 	| TPtr _ ->
 	    let bitsoffset, bitswidth = bitsOffset ttype offset in
 	    let fname = String.concat "_" (List.rev names) in
-(*
-	    printf "--> pointer %s: bitsoffset=%d bitswidth=%d\n"
-	      fname bitsoffset bitswidth;
-*)
+	    if debug then
+	      eprintf "--> pointer %s: bitsoffset=%d bitswidth=%d\n"
+		fname bitsoffset bitswidth;
 	    [] (* XXX *)
 
 	| t ->
@@ -312,6 +315,15 @@ OPTIONS" in
 	  | Some endian -> P.set_endian field endian
 	  | None -> P.set_endian field Bitmatch.NativeEndian in
 
+	field
+
+      and pattern_field_of_string fname bitsoffset nr_elems =
+	let _loc = camlp4_loc_of_cil_loc loc in
+	let field = P.create_pattern_field _loc in
+	let field = P.set_lident_patt field fname in
+	let field = P.set_type_string field in
+	let field = P.set_length_int field (nr_elems*8) in
+	let field = P.set_offset_int field bitsoffset in
 	field
 
       (* Convert a CIL location into a camlp4 location.  Grrr these
