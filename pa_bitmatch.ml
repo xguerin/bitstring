@@ -133,6 +133,37 @@ let parse_field _loc field qs =
 
   field
 
+(* Choose the right constructor function. *)
+let build_bitmatch_call _loc funcname length endian signed =
+  match length, endian, signed with
+    (* XXX The meaning of signed/unsigned breaks down at
+     * 31, 32, 63 and 64 bits.
+     *)
+  | (Some 1, _, _) -> <:expr<Bitmatch.$lid:funcname ^ "_bit"$ >>
+  | (Some (2|3|4|5|6|7|8), _, sign) ->
+      let call = Printf.sprintf "%s_char_%s"
+        funcname (if sign then "signed" else "unsigned") in
+      <:expr< Bitmatch.$lid:call$ >>
+  | (len, endian, signed) ->
+      let t = match len with
+      | Some i when i <= 31 -> "int"
+      | Some 32 -> "int32"
+      | _ -> "int64" in
+      let sign = if signed then "signed" else "unsigned" in
+      match endian with
+      | P.ConstantEndian constant ->
+          let endianness = match constant with
+          | BigEndian -> "be"
+          | LittleEndian -> "le"
+          | NativeEndian -> "ne" in
+          let call = Printf.sprintf "%s_%s_%s_%s"
+            funcname t endianness sign in
+          <:expr< Bitmatch.$lid:call$ >>
+      | P.EndianExpr expr ->
+          let call = Printf.sprintf "%s_%s_%s_%s"
+            funcname t "ee" sign in
+          <:expr< Bitmatch.$lid:call$ $expr$ >>
+
 (* Generate the code for a constructor, ie. 'BITSTRING ...'. *)
 let output_constructor _loc fields =
   let fail = locfail _loc in
@@ -179,84 +210,10 @@ let output_constructor _loc fields =
        *)
       let flen_is_const = expr_is_constant flen in
 
-      (* Choose the right constructor function. *)
-      let int_construct_const = function
-	  (* XXX The meaning of signed/unsigned breaks down at
-	   * 31, 32, 63 and 64 bits.
-	   *)
-	| (1, _, _) ->
-	    <:expr<Bitmatch.construct_bit>>
-	| ((2|3|4|5|6|7|8), _, false) ->
-	    <:expr<Bitmatch.construct_char_unsigned>>
-	| ((2|3|4|5|6|7|8), _, true) ->
-	    <:expr<Bitmatch.construct_char_signed>>
-	| (i, P.ConstantEndian BigEndian, false) when i <= 31 ->
-	    <:expr<Bitmatch.construct_int_be_unsigned>>
-	| (i, P.ConstantEndian BigEndian, true) when i <= 31 ->
-	    <:expr<Bitmatch.construct_int_be_signed>>
-	| (i, P.ConstantEndian LittleEndian, false) when i <= 31 ->
-	    <:expr<Bitmatch.construct_int_le_unsigned>>
-	| (i, P.ConstantEndian LittleEndian, true) when i <= 31 ->
-	    <:expr<Bitmatch.construct_int_le_signed>>
-	| (i, P.ConstantEndian NativeEndian, false) when i <= 31 ->
-	    <:expr<Bitmatch.construct_int_ne_unsigned>>
-	| (i, P.ConstantEndian NativeEndian, true) when i <= 31 ->
-	    <:expr<Bitmatch.construct_int_ne_signed>>
-	| (i, P.EndianExpr expr, false) when i <= 31 ->
-	    <:expr<Bitmatch.construct_int_ee_unsigned $expr$>>
-	| (i, P.EndianExpr expr, true) when i <= 31 ->
-	    <:expr<Bitmatch.construct_int_ee_signed $expr$>>
-	| (32, P.ConstantEndian BigEndian, false) ->
-	    <:expr<Bitmatch.construct_int32_be_unsigned>>
-	| (32, P.ConstantEndian BigEndian, true) ->
-	    <:expr<Bitmatch.construct_int32_be_signed>>
-	| (32, P.ConstantEndian LittleEndian, false) ->
-	    <:expr<Bitmatch.construct_int32_le_unsigned>>
-	| (32, P.ConstantEndian LittleEndian, true) ->
-	    <:expr<Bitmatch.construct_int32_le_signed>>
-	| (32, P.ConstantEndian NativeEndian, false) ->
-	    <:expr<Bitmatch.construct_int32_ne_unsigned>>
-	| (32, P.ConstantEndian NativeEndian, true) ->
-	    <:expr<Bitmatch.construct_int32_ne_signed>>
-	| (32, P.EndianExpr expr, false) ->
-	    <:expr<Bitmatch.construct_int32_ee_unsigned $expr$>>
-	| (32, P.EndianExpr expr, true) ->
-	    <:expr<Bitmatch.construct_int32_ee_signed $expr$>>
-	| (_, P.ConstantEndian BigEndian, false) ->
-	    <:expr<Bitmatch.construct_int64_be_unsigned>>
-	| (_, P.ConstantEndian BigEndian, true) ->
-	    <:expr<Bitmatch.construct_int64_be_signed>>
-	| (_, P.ConstantEndian LittleEndian, false) ->
-	    <:expr<Bitmatch.construct_int64_le_unsigned>>
-	| (_, P.ConstantEndian LittleEndian, true) ->
-	    <:expr<Bitmatch.construct_int64_le_signed>>
-	| (_, P.ConstantEndian NativeEndian, false) ->
-	    <:expr<Bitmatch.construct_int64_ne_unsigned>>
-	| (_, P.ConstantEndian NativeEndian, true) ->
-	    <:expr<Bitmatch.construct_int64_ne_signed>>
-	| (_, P.EndianExpr expr, false) ->
-	    <:expr<Bitmatch.construct_int64_ee_unsigned $expr$>>
-	| (_, P.EndianExpr expr, true) ->
-	    <:expr<Bitmatch.construct_int64_ee_signed $expr$>>
-      in
-      let int_construct = function
-	| (P.ConstantEndian BigEndian, false) ->
-	    <:expr<Bitmatch.construct_int64_be_unsigned>>
-	| (P.ConstantEndian BigEndian, true) ->
-	    <:expr<Bitmatch.construct_int64_be_signed>>
-	| (P.ConstantEndian LittleEndian, false) ->
-	    <:expr<Bitmatch.construct_int64_le_unsigned>>
-	| (P.ConstantEndian LittleEndian, true) ->
-	    <:expr<Bitmatch.construct_int64_le_signed>>
-	| (P.ConstantEndian NativeEndian, false) ->
-	    <:expr<Bitmatch.construct_int64_ne_unsigned>>
-	| (P.ConstantEndian NativeEndian, true) ->
-	    <:expr<Bitmatch.construct_int64_ne_signed>>
-	| (P.EndianExpr expr, false) ->
-	    <:expr<Bitmatch.construct_int64_ee_unsigned $expr$>>
-	| (P.EndianExpr expr, true) ->
-	    <:expr<Bitmatch.construct_int64_ee_signed $expr$>>
-      in
+      let int_construct_const (i, endian, signed) =
+        build_bitmatch_call _loc "construct" (Some i) endian signed in
+      let int_construct (endian, signed) =
+       build_bitmatch_call _loc "construct" None endian signed in
 
       let expr =
 	match t, flen_is_const with
@@ -475,83 +432,10 @@ let output_bitmatch _loc bs cases =
 	 *)
 	let flen_is_const = expr_is_constant flen in
 
-	let int_extract_const = function
-	    (* XXX The meaning of signed/unsigned breaks down at
-	     * 31, 32, 63 and 64 bits.
-	     *)
-	  | (1, _, _) ->
-	      <:expr<Bitmatch.extract_bit>>
-	  | ((2|3|4|5|6|7|8), _, false) ->
-	      <:expr<Bitmatch.extract_char_unsigned>>
-	  | ((2|3|4|5|6|7|8), _, true) ->
-	      <:expr<Bitmatch.extract_char_signed>>
-	  | (i, P.ConstantEndian BigEndian, false) when i <= 31 ->
-	      <:expr<Bitmatch.extract_int_be_unsigned>>
-	  | (i, P.ConstantEndian BigEndian, true) when i <= 31 ->
-	      <:expr<Bitmatch.extract_int_be_signed>>
-	  | (i, P.ConstantEndian LittleEndian, false) when i <= 31 ->
-	      <:expr<Bitmatch.extract_int_le_unsigned>>
-	  | (i, P.ConstantEndian LittleEndian, true) when i <= 31 ->
-	      <:expr<Bitmatch.extract_int_le_signed>>
-	  | (i, P.ConstantEndian NativeEndian, false) when i <= 31 ->
-	      <:expr<Bitmatch.extract_int_ne_unsigned>>
-	  | (i, P.ConstantEndian NativeEndian, true) when i <= 31 ->
-	      <:expr<Bitmatch.extract_int_ne_signed>>
-	  | (i, P.EndianExpr expr, false) when i <= 31 ->
-	      <:expr<Bitmatch.extract_int_ee_unsigned $expr$>>
-	  | (i, P.EndianExpr expr, true) when i <= 31 ->
-	      <:expr<Bitmatch.extract_int_ee_signed $expr$>>
-	  | (32, P.ConstantEndian BigEndian, false) ->
-	      <:expr<Bitmatch.extract_int32_be_unsigned>>
-	  | (32, P.ConstantEndian BigEndian, true) ->
-	      <:expr<Bitmatch.extract_int32_be_signed>>
-	  | (32, P.ConstantEndian LittleEndian, false) ->
-	      <:expr<Bitmatch.extract_int32_le_unsigned>>
-	  | (32, P.ConstantEndian LittleEndian, true) ->
-	      <:expr<Bitmatch.extract_int32_le_signed>>
-	  | (32, P.ConstantEndian NativeEndian, false) ->
-	      <:expr<Bitmatch.extract_int32_ne_unsigned>>
-	  | (32, P.ConstantEndian NativeEndian, true) ->
-	      <:expr<Bitmatch.extract_int32_ne_signed>>
-	  | (32, P.EndianExpr expr, false) ->
-	      <:expr<Bitmatch.extract_int32_ee_unsigned $expr$>>
-	  | (32, P.EndianExpr expr, true) ->
-	      <:expr<Bitmatch.extract_int32_ee_signed $expr$>>
-	  | (_, P.ConstantEndian BigEndian, false) ->
-	      <:expr<Bitmatch.extract_int64_be_unsigned>>
-	  | (_, P.ConstantEndian BigEndian, true) ->
-	      <:expr<Bitmatch.extract_int64_be_signed>>
-	  | (_, P.ConstantEndian LittleEndian, false) ->
-	      <:expr<Bitmatch.extract_int64_le_unsigned>>
-	  | (_, P.ConstantEndian LittleEndian, true) ->
-	      <:expr<Bitmatch.extract_int64_le_signed>>
-	  | (_, P.ConstantEndian NativeEndian, false) ->
-	      <:expr<Bitmatch.extract_int64_ne_unsigned>>
-	  | (_, P.ConstantEndian NativeEndian, true) ->
-	      <:expr<Bitmatch.extract_int64_ne_signed>>
-	  | (_, P.EndianExpr expr, false) ->
-	      <:expr<Bitmatch.extract_int64_ee_unsigned $expr$>>
-	  | (_, P.EndianExpr expr, true) ->
-	      <:expr<Bitmatch.extract_int64_ee_signed $expr$>>
-	in
-	let int_extract = function
-	  | (P.ConstantEndian BigEndian, false) ->
-	      <:expr<Bitmatch.extract_int64_be_unsigned>>
-	  | (P.ConstantEndian BigEndian, true) ->
-	      <:expr<Bitmatch.extract_int64_be_signed>>
-	  | (P.ConstantEndian LittleEndian, false) ->
-	      <:expr<Bitmatch.extract_int64_le_unsigned>>
-	  | (P.ConstantEndian LittleEndian, true) ->
-	      <:expr<Bitmatch.extract_int64_le_signed>>
-	  | (P.ConstantEndian NativeEndian, false) ->
-	      <:expr<Bitmatch.extract_int64_ne_unsigned>>
-	  | (P.ConstantEndian NativeEndian, true) ->
-	      <:expr<Bitmatch.extract_int64_ne_signed>>
-	  | (P.EndianExpr expr, false) ->
-	      <:expr<Bitmatch.extract_int64_ee_unsigned $expr$>>
-	  | (P.EndianExpr expr, true) ->
-	      <:expr<Bitmatch.extract_int64_ee_signed $expr$>>
-	in
+      let int_extract_const (i, endian, signed) =
+        build_bitmatch_call _loc "extract" (Some i) endian signed in
+      let int_extract (endian, signed) =
+       build_bitmatch_call _loc "extract" None endian signed in
 
 	let expr =
 	  match t, flen_is_const with
