@@ -166,9 +166,22 @@ let build_bitmatch_call _loc funcname length endian signed =
 
 (* Generate the code for a constructor, ie. 'BITSTRING ...'. *)
 let output_constructor _loc fields =
-  let loc_fname = Loc.file_name _loc in
-  let loc_line = string_of_int (Loc.start_line _loc) in
-  let loc_char = string_of_int (Loc.start_off _loc - Loc.start_bol _loc) in
+  (* This function makes code to raise a Bitmatch.Construct_failure exception
+   * containing a message and the current _loc context.
+   * (Thanks to Bluestorm for suggesting this).
+   *)
+  let construct_failure _loc msg =
+    <:expr<
+      Bitmatch.Construct_failure
+        ($`str:msg$,
+	 $`str:Loc.file_name _loc$,
+	 $`int:Loc.start_line _loc$,
+	 $`int:Loc.start_off _loc - Loc.start_bol _loc$)
+    >>
+  in
+  let raise_construct_failure _loc msg =
+    <:expr< raise $construct_failure _loc msg$ >>
+  in
 
   (* Bitstrings are created like the 'Buffer' module (in fact, using
    * the Buffer module), by appending snippets to a growing buffer.
@@ -249,10 +262,7 @@ let output_constructor _loc fields =
 	      if $flen$ >= 1 && $flen$ <= 64 then
 		$construct_fn$ $lid:buffer$ $fexpr$ $flen$ $lid:exn$
 	      else
-		raise (Bitmatch.Construct_failure
-			 ("length of int field must be [1..64]",
-			  $str:loc_fname$,
-			  $int:loc_line$, $int:loc_char$))
+		$raise_construct_failure _loc "length of int field must be [1..64]"$
 	    >>
 
         (* String, constant length > 0, must be a multiple of 8. *)
@@ -264,10 +274,7 @@ let output_constructor _loc fields =
 	      if String.length $lid:bs$ = $`int:j$ then
 		Bitmatch.construct_string $lid:buffer$ $lid:bs$
 	      else
-		raise (Bitmatch.Construct_failure
-			 ("length of string does not match declaration",
-			  $str:loc_fname$,
-			  $int:loc_line$, $int:loc_char$))
+		$raise_construct_failure _loc "length of string does not match declaration"$
 	    >>
 
 	(* String, constant length -1, means variable length string
@@ -297,20 +304,11 @@ let output_constructor _loc fields =
 		  if String.length $lid:bs$ = ($lid:bslen$ lsr 3) then
 		    Bitmatch.construct_string $lid:buffer$ $lid:bs$
 		  else
-		    raise (Bitmatch.Construct_failure
-			     ("length of string does not match declaration",
-			      $str:loc_fname$,
-			      $int:loc_line$, $int:loc_char$))
+		    $raise_construct_failure _loc "length of string does not match declaration"$
 		) else
-		  raise (Bitmatch.Construct_failure
-			   ("length of string must be a multiple of 8",
-			    $str:loc_fname$,
-			    $int:loc_line$, $int:loc_char$))
+		  $raise_construct_failure _loc "length of string must be a multiple of 8"$
 	      ) else
-		raise (Bitmatch.Construct_failure
-			 ("length of string must be > 0",
-			  $str:loc_fname$,
-			  $int:loc_line$, $int:loc_char$))
+		$raise_construct_failure _loc "length of string must be > 0"$
 	    >>
 
         (* Bitstring, constant length >= 0. *)
@@ -321,10 +319,7 @@ let output_constructor _loc fields =
 	      if Bitmatch.bitstring_length $lid:bs$ = $`int:i$ then
 		Bitmatch.construct_bitstring $lid:buffer$ $lid:bs$
 	      else
-		raise (Bitmatch.Construct_failure
-			 ("length of bitstring does not match declaration",
-			  $str:loc_fname$,
-			  $int:loc_line$, $int:loc_char$))
+		$raise_construct_failure _loc "length of bitstring does not match declaration"$
 	    >>
 
 	(* Bitstring, constant length -1, means variable length bitstring
@@ -351,15 +346,9 @@ let output_constructor _loc fields =
 		if Bitmatch.bitstring_length $lid:bs$ = $lid:bslen$ then
 		  Bitmatch.construct_bitstring $lid:buffer$ $lid:bs$
 		else
-		  raise (Bitmatch.Construct_failure
-			   ("length of bitstring does not match declaration",
-			    $str:loc_fname$,
-			    $int:loc_line$, $int:loc_char$))
+		  $raise_construct_failure _loc "length of bitstring does not match declaration"$
 	      ) else
-		raise (Bitmatch.Construct_failure
-			 ("length of bitstring must be > 0",
-			  $str:loc_fname$,
-			  $int:loc_line$, $int:loc_char$))
+		$raise_construct_failure _loc "length of bitstring must be > 0"$
 	    >> in
       expr
   ) fields in
@@ -386,11 +375,8 @@ let output_constructor _loc fields =
 
   if !exn_used then
     <:expr<
-      let $lid:exn$ =
-	Bitmatch.Construct_failure ("value out of range",
-				    $str:loc_fname$,
-				    $int:loc_line$, $int:loc_char$) in
-	$expr$
+      let $lid:exn$ = $construct_failure _loc "value out of range"$ in
+      $expr$
     >>
   else
     expr
