@@ -11,8 +11,10 @@ cil-tools/bitmatch_import_c.ml
 cil-tools/bitmatch-import-prefix.h
 cil-tools/.depend
 cil-tools/ext3.c
+cil-tools/ext3.ml
 cil-tools/Makefile.in
 cil-tools/task_struct.c
+cil-tools/task_struct.ml
 configure.ac
 COPYING.LIB
 create_test_pattern.ml
@@ -41,4 +43,6 @@ tests/30_bitbuffer.ml
 tests/40_endianexpr.ml
 tests/50_named_pattern.ml
 tests/51_open_pattern.ml
+tests/60_simple_offset.ml
+tests/61_offset_string.ml
 TODO
