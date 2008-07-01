@@ -48,33 +48,18 @@ let locfail _loc msg = Loc.raise _loc (Failure msg)
  * expressions such as [k], [k+c], [k-c] etc.
  *)
 let rec expr_is_constant = function
-  | <:expr< $int:i$ >> ->		(* Literal integer constant. *)
+  | <:expr< $int:i$ >> ->	       (* Literal integer constant. *)
     Some (int_of_string i)
-  | <:expr< $a$ + $b$ >> ->		(* Addition of constants. *)
+  | <:expr< $lid:op$ $a$ $b$ >> ->
     (match expr_is_constant a, expr_is_constant b with
-     | Some a, Some b -> Some (a+b)
+     | Some a, Some b ->	       (* Integer binary operations. *)
+         let ops = ["+", (+); "-", (-); "*", ( * ); "/", (/);
+                    "land", (land); "lor", (lor); "lxor", (lxor);
+                    "lsl", (lsl); "lsr", (lsr); "asr", (asr);
+		    "mod", (mod)] in
+         (try Some ((List.assoc op ops) a b) with Not_found -> None)
      | _ -> None)
-  | <:expr< $a$ - $b$ >> ->		(* Subtraction. *)
-    (match expr_is_constant a, expr_is_constant b with
-     | Some a, Some b -> Some (a-b)
-     | _ -> None)
-  | <:expr< $a$ * $b$ >> ->	        (* Multiplication. *)
-    (match expr_is_constant a, expr_is_constant b with
-     | Some a, Some b -> Some (a*b)
-     | _ -> None)
-  | <:expr< $a$ / $b$ >> ->	        (* Division. *)
-    (match expr_is_constant a, expr_is_constant b with
-     | Some a, Some b -> Some (a/b)
-     | _ -> None)
-  | <:expr< $a$ lsl $b$ >> ->	        (* Shift left. *)
-    (match expr_is_constant a, expr_is_constant b with
-     | Some a, Some b -> Some (a lsl b)
-     | _ -> None)
-  | <:expr< $a$ lsr $b$ >> ->	        (* Shift right. *)
-    (match expr_is_constant a, expr_is_constant b with
-     | Some a, Some b -> Some (a lsr b)
-     | _ -> None)
-  | _ -> None				(* Anything else is not constant. *)
+  | _ -> None
 
 (* Generate a fresh, unique symbol each time called. *)
 let gensym =
