@@ -166,8 +166,6 @@ let build_bitmatch_call _loc funcname length endian signed =
 
 (* Generate the code for a constructor, ie. 'BITSTRING ...'. *)
 let output_constructor _loc fields =
-  let fail = locfail _loc in
-
   let loc_fname = Loc.file_name _loc in
   let loc_line = string_of_int (Loc.start_line _loc) in
   let loc_char = string_of_int (Loc.start_off _loc - Loc.start_bol _loc) in
@@ -194,6 +192,8 @@ let output_constructor _loc fields =
       let t = P.get_type field in
       let _loc = P.get_location field in
       let offset = P.get_offset field in
+
+      let fail = locfail _loc in
 
       (* offset() not supported in constructors.  Implementation of
        * forward-only offsets is fairly straightforward: we would
@@ -400,8 +400,6 @@ let output_constructor _loc fields =
  * the list of cases to test against.
  *)
 let output_bitmatch _loc bs cases =
-  let fail = locfail _loc in
-
   let data = gensym "data" and off = gensym "off" and len = gensym "len" in
   let result = gensym "result" in
 
@@ -425,6 +423,8 @@ let output_bitmatch _loc bs cases =
 	let t = P.get_type field in
 	let _loc = P.get_location field in
 	let offset = P.get_offset field in
+
+	let fail = locfail _loc in
 
 	(* Is flen (field len) an integer constant?  If so, what is it?
 	 * This will be [Some i] if it's a constant or [None] if it's
