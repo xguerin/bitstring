@@ -63,3 +63,4 @@ Major to-do items.
      of functions to be called (at compile time).  However do note
      that the offset in the bitstring is usually not known.
 
+(17) Fix the META file.  Current one is very broken.
