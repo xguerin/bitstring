@@ -76,84 +76,47 @@ let parse_field _loc field qs =
     match qs with
     | None -> (false, false, false, false, field)
     | Some qs ->
-	List.fold_left (
-	  fun (endian_set, signed_set, type_set, offset_set, field) qual_expr ->
-	    match qual_expr with
-	    | "bigendian", None ->
-		if endian_set then
-		  fail "an endian flag has been set already"
-		else (
-		  let field = P.set_endian field BigEndian in
-		  (true, signed_set, type_set, offset_set, field)
-		)
-	    | "littleendian", None ->
-		if endian_set then
-		  fail "an endian flag has been set already"
-		else (
-		  let field = P.set_endian field LittleEndian in
-		  (true, signed_set, type_set, offset_set, field)
-		)
-	    | "nativeendian", None ->
-		if endian_set then
-		  fail "an endian flag has been set already"
-		else (
-		  let field = P.set_endian field NativeEndian in
-		  (true, signed_set, type_set, offset_set, field)
-		)
-	    | "endian", Some expr ->
-		if endian_set then
-		  fail "an endian flag has been set already"
-		else (
-		  let field = P.set_endian_expr field expr in
-		  (true, signed_set, type_set, offset_set, field)
-		)
-	    | "signed", None ->
-		if signed_set then
-		  fail "a signed flag has been set already"
-		else (
-		  let field = P.set_signed field true in
-		  (endian_set, true, type_set, offset_set, field)
-		)
-	    | "unsigned", None ->
-		if signed_set then
-		  fail "a signed flag has been set already"
-		else (
-		  let field = P.set_signed field false in
-		  (endian_set, true, type_set, offset_set, field)
-		)
-	    | "int", None ->
-		if type_set then
-		  fail "a type flag has been set already"
-		else (
-		  let field = P.set_type_int field in
-		  (endian_set, signed_set, true, offset_set, field)
-		)
-	    | "string", None ->
-		if type_set then
-		  fail "a type flag has been set already"
-		else (
-		  let field = P.set_type_string field in
-		  (endian_set, signed_set, true, offset_set, field)
-		)
-	    | "bitstring", None ->
-		if type_set then
-		  fail "a type flag has been set already"
-		else (
-		  let field = P.set_type_bitstring field in
-		  (endian_set, signed_set, true, offset_set, field)
-		)
-	    | "offset", Some expr ->
-		if offset_set then
-		  fail "an offset has been set already"
-		else (
-		  let field = P.set_offset field expr in
-		  (endian_set, signed_set, type_set, true, field)
-		)
-	    | s, Some _ ->
-		fail (s ^ ": unknown qualifier, or qualifier should not be followed by an expression")
-	    | s, None ->
-		fail (s ^ ": unknown qualifier, or qualifier should be followed by an expression")
-	) (false, false, false, false, field) qs in
+        let check already_set msg = if already_set then fail msg in
+        let apply_qualifier
+	    (endian_set, signed_set, type_set, offset_set, field) =
+	  function
+          | "endian", Some expr ->
+              check endian_set "an endian flag has been set already";
+              let field = P.set_endian_expr field expr in
+	      (true, signed_set, type_set, offset_set, field)
+          | "endian", None ->
+	      fail "qualifier 'endian' should be followed by an expression"
+          | "offset", Some expr ->
+              check offset_set "an offset has been set already";
+              let field = P.set_offset field expr in
+	      (endian_set, signed_set, type_set, true, field)
+          | "offset", None ->
+	      fail "qualifier 'offset' should be followed by an expression"
+          | s, Some _ ->
+	      fail (s ^ ": unknown qualifier, or qualifier should not be followed by an expression")
+          | qual, None ->
+              let endian_quals = ["bigendian", BigEndian;
+                                  "littleendian", LittleEndian;
+                                  "nativeendian", NativeEndian] in
+              let sign_quals = ["signed", true; "unsigned", false] in
+              let type_quals = ["int", P.set_type_int;
+				"string", P.set_type_string;
+				"bitstring", P.set_type_bitstring] in
+              if List.mem_assoc qual endian_quals then (
+		check endian_set "an endian flag has been set already";
+		let field = P.set_endian field (List.assoc qual endian_quals) in
+		(true, signed_set, type_set, offset_set, field)
+              ) else if List.mem_assoc qual sign_quals then (
+		check signed_set "a signed flag has been set already";
+		let field = P.set_signed field (List.assoc qual sign_quals) in
+		(endian_set, true, type_set, offset_set, field)
+              ) else if List.mem_assoc qual type_quals then (
+		check type_set "a type flag has been set already";
+		let field = List.assoc qual type_quals field in
+		(endian_set, signed_set, true, offset_set, field)
+              ) else
+		fail (qual ^ ": unknown qualifier, or qualifier should be followed by an expression") in
+        List.fold_left apply_qualifier (false, false, false, false, field) qs in
 
   (* If type is set to string or bitstring then endianness and
    * signedness qualifiers are meaningless and must not be set.
