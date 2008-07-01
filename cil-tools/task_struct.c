@@ -4,6 +4,7 @@
  * Use: bitmatch-import-c task_struct.c > task_struct.ml
  *
  * Tip: Add the --debug flag to that command line to see what's going on.
+ * Also use bitmatch-objinfo to examine the bmpp file.
  */
 
 /* Any defines, etc. necessary to get the include to work. */

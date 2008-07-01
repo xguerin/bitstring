@@ -32,6 +32,8 @@ OCAMLOPTFLAGS	=
 OCAMLOPTPACKAGES = $(OCAMLCPACKAGES)
 OCAMLOPTLIBS	= $(OCAMLOPTPACKAGES) camlp4lib.cmxa -linkpkg ../bitmatch.cmxa ../bitmatch_persistent.cmxa
 
+PP		= -pp "camlp4o -I .. bitmatch.cma bitmatch_persistent.cma pa_bitmatch.cmo"
+
 OCAMLDOCFLAGS	= -html -sort
 
 all:		bitmatch-import-c bitmatch-import-c.opt
@@ -45,19 +47,36 @@ bitmatch-import-c.opt: bitmatch_import_c.cmx
 test:
 
 # Examples.
+#
+# To compile task_struct you'll need to grab a copy of the Linux
+# kernel original header files and set the directory below.
 
 #DEBUG		=
 DEBUG		= --debug
-LINUX_HEADERS	= linux-2.6.25.4-headers
+LINUX_HEADERS	= linux-2.6.25.7-headers
 LINUX_INCLUDES	= -I $(LINUX_HEADERS)
 
-examples: ext3.ml task_struct.ml
+#EXAMPLES	= ext3 task_struct
+EXAMPLES	= ext3
+
+examples: $(EXAMPLES)
+
+ext3: ext3.cmo ext3.bmpp
+	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCLIBS) $< -o $@
+
+ext3.cmo: ext3.ml
+	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) $(PP) -c $< -o $@
 
 ext3.bmpp: ext3.c bitmatch-import-c
-	cd $(LINUX_HEADERS) && ln -sf asm-x86 asm
 	rm -f $@.new
 	./bitmatch-import-c $(DEBUG) $(LINUX_INCLUDES) $< > $@.new
 	mv $@.new $@
+
+task_struct: task_struct.cmo task_struct.bmpp
+	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCLIBS) $< -o $@
+
+task_struct.cmo: task_struct.ml
+	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) $(PP) -c $< -o $@
 
 task_struct.bmpp: task_struct.c bitmatch-import-c
 	cd $(LINUX_HEADERS) && ln -sf asm-x86 asm
