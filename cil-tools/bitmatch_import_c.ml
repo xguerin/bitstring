@@ -293,7 +293,7 @@ OPTIONS" in
 	    [] (* XXX *)
 
 	| t ->
-	    Errormsg.unimp "to_fields: %a: unhandled type: %a"
+	    Errormsg.warn "pattern_of_struct: %a: unhandled type: %a"
 	      d_loc loc d_type t;
 	    []
 
