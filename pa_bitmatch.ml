@@ -38,6 +38,8 @@ let debug = false
 (* Hashtable storing named persistent patterns. *)
 let pattern_hash : (string, P.pattern) Hashtbl.t = Hashtbl.create 13
 
+let locfail _loc msg = Loc.raise _loc (Failure msg)
+
 (* Work out if an expression is an integer constant.
  *
  * Returns [Some i] if so (where i is the integer value), else [None].
@@ -83,6 +85,8 @@ let gensym =
 
 (* Deal with the qualifiers which appear for a field of both types. *)
 let parse_field _loc field qs =
+  let fail = locfail _loc in
+
   let endian_set, signed_set, type_set, offset_set, field =
     match qs with
     | None -> (false, false, false, false, field)
@@ -92,78 +96,78 @@ let parse_field _loc field qs =
 	    match qual_expr with
 	    | "bigendian", None ->
 		if endian_set then
-		  Loc.raise _loc (Failure "an endian flag has been set already")
+		  fail "an endian flag has been set already"
 		else (
 		  let field = P.set_endian field BigEndian in
 		  (true, signed_set, type_set, offset_set, field)
 		)
 	    | "littleendian", None ->
 		if endian_set then
-		  Loc.raise _loc (Failure "an endian flag has been set already")
+		  fail "an endian flag has been set already"
 		else (
 		  let field = P.set_endian field LittleEndian in
 		  (true, signed_set, type_set, offset_set, field)
 		)
 	    | "nativeendian", None ->
 		if endian_set then
-		  Loc.raise _loc (Failure "an endian flag has been set already")
+		  fail "an endian flag has been set already"
 		else (
 		  let field = P.set_endian field NativeEndian in
 		  (true, signed_set, type_set, offset_set, field)
 		)
 	    | "endian", Some expr ->
 		if endian_set then
-		  Loc.raise _loc (Failure "an endian flag has been set already")
+		  fail "an endian flag has been set already"
 		else (
 		  let field = P.set_endian_expr field expr in
 		  (true, signed_set, type_set, offset_set, field)
 		)
 	    | "signed", None ->
 		if signed_set then
-		  Loc.raise _loc (Failure "a signed flag has been set already")
+		  fail "a signed flag has been set already"
 		else (
 		  let field = P.set_signed field true in
 		  (endian_set, true, type_set, offset_set, field)
 		)
 	    | "unsigned", None ->
 		if signed_set then
-		  Loc.raise _loc (Failure "a signed flag has been set already")
+		  fail "a signed flag has been set already"
 		else (
 		  let field = P.set_signed field false in
 		  (endian_set, true, type_set, offset_set, field)
 		)
 	    | "int", None ->
 		if type_set then
-		  Loc.raise _loc (Failure "a type flag has been set already")
+		  fail "a type flag has been set already"
 		else (
 		  let field = P.set_type_int field in
 		  (endian_set, signed_set, true, offset_set, field)
 		)
 	    | "string", None ->
 		if type_set then
-		  Loc.raise _loc (Failure "a type flag has been set already")
+		  fail "a type flag has been set already"
 		else (
 		  let field = P.set_type_string field in
 		  (endian_set, signed_set, true, offset_set, field)
 		)
 	    | "bitstring", None ->
 		if type_set then
-		  Loc.raise _loc (Failure "a type flag has been set already")
+		  fail "a type flag has been set already"
 		else (
 		  let field = P.set_type_bitstring field in
 		  (endian_set, signed_set, true, offset_set, field)
 		)
 	    | "offset", Some expr ->
 		if offset_set then
-		  Loc.raise _loc (Failure "an offset has been set already")
+		  fail "an offset has been set already"
 		else (
 		  let field = P.set_offset field expr in
 		  (endian_set, signed_set, type_set, true, field)
 		)
 	    | s, Some _ ->
-		Loc.raise _loc (Failure (s ^ ": unknown qualifier, or qualifier should not be followed by an expression"))
+		fail (s ^ ": unknown qualifier, or qualifier should not be followed by an expression")
 	    | s, None ->
-		Loc.raise _loc (Failure (s ^ ": unknown qualifier, or qualifier should be followed by an expression"))
+		fail (s ^ ": unknown qualifier, or qualifier should be followed by an expression")
 	) (false, false, false, false, field) qs in
 
   (* If type is set to string or bitstring then endianness and
@@ -172,9 +176,7 @@ let parse_field _loc field qs =
   let () =
     let t = P.get_type field in
     if (t = P.Bitstring || t = P.String) && (endian_set || signed_set) then
-      Loc.raise _loc (
-	Failure "string types and endian or signed qualifiers cannot be mixed"
-      ) in
+      fail "string types and endian or signed qualifiers cannot be mixed" in
 
   (* Default endianness, signedness, type if not set already. *)
   let field = if endian_set then field else P.set_endian field BigEndian in
@@ -185,6 +187,8 @@ let parse_field _loc field qs =
 
 (* Generate the code for a constructor, ie. 'BITSTRING ...'. *)
 let output_constructor _loc fields =
+  let fail = locfail _loc in
+
   let loc_fname = Loc.file_name _loc in
   let loc_line = string_of_int (Loc.start_line _loc) in
   let loc_char = string_of_int (Loc.start_off _loc - Loc.start_bol _loc) in
@@ -219,9 +223,8 @@ let output_constructor _loc fields =
        * including going backwards, that would require a rethink in
        * how we construct bitstrings.
        *)
-      if offset <> None then (
-	Loc.raise _loc (Failure "offset expressions are not supported in BITSTRING constructors")
-      );
+      if offset <> None then
+	fail "offset expressions are not supported in BITSTRING constructors";
 
       (* Is flen an integer constant?  If so, what is it?  This
        * is very simple-minded and only detects simple constants.
@@ -324,7 +327,7 @@ let output_constructor _loc fields =
 	    >>
 
 	| P.Int, Some _ ->
-	    Loc.raise _loc (Failure "length of int field must be [1..64]")
+	    fail "length of int field must be [1..64]"
 
 	(* Int field, non-constant length.  We need to perform a runtime
 	 * test to ensure the length is [1..64].
@@ -372,7 +375,7 @@ let output_constructor _loc fields =
 	 * any other value.
 	 *)
 	| P.String, Some _ ->
-	    Loc.raise _loc (Failure "length of string must be > 0 and a multiple of 8, or the special value -1")
+	    fail "length of string must be > 0 and a multiple of 8, or the special value -1"
 
 	(* String, non-constant length.
 	 * We check at runtime that the length is > 0, a multiple of 8,
@@ -427,9 +430,7 @@ let output_constructor _loc fields =
 
 	(* Bitstring, constant length < -1 is an error. *)
 	| P.Bitstring, Some _ ->
-	    Loc.raise _loc
-	      (Failure
-		 "length of bitstring must be >= 0 or the special value -1")
+	    fail "length of bitstring must be >= 0 or the special value -1"
 
 	(* Bitstring, non-constant length.
 	 * We check at runtime that the length is >= 0 and matches
@@ -494,6 +495,8 @@ let output_constructor _loc fields =
  * the list of cases to test against.
  *)
 let output_bitmatch _loc bs cases =
+  let fail = locfail _loc in
+
   let data = gensym "data" and off = gensym "off" and len = gensym "len" in
   let result = gensym "result" in
 
@@ -617,7 +620,7 @@ let output_bitmatch _loc bs cases =
 	      >>
 
 	  | P.Int, Some _ ->
-	      Loc.raise _loc (Failure "length of int field must be [1..64]")
+	      fail "length of int field must be [1..64]"
 
 	  (* Int field, non-const flen.  We have to test the range of
 	   * the field at runtime.  If outside the range it's a no-match
@@ -662,7 +665,7 @@ let output_bitmatch _loc bs cases =
 	      >>
 
 	  | P.String, Some _ ->
-	      Loc.raise _loc (Failure "length of string must be > 0 and a multiple of 8, or the special value -1")
+	      fail "length of string must be > 0 and a multiple of 8, or the special value -1"
 
 	  (* String field, non-const flen.  We check the flen is > 0
 	   * and a multiple of 8 (-1 is not allowed here), at runtime.
@@ -691,8 +694,7 @@ let output_bitmatch _loc bs cases =
 		| <:patt< $lid:ident$ >> -> ident
 		| <:patt< _ >> -> "_"
 		| _ ->
-		    Loc.raise _loc
-		      (Failure "cannot compare a bitstring to a constant") in
+		    fail "cannot compare a bitstring to a constant" in
 	      <:expr<
 		if $lid:len$ >= $`int:i$ then (
 		  let $lid:ident$, $lid:off$, $lid:len$ =
@@ -711,8 +713,7 @@ let output_bitmatch _loc bs cases =
 		| <:patt< $lid:ident$ >> -> ident
 		| <:patt< _ >> -> "_"
 		| _ ->
-		    Loc.raise _loc
-		      (Failure "cannot compare a bitstring to a constant") in
+		    fail "cannot compare a bitstring to a constant" in
 	      <:expr<
 		let $lid:ident$, $lid:off$, $lid:len$ =
 		  Bitmatch.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
@@ -720,7 +721,7 @@ let output_bitmatch _loc bs cases =
 	      >>
 
 	  | P.Bitstring, Some _ ->
-	      Loc.raise _loc (Failure "length of bitstring must be >= 0 or the special value -1")
+	      fail "length of bitstring must be >= 0 or the special value -1"
 
 	  (* Bitstring field, non-const flen.  We check the flen is >= 0
 	   * (-1 is not allowed here) at runtime.
@@ -731,8 +732,7 @@ let output_bitmatch _loc bs cases =
 		| <:patt< $lid:ident$ >> -> ident
 		| <:patt< _ >> -> "_"
 		| _ ->
-		    Loc.raise _loc
-		      (Failure "cannot compare a bitstring to a constant") in
+		    fail "cannot compare a bitstring to a constant" in
 	      <:expr<
 		if $flen$ >= 0 && $flen$ <= $lid:len$ then (
 		  let $lid:ident$, $lid:off$, $lid:len$ =
@@ -829,7 +829,7 @@ let output_bitmatch _loc bs cases =
 	      | Some current_offset, Some requested_offset ->
 		  let move = requested_offset - current_offset in
 		  if move < 0 then
-		    Loc.raise _loc (Failure (sprintf "requested offset is less than the current offset (%d < %d)" requested_offset current_offset));
+		    fail (sprintf "requested offset is less than the current offset (%d < %d)" requested_offset current_offset);
 		  (* Add some code to move the offset and length by a
 		   * constant amount, and a runtime test that len >= 0
 		   * (XXX possibly the runtime test is unnecessary?)
@@ -942,7 +942,7 @@ let add_named_pattern _loc name pattern =
 let expand_named_pattern _loc name =
   try Hashtbl.find pattern_hash name
   with Not_found ->
-    Loc.raise _loc (Failure (sprintf "named pattern not found: %s" name))
+    locfail _loc (sprintf "named pattern not found: %s" name)
 
 (* Add named patterns from a file.  See the documentation on the
  * directory search path in bitmatch_persistent.mli
