@@ -26,6 +26,8 @@ open Cil
 
 module P = Bitmatch_persistent
 
+let (//) = Filename.concat
+
 let () =
   (* Parse command line arguments. *)
   let debug = ref false in
@@ -99,8 +101,9 @@ OPTIONS" in
     ) in
 
   let cmd =
-    sprintf "cpp %s -include bitmatch-import-prefix.h %s > %s"
+    sprintf "cpp %s -I %s -include bitmatch-import-prefix.h %s > %s"
       (String.concat " " (List.map Filename.quote cpp_args))
+      (Filename.quote (Bitmatch_config.ocamllibdir // "bitmatch"))
       (Filename.quote input_file) (Filename.quote tmp) in
   if debug then prerr_endline cmd;
   if Sys.command cmd <> 0 then (
