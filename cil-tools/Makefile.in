@@ -61,21 +61,21 @@ EXAMPLES	= ext3
 
 examples: $(EXAMPLES)
 
-ext3: ext3.cmo ext3.bmpp
+ext3: ext3.cmo
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCLIBS) $< -o $@
 
-ext3.cmo: ext3.ml
+ext3.cmo: ext3.ml ext3.bmpp
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) $(PP) -c $< -o $@
 
 ext3.bmpp: ext3.c bitmatch-import-c
 	rm -f $@.new
-	./bitmatch-import-c $(DEBUG) $(LINUX_INCLUDES) $< > $@.new
+	./bitmatch-import-c $(DEBUG) $< > $@.new
 	mv $@.new $@
 
-task_struct: task_struct.cmo task_struct.bmpp
+task_struct: task_struct.cmo
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCLIBS) $< -o $@
 
-task_struct.cmo: task_struct.ml
+task_struct.cmo: task_struct.ml task_struct.bmpp
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) $(PP) -c $< -o $@
 
 task_struct.bmpp: task_struct.c bitmatch-import-c
@@ -87,7 +87,7 @@ task_struct.bmpp: task_struct.c bitmatch-import-c
 # Clean.
 
 clean:
-	rm -f core *~ *.cmi *.cmo *.cmx *.cma *.cmxa *.a *.o
+	rm -f core *~ *.cmi *.cmo *.cmx *.cma *.cmxa *.a *.o *.bmpp
 	rm -f bitmatch-import-c bitmatch-import-c.opt
 
 distclean: clean

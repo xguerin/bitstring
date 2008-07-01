@@ -15,7 +15,7 @@ let () =
   let bits = Bitmatch.bitstring_of_file "examples/ext3_sb" in
 
   bitmatch bits with
-  | { :ext3_super_block } ->
+  | { :ext2_super_block } ->
       printf "ext3 superblock:\n";
       printf "  s_inodes_count = %ld\n" s_inodes_count;
       printf "  s_blocks_count = %ld\n" s_blocks_count;
