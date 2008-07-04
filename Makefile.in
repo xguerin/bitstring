@@ -25,6 +25,9 @@ OCAMLMKLIB	= @OCAMLMKLIB@
 OCAMLDOC	= @OCAMLDOC@
 INSTALL		= @INSTALL@
 
+pkg_cil		= @pkg_cil@
+pkg_extlib	= @pkg_extlib@
+
 OCAMLCFLAGS	= -g
 OCAMLCPACKAGES	=
 OCAMLOPTFLAGS	=
