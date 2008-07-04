@@ -33,7 +33,7 @@ Major to-do items.
     Make the error locations fine-grained, particularly so they point to
     individual fields, not the whole match.
 
-(10) Cross-module, persistent, named patterns, see:
+(10) DONE - Cross-module, persistent, named patterns, see:
   http://caml.inria.fr/pub/ml-archives/caml-list/2008/04/25992c9c9fa999fe1d35d961dd9917a2.en.html
 
 (11) DONE -
@@ -49,7 +49,7 @@ Major to-do items.
 
 (12) DONE - More constant field lengths.
 
-(13) Implement native endian functions.
+(13) PARTLY DONE - Implement native endian functions.
 
 (14) PARTLY DONE - A proper test suite.
 
