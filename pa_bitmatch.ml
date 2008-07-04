@@ -791,7 +791,10 @@ let load_patterns_from_file _loc filename =
   let names = List.rev !names in
   List.iter (
     function
-    | name, P.Pattern patt -> add_named_pattern _loc name patt
+    | name, P.Pattern patt ->
+	if patt = [] then
+	  locfail _loc (sprintf "pattern %s: no fields" name);
+	add_named_pattern _loc name patt
     | _, P.Constructor _ -> () (* just ignore these for now *)
   ) names
 
