@@ -1,14 +1,22 @@
-name="bitmatch"
-version="@PACKAGE_VERSION@"
-description="Bitstrings and bitstring matching"
-requires="unix"
-archive(byte)="bitmatch.cma"
-archive(native)="bitmatch.cmxa"
+name = "bitmatch"
+version = "@PACKAGE_VERSION@"
+description = "Bitstrings and bitstring matching"
+requires = "unix"
+archive(byte) = "bitmatch.cma"
+archive(native) = "bitmatch.cmxa"
+
+package "persistent" (
+  requires = "bitmatch"
+  version = "@PACKAGE_VERSION@"
+  description = "Persistent patterns for bitmatch (requires camlp4)"
+  archive(byte) = "bitmatch_persistent.cma"
+  archive(native) = "bitmatch_persistent.cmxa"
+)
 
 package "syntax" (
-  requires = "camlp4.quotations.o"
   version = "@PACKAGE_VERSION@"
   description = "Syntax extension: bitmatch operators"
-  archive(syntax,preprocessor) = "pa_bitmatch.cmo"
-  archive(syntax,toploop) = "pa_bitmatch.cmo"
+  archive(syntax,preprocessor) = "unix.cma bitmatch.cma bitmatch_persistent.cma pa_bitmatch.cmo"
+  archive(syntax,toploop) = "unix.cma bitmatch.cma bitmatch_persistent.cma pa_bitmatch.cmo"
+  preprocessor = "camlp4of"
 )

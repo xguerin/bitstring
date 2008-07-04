@@ -455,14 +455,14 @@ bitmatch bits with
    ocamlc -I +bitmatch \
      -pp "camlp4o bitmatch.cma bitmatch_persistent.cma \
             `ocamlc -where`/bitmatch/pa_bitmatch.cmo" \
-     bitmatch.cma test.ml -o test
+     unix.cma bitmatch.cma test.ml -o test
    v}
 
    Simpler method using findlib:
 
    {v
    ocamlfind ocamlc \
-     -package bitmatch.syntax -syntax bitmatch.syntax \
+     -package bitmatch,bitmatch.syntax -syntax bitmatch.syntax \
      -linkpkg test.ml -o test
    v}
 
