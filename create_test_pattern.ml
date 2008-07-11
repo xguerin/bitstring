@@ -1,4 +1,4 @@
-(* Create persistent pattern
+(* Create persistent pattern.
  * $Id$
  *)
 

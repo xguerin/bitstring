@@ -1,5 +1,7 @@
 /* This file is automagically prefixed to all .ubd files
  * and provides some macros that we need for CIL.
+ *
+ * This file is in the public domain.
  */
 
 /* This is needed for older versions of CIL which didn't

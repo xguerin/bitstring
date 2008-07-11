@@ -16,6 +16,7 @@ cil-tools/Makefile.in
 cil-tools/task_struct.c
 cil-tools/task_struct.ml
 configure.ac
+COPYING
 COPYING.LIB
 create_test_pattern.ml
 examples/elf.ml

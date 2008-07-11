@@ -1,5 +1,4 @@
-ocaml-bitmatch copyright (C) 2008 Red Hat Inc.
-License: LGPLv2+ with OCaml linking exception.
+ocaml-bitmatch Copyright (C) 2008 Red Hat Inc, Richard W.M. Jones.
 
 Please see the html subdirectory for developer documentation.
 
@@ -26,3 +25,14 @@ Other make targets:
 To install (as root):
 
 	make install
+
+LICENSE
+----------------------------------------------------------------------
+
+The library is licensed under the LGPL v2 or later, with the OCaml
+linking exception.  See the file COPYING.LIB for full terms.
+
+Programs are licensed under the GPL v2 or later.  See the file COPYING
+for full terms.
+
+All examples and tests are public domain.
