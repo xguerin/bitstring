@@ -453,7 +453,7 @@ bitmatch bits with
 
    {v
    ocamlc -I +bitmatch \
-     -pp "camlp4o bitmatch.cma bitmatch_persistent.cma \
+     -pp "camlp4of bitmatch.cma bitmatch_persistent.cma \
             `ocamlc -where`/bitmatch/pa_bitmatch.cmo" \
      unix.cma bitmatch.cma test.ml -o test
    v}
