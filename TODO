@@ -63,4 +63,38 @@ Major to-do items.
      of functions to be called (at compile time).  However do note
      that the offset in the bitstring is usually not known.
 
-(17) Fix the META file.  Current one is very broken.
+(17) PARTLY DONE - Fix the META file.  Current one is very broken.
+
+(18) when() qualifier:
+
+     { field : 16 : when (field > 100) }
+
+     The when(expr) qualifier will abort the rest of the match if the
+     expression is false.
+
+(19) bind() qualifier:
+
+     { field : 16 : bind (field * 3) }
+       ^pattern           ^new value
+
+     The bind(expr) qualifier binds the pattern to a new value,
+     equivalent to doing:
+
+     let field = field * 3 in
+     (* remainder of match *)
+
+     There is a question of whether bind() should run before or
+     after when() [best is probably when() first, then bind()].
+
+(20) save_offset_to() qualifier:
+
+     { field : 16 : save_offset_to (offset), bind (field - offset) }
+
+     or:
+
+     { field : 16 : save_offset_to (field_offset) } ->
+       printf "the offset of field (%d) is %d\n" field field_offset
+
+     save_offset_to(patt) binds the current match offset to
+     the variable, for later use within bind(), when() or
+     any later parts of the match.
