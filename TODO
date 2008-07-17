@@ -65,14 +65,14 @@ Major to-do items.
 
 (17) PARTLY DONE - Fix the META file.  Current one is very broken.
 
-(18) when() qualifier:
+(18) DONE - check() qualifier:
 
-     { field : 16 : when (field > 100) }
+     { field : 16 : check (field > 100) }
 
-     The when(expr) qualifier will abort the rest of the match if the
+     The check(expr) qualifier will abort the rest of the match if the
      expression is false.
 
-(19) bind() qualifier:
+(19) DONE - bind() qualifier:
 
      { field : 16 : bind (field * 3) }
        ^pattern           ^new value
@@ -86,7 +86,7 @@ Major to-do items.
      There is a question of whether bind() should run before or
      after when() [best is probably when() first, then bind()].
 
-(20) save_offset_to() qualifier:
+(20) DONE - save_offset_to() qualifier:
 
      { field : 16 : save_offset_to (offset), bind (field - offset) }
 
