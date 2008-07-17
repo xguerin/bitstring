@@ -3,7 +3,7 @@
  *)
 
 open Printf
-open Bitmatch
+open Bitstring
 
 let bits = (BITSTRING { 101 : 16; 202 : 16 })
 

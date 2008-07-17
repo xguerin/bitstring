@@ -3,7 +3,7 @@
  *)
 
 open Printf
-open Bitmatch
+open Bitstring
 
 open bitmatch "tests/test.bmpp"
 

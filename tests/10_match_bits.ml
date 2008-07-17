@@ -17,9 +17,9 @@ let () =
     (* Create a random string of bits. *)
     let expected = List.map (fun _ -> Random.bool ()) (range 0 (len-1)) in
 
-    let bits = Bitmatch.Buffer.create () in
-    List.iter (Bitmatch.Buffer.add_bit bits) expected;
-    let bits = Bitmatch.Buffer.contents bits in
+    let bits = Bitstring.Buffer.create () in
+    List.iter (Bitstring.Buffer.add_bit bits) expected;
+    let bits = Bitstring.Buffer.contents bits in
 
     (* Now read the bitstring in groups of 1, 2, 3 .. etc. bits.
      * In each case check the result against what we generated ('expected').

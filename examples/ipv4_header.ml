@@ -4,7 +4,7 @@
 
 open Printf
 
-let header = Bitmatch.bitstring_of_file "ipv4_header.dat"
+let header = Bitstring.bitstring_of_file "ipv4_header.dat"
 
 let () =
   bitmatch header with
@@ -29,13 +29,13 @@ let () =
     printf "  checksum: %d\n" checksum;
     printf "  source: %lx  dest: %lx\n" source dest;
     printf "  header options + padding:\n";
-    Bitmatch.hexdump_bitstring stdout options;
+    Bitstring.hexdump_bitstring stdout options;
     printf "  packet payload:\n";
-    Bitmatch.hexdump_bitstring stdout payload
+    Bitstring.hexdump_bitstring stdout payload
 
   | { version : 4 } ->
     eprintf "cannot parse IP version %d\n" version
 
   | { _ } as header ->
     eprintf "data is smaller than one nibble:\n";
-    Bitmatch.hexdump_bitstring stderr header
+    Bitstring.hexdump_bitstring stderr header

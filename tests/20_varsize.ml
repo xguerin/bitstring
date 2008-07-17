@@ -7,7 +7,7 @@ open Printf
 let nr_passes = 10000
 let max_size = 8			(* max field size in bits *)
 
-(* let () = Bitmatch.debug := true *)
+(* let () = Bitstring.debug := true *)
 
 (* Return a full 64 bits of randomness. *)
 let rand64 () =
@@ -36,8 +36,8 @@ let dump n0 n0sz n1 n1sz n2 n2sz n3 n3sz bits r0 r1 r2 r3 =
   eprintf "  1: %3d - %016Lx - %016Lx\n" n1sz n1 r1;
   eprintf "  2: %3d - %016Lx - %016Lx\n" n2sz n2 r2;
   eprintf "  3: %3d - %016Lx - %016Lx\n" n3sz n3 r3;
-  eprintf "bits (length = %d):\n" (Bitmatch.bitstring_length bits);
-  Bitmatch.hexdump_bitstring stderr bits;
+  eprintf "bits (length = %d):\n" (Bitstring.bitstring_length bits);
+  Bitstring.hexdump_bitstring stderr bits;
   eprintf "%!"
 
 let () =
@@ -63,16 +63,16 @@ let () =
 	   n3 : n3sz
 	 })
       with
-	Bitmatch.Construct_failure (msg, _, _, _) ->
+	Bitstring.Construct_failure (msg, _, _, _) ->
 	  eprintf "FAILED: Construct_failure %s\n%!" msg;
 	  dump n0 n0sz n1 n1sz n2 n2sz n3 n3sz
-	    (Bitmatch.empty_bitstring) 0L 0L 0L 0L;
+	    (Bitstring.empty_bitstring) 0L 0L 0L 0L;
 	  exit 2 in
 
     let r0, r1, r2, r3 =
       bitmatch bits with
       | { r0 : n0sz; r1 : n1sz; r2 : n2sz; r3 : n3sz; rest : -1 : bitstring } ->
-	  let rest_len = Bitmatch.bitstring_length rest in
+	  let rest_len = Bitstring.bitstring_length rest in
           if rest_len <> 0 then (
 	    eprintf "FAILED: rest is not zero length (length = %d)\n%!"
 	      rest_len;

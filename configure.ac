@@ -1,4 +1,4 @@
-# Bitmatch syntax extension.
+# Bitstring syntax extension.
 # Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
 #
 # This library is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(ocaml-bitmatch,1.9.6)
+AC_INIT(ocaml-bitstring,1.9.7)
 
 dnl Check for basic C environment.
 AC_PROG_CC
@@ -61,5 +61,5 @@ AC_SUBST(pkg_cil)
 
 dnl Produce output files.
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_FILES([Makefile META bitmatch_config.ml cil-tools/Makefile])
+AC_CONFIG_FILES([Makefile META bitstring_config.ml cil-tools/Makefile])
 AC_OUTPUT

@@ -3,7 +3,7 @@
  *)
 
 open Printf
-open Bitmatch
+open Bitstring
 
 let make_bits p i n j m k = (
   let pad0 = ones_bitstring p in

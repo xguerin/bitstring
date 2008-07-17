@@ -1,4 +1,4 @@
-# Bitmatch syntax extension.
+# Bitstring syntax extension.
 # Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
 #
 # This library is free software; you can redistribute it and/or
@@ -46,54 +46,56 @@ EXAMPLES	= $(patsubst %.ml,%,$(wildcard examples/*.ml))
 
 TESTS		= $(patsubst %.ml,%,$(wildcard tests/*.ml))
 
-all:	bitmatch.cma bitmatch_persistent.cma \
-	bitmatch.cmxa bitmatch_persistent.cmxa \
-	pa_bitmatch.cmo \
-	bitmatch-objinfo
+all:	bitstring.cma bitstring_persistent.cma \
+	bitstring.cmxa bitstring_persistent.cmxa \
+	pa_bitstring.cmo \
+	bitstring-objinfo
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
-bitmatch.cma: bitmatch_types.cmo bitmatch_config.cmo bitmatch.cmo
+bitstring.cma: bitstring_types.cmo bitstring_config.cmo bitstring.cmo \
+	  bitmatch.cmo
 	$(OCAMLFIND) ocamlc -a -o $@ $^
 
-bitmatch_persistent.cma: bitmatch_persistent.cmo
+bitstring_persistent.cma: bitstring_persistent.cmo
 	$(OCAMLFIND) ocamlc -a -o $@ $^
 
-bitmatch_persistent.cmo: bitmatch_persistent.ml
+bitstring_persistent.cmo: bitstring_persistent.ml
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) \
 	  -I +camlp4 -pp camlp4of -c $<
 
-bitmatch.cmxa: bitmatch_types.cmx bitmatch_config.cmx bitmatch.cmx
+bitstring.cmxa: bitstring_types.cmx bitstring_config.cmx bitstring.cmx \
+	  bitmatch.cmx
 	$(OCAMLFIND) ocamlopt -a -o $@ $^
 
-bitmatch_persistent.cmxa: bitmatch_persistent.cmx
+bitstring_persistent.cmxa: bitstring_persistent.cmx
 	$(OCAMLFIND) ocamlopt -a -o $@ $^
 
-bitmatch_persistent.cmx: bitmatch_persistent.ml
+bitstring_persistent.cmx: bitstring_persistent.ml
 	$(OCAMLFIND) ocamlopt $(OCAMLOPTFLAGS) $(OCAMLOPTPACKAGES) \
 	  -I +camlp4 -pp camlp4of -c $<
 
-bitmatch_persistent.cmi: bitmatch_persistent.mli
+bitstring_persistent.cmi: bitstring_persistent.mli
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) \
 	  -I +camlp4 -pp camlp4of -c $<
 
-pa_bitmatch.cmo: pa_bitmatch.ml bitmatch.cma bitmatch_persistent.cma
-	$(OCAMLFIND) ocamlc bitmatch.cma -I +camlp4 camlp4lib.cma \
+pa_bitstring.cmo: pa_bitstring.ml bitstring.cma bitstring_persistent.cma
+	$(OCAMLFIND) ocamlc bitstring.cma -I +camlp4 camlp4lib.cma \
 	  -pp camlp4of -c $< -o $@
 
-bitmatch-objinfo: bitmatch_objinfo.cmo bitmatch.cma bitmatch_persistent.cma
+bitstring-objinfo: bitstring_objinfo.cmo bitstring.cma bitstring_persistent.cma
 	$(OCAMLFIND) ocamlc -I +camlp4 unix.cma camlp4lib.cma \
-	  bitmatch.cma bitmatch_persistent.cma \
+	  bitstring.cma bitstring_persistent.cma \
 	  $< -o $@
 
 # Tests and examples.
 
-PP	= -pp "camlp4o bitmatch.cma bitmatch_persistent.cma pa_bitmatch.cmo"
+PP	= -pp "camlp4o bitstring.cma bitstring_persistent.cma pa_bitstring.cmo"
 
-test: pa_bitmatch.cmo bitmatch.cma bitmatch_persistent.cma tests/test.bmpp
+test: pa_bitstring.cmo bitstring.cma bitstring_persistent.cma tests/test.bmpp
 	@for f in $(TESTS); do \
 	  echo Building $$f; \
 	  $(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(PP) \
-	    -package unix -linkpkg -I . bitmatch.cma $$f.ml -o $$f; \
+	    -package unix -linkpkg -I . bitstring.cma $$f.ml -o $$f; \
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	  echo Running $$f; \
 	  $$f; \
@@ -108,35 +110,35 @@ tests/test.bmpp: create_test_pattern
 create_test_pattern: create_test_pattern.cmo
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) -pp camlp4of \
 	  unix.cma -I +camlp4 camlp4lib.cma \
-	  -I . bitmatch.cma bitmatch_persistent.cma $< -o $@
+	  -I . bitstring.cma bitstring_persistent.cma $< -o $@
 
 create_test_pattern.cmo: create_test_pattern.ml
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) -pp camlp4of \
 	  unix.cma -I +camlp4 \
 	  -I . -c $< -o $@
 
-examples: pa_bitmatch.cmo bitmatch.cma bitmatch_persistent.cma
+examples: pa_bitstring.cmo bitstring.cma bitstring_persistent.cma
 	@for f in $(EXAMPLES); do \
 	  echo Building $$f; \
 	  $(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(PP) \
-	    -package unix -linkpkg -I . bitmatch.cma $$f.ml -o $$f; \
+	    -package unix -linkpkg -I . bitstring.cma $$f.ml -o $$f; \
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	done
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
-print-tests: pa_bitmatch.cmo bitmatch_persistent.cma
+print-tests: pa_bitstring.cmo bitstring_persistent.cma
 	@for f in $(TESTS); do \
 	  echo Test: $$f.ml; \
-	  cmd="camlp4o bitmatch.cma bitmatch_persistent.cma pa_bitmatch.cmo \
+	  cmd="camlp4o bitstring.cma bitstring_persistent.cma pa_bitstring.cmo \
 	    -printer pr_o.cmo $$f.ml"; \
 	  echo $$cmd; \
 	  $$cmd; \
 	done
 
-print-examples: pa_bitmatch.cmo
+print-examples: pa_bitstring.cmo
 	@for f in $(EXAMPLES); do \
 	  echo Example: $$f.ml; \
-	  camlp4o bitmatch.cma bitmatch_persistent.cma pa_bitmatch.cmo \
+	  camlp4o bitstring.cma bitstring_persistent.cma pa_bitstring.cmo \
 	    -printer pr_o.cmo $$f.ml; \
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	done
@@ -152,7 +154,8 @@ clean:
 distclean: clean
 	rm -rf autom4te.cache
 	rm -f config.log config.status
-	rm -f config.h Makefile META bitmatch_config.ml
+	rm -f config.h Makefile META bitstring_config.ml
+	rm -f bitstring-objinfo
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
 # Documentation.
@@ -162,16 +165,16 @@ doc:
 	rm -rf html
 	mkdir html
 	$(OCAMLDOC) $(OCAMLDOCFLAGS) -d html -I +camlp4 \
-	  bitmatch.mli bitmatch_persistent.mli
+	  bitstring.mli bitstring_persistent.mli
 endif
 
 # Install.
 
 install:
-	ocamlfind install bitmatch META *.mli *.cmx *.cma *.cmxa *.a \
-		bitmatch.cmi \
-		bitmatch_persistent.cmi \
-		pa_bitmatch.cmo
+	ocamlfind install bitstring META *.mli *.cmx *.cma *.cmxa *.a \
+		bitstring.cmi \
+		bitstring_persistent.cmi \
+		pa_bitstring.cmo
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
 # Standard rules.
@@ -186,16 +189,16 @@ install:
 depend: .depend
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
-.depend: bitmatch.ml bitmatch.mli \
-	  bitmatch_persistent.ml bitmatch_persistent.mli \
-	  bitmatch_objinfo.ml \
+.depend: bitstring.ml bitstring.mli \
+	  bitstring_persistent.ml bitstring_persistent.mli \
+	  bitstring_objinfo.ml \
 	  create_test_pattern.ml
 	rm -f .depend
 	$(OCAMLFIND) ocamldep $(OCAMLCPACKAGES) \
-	  bitmatch.ml bitmatch.mli \
-	  bitmatch_objinfo.ml >> $@
+	  bitstring.ml bitstring.mli \
+	  bitstring_objinfo.ml >> $@
 	$(OCAMLFIND) ocamldep $(OCAMLCPACKAGES) -pp camlp4of \
-	  bitmatch_persistent.ml bitmatch_persistent.mli \
+	  bitstring_persistent.ml bitstring_persistent.mli \
 	  create_test_pattern.ml >> $@
 
 ifeq ($(wildcard .depend),.depend)

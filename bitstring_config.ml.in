@@ -1,4 +1,4 @@
-(* Bitmatch library.
+(* Bitstring library.
  * Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
  *
  * @configure_input@
@@ -25,7 +25,7 @@
  * configure script.
  *)
 
-let nativeendian = Bitmatch_types.@NATIVEENDIAN@
+let nativeendian = Bitstring_types.@NATIVEENDIAN@
 
 let package = "@PACKAGE_NAME@"
 let version = "@PACKAGE_VERSION@"

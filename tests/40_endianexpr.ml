@@ -3,7 +3,7 @@
  *)
 
 open Printf
-open Bitmatch
+open Bitstring
 
 let () =
   let rec loop = function

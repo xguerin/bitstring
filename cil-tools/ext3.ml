@@ -1,7 +1,7 @@
 (* This is an example program using an imported C structure.
  *
  * The C structure is imported from <linux/ext3_fs.h> via "ext3.c"
- * by the bitmatch-import-c program, and saved as "ext3.bmpp".
+ * by the bitstring-import-c program, and saved as "ext3.bmpp".
  *
  * Then we can load "ext3.bmpp" here.
  *)
@@ -12,7 +12,7 @@ open bitmatch "ext3.bmpp"
 
 let () =
   (* Load a real ext3 superblock from the examples directory. *)
-  let bits = Bitmatch.bitstring_of_file "examples/ext3_sb" in
+  let bits = Bitstring.bitstring_of_file "examples/ext3_sb" in
 
   bitmatch bits with
   | { :ext2_super_block } ->

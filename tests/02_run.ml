@@ -3,5 +3,5 @@
  *)
 
 let () =
-  let bits = Bitmatch.create_bitstring 16 in
-  ignore (Bitmatch.string_of_bitstring bits)
+  let bits = Bitstring.create_bitstring 16 in
+  ignore (Bitstring.string_of_bitstring bits)

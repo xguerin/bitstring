@@ -1,3 +1,4 @@
+(** Bitmatch backwards compatibility library. *)
 (* Bitstring library.
  * Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
  *
@@ -18,10 +19,9 @@
  *
  * $Id$
  *)
+(** This is just for backwards compatibility with code
+    from when the library was called bitmatch.  You should
+    replace all references to this module with {!Bitstring}.
+*)
 
-type endian = BigEndian | LittleEndian | NativeEndian
-
-let string_of_endian = function
-  | BigEndian -> "bigendian"
-  | LittleEndian -> "littleendian"
-  | NativeEndian -> "nativeendian"
+include Bitstring

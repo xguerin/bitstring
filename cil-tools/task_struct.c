@@ -1,10 +1,10 @@
 /* This is an example import file, showing how to import the
  * Linux task_struct structure from header files.
  *
- * Use: bitmatch-import-c task_struct.c > task_struct.ml
+ * Use: bitstring-import-c task_struct.c > task_struct.ml
  *
  * Tip: Add the --debug flag to that command line to see what's going on.
- * Also use bitmatch-objinfo to examine the bmpp file.
+ * Also use bitstring-objinfo to examine the bmpp file.
  */
 
 /* Any defines, etc. necessary to get the include to work. */
@@ -23,4 +23,4 @@
 #include "linux/sched.h"
 
 /* This tells the importer program what structures and constants to import. */
-typedef struct task_struct BITMATCH_IMPORT(task_struct);
+typedef struct task_struct BITSTRING_IMPORT(task_struct);

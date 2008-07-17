@@ -24,7 +24,7 @@ open ExtString
 
 open Cil
 
-module P = Bitmatch_persistent
+module P = Bitstring_persistent
 
 let (//) = Filename.concat
 
@@ -33,7 +33,7 @@ let () =
   let debug = ref false in
   let save_temps = ref false in
   let version () =
-    printf "bitmatch-import-c %s" Bitmatch.version;
+    printf "bitstring-import-c %s" Bitstring.version;
     exit 1
   in
   let cpp_args = ref [] in
@@ -61,14 +61,14 @@ let () =
     match !input_file with
     | None -> input_file := Some str
     | Some _ ->
-	eprintf "bitmatch-import-c: only give a single input file\n";
+	eprintf "bitstring-import-c: only give a single input file\n";
 	exit 1
   in
   let usage_msg = "\
 
-bitmatch-import-c: Import C structures and constants and
+bitstring-import-c: Import C structures and constants and
   generate bitmatching functions from them.  Please see the
-  manual page bitmatch-import-c(1) for more information.
+  manual page bitstring-import-c(1) for more information.
 
 OPTIONS" in
 
@@ -80,7 +80,7 @@ OPTIONS" in
     match !input_file with
     | Some f -> f
     | None ->
-	eprintf "bitmatch-import-c: no input file specified\n";
+	eprintf "bitstring-import-c: no input file specified\n";
 	exit 1 in
   let cpp_args = List.rev !cpp_args in
 
@@ -101,9 +101,9 @@ OPTIONS" in
     ) in
 
   let cmd =
-    sprintf "cpp %s -I %s -include bitmatch-import-prefix.h %s > %s"
+    sprintf "cpp %s -I %s -include bitstring-import-prefix.h %s > %s"
       (String.concat " " (List.map Filename.quote cpp_args))
-      (Filename.quote (Bitmatch_config.ocamllibdir // "bitmatch"))
+      (Filename.quote (Bitstring_config.ocamllibdir // "bitstring"))
       (Filename.quote input_file) (Filename.quote tmp) in
   if debug then prerr_endline cmd;
   if Sys.command cmd <> 0 then (
@@ -117,7 +117,7 @@ OPTIONS" in
   delete_tmp ();
 
   (* Find out which structures, #defines, etc. are to be imported.
-   * (cf. the macros in bitmatch-import-prefix.h)
+   * (cf. the macros in bitstring-import-prefix.h)
    *)
   let constants =
     List.filter_map (
@@ -125,7 +125,7 @@ OPTIONS" in
       | GVar ({vname = vname; vtype = vtype},
 	      { init = Some (SingleInit vinit) },
 	      loc)
-	  when String.starts_with vname "__bitmatch_constant_" ->
+	  when String.starts_with vname "__bitstring_constant_" ->
 	  let vname = String.sub vname 20 (String.length vname - 20) in
 
 	  (* Do constant folding on the initializer and then calculate
@@ -146,7 +146,7 @@ OPTIONS" in
     List.filter_map (
       function
       | GType ({tname = tname; ttype = ttype}, loc)
-	  when String.starts_with tname "__bitmatch_import_" ->
+	  when String.starts_with tname "__bitstring_import_" ->
 	  let tname = String.sub tname 18 (String.length tname - 18) in
 	  Some (tname, ttype, loc)
       | _ -> None
@@ -199,7 +199,7 @@ OPTIONS" in
        *                __attribute__((bitwise)).
        *   ttype    CIL type of struct.
        * Returns:
-       *   pattern  A bitmatch persistent pattern.
+       *   pattern  A bitstring persistent pattern.
        *)
       let rec pattern_of_struct ?(names=[]) ?(offset=NoOffset) ?(endian=None)
 	  ttype =
@@ -213,9 +213,9 @@ OPTIONS" in
 	    when hasAttribute "bitwise" attrs ->
 	    let endian =
 	      if String.starts_with tname "__le" then
-		Some Bitmatch.LittleEndian
+		Some Bitstring.LittleEndian
 	      else if String.starts_with tname "__be" then
-		Some Bitmatch.BigEndian
+		Some Bitstring.BigEndian
 	      else (
 		Errormsg.warn "%a: unknown bitwise attribute typename: %s\n"
 		  d_loc loc tname;
@@ -316,7 +316,7 @@ OPTIONS" in
 	let field =
 	  match endian with
 	  | Some endian -> P.set_endian field endian
-	  | None -> P.set_endian field Bitmatch.NativeEndian in
+	  | None -> P.set_endian field Bitstring.NativeEndian in
 
 	field
 

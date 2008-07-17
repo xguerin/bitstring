@@ -16,9 +16,9 @@ let protocol = 17			(* UDP *)
 let checksum = 0
 let source = 0xc0a80202_l		(* 192.168.2.2 *)
 let dest = 0xc0a80201_l			(* 192.168.2.1 *)
-let options = Bitmatch.empty_bitstring
+let options = Bitstring.empty_bitstring
 let payload_length = (length - hdrlen*4) * 8
-let payload = Bitmatch.create_bitstring payload_length
+let payload = Bitstring.create_bitstring payload_length
 
 let header =
   BITSTRING {
@@ -34,4 +34,4 @@ let header =
 *)
   }
 
-let () = Bitmatch.bitstring_to_file header "ipv4_header_out.dat"
+let () = Bitstring.bitstring_to_file header "ipv4_header_out.dat"

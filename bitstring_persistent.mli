@@ -1,4 +1,4 @@
-(** Bitmatch persistent patterns. *)
+(** Bitstring persistent patterns. *)
 (* Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
  *
  * This library is free software; you can redistribute it and/or
@@ -22,14 +22,14 @@
 (**
    {b Warning:} This documentation is for ADVANCED USERS ONLY.
    If you are not an advanced user, you are probably looking
-   for {{:Bitmatch.html}the Bitmatch documentation}.
+   for {{:Bitstring.html}the Bitstring documentation}.
 
    {{:#reference}Jump straight to the reference section for
    documentation on types and functions}.
 
    {2 Introduction}
 
-   Bitmatch allows you to name sets of fields and reuse them
+   Bitstring allows you to name sets of fields and reuse them
    elsewhere.  For example if you frequently need to parse
    Pascal-style strings in the form length byte + string, then you
    could name the [{ strlen : 8 : int; str : strlen*8 : string }]
@@ -75,7 +75,7 @@ v}
    'Persistent' refers to the fact that they can be saved into binary
    files.  However these binary files use OCaml [Marshal] module and
    depend (sometimes) on the version of OCaml used to generate them
-   and (sometimes) the version of bitmatch used.  So your build system
+   and (sometimes) the version of bitstring used.  So your build system
    should rebuild these files from source when your code is rebuilt.
 
    Persistent patterns are syntactic.  They work in the same way
@@ -87,14 +87,14 @@ v}
    Programs which generate and manipulate persistent patterns have to
    link to camlp4.  Since camlp4 in OCaml >= 3.10 is rather large, we
    have placed this code into this separate submodule, so that
-   programs which just use bitmatch don't need to pull in the whole of
+   programs which just use bitstring don't need to pull in the whole of
    camlp4.  This restriction does not apply to code which only uses
    persistent patterns but does not generate them.  If the distinction
    isn't clear, use [ocamlobjinfo] to look at the dependencies of your
    [*.cmo] files.
 
    Persistent patterns can be generated in several ways, but they
-   can only be {i used} by the [pa_bitmatch] syntax extension.
+   can only be {i used} by the [pa_bitstring] syntax extension.
    This means they are purely compile-time constructs.  You
    cannot use them to make arbitrary patterns and run those
    patterns (not unless your program runs [ocamlc] to make a [*.cmo]
@@ -169,9 +169,9 @@ v}
    - Relative to the current directory
    - Relative to the OCaml library directory
 
-   {3 bitmatch-objinfo}
+   {3 bitstring-objinfo}
 
-   The [bitmatch-objinfo] command can be run on a file in order
+   The [bitstring-objinfo] command can be run on a file in order
    to print out the patterns in the file.
 
    {3 Constructors}
@@ -313,14 +313,14 @@ val named_from_channel : in_channel -> named
 
     Note: This is not type safe.  The pattern/constructor must
     have been written out under the same version of OCaml and
-    the same version of bitmatch. *)
+    the same version of bitstring. *)
 
 val named_from_string : string -> int -> named
 (** Load a pattern/constructor from a string at offset within the string.
 
     Note: This is not type safe.  The pattern/constructor must
     have been written out under the same version of OCaml and
-    the same version of bitmatch. *)
+    the same version of bitstring. *)
 
 (** {3 Create pattern fields}
 
@@ -384,11 +384,11 @@ val set_length : 'a field -> expr -> 'a field
     The effect is that the field [{ len : 2*i : string }] could
     be created by calling [set_length field <:expr< 2*i >>]. *)
 
-val set_endian : 'a field -> Bitmatch.endian -> 'a field
+val set_endian : 'a field -> Bitstring.endian -> 'a field
 (** Sets the endianness of a field to the constant endianness.
 
     The effect is that the field [{ _ : 16 : bigendian }] could
-    be created by calling [set_endian field Bitmatch.BigEndian]. *)
+    be created by calling [set_endian field Bitstring.BigEndian]. *)
 
 val set_endian_expr : 'a field -> expr -> 'a field
 (** Sets the endianness of a field to an endianness expression.
@@ -422,7 +422,7 @@ val set_type_bitstring : 'a field -> 'a field
 
 val set_location : 'a field -> loc_t -> 'a field
 (** Sets the source code location of a field.  This is used when
-    pa_bitmatch displays error messages. *)
+    pa_bitstring displays error messages. *)
 
 val set_offset_int : 'a field -> int -> 'a field
 (** Set the offset expression for a field to the given number.
@@ -508,7 +508,7 @@ val get_length : 'a field -> expr
     is an OCaml expression, since lengths can be non-constant. *)
 
 type endian_expr =
-  | ConstantEndian of Bitmatch.endian
+  | ConstantEndian of Bitstring.endian
   | EndianExpr of expr
 
 val get_endian : 'a field -> endian_expr

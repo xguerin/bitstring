@@ -27,9 +27,9 @@ let display pkt =
     printf "  checksum: %d\n" checksum;
     printf "  source: %lx  dest: %lx\n" source dest;
     printf "  header options + padding:\n";
-    Bitmatch.hexdump_bitstring stdout options;
+    Bitstring.hexdump_bitstring stdout options;
     printf "  packet payload:\n";
-    Bitmatch.hexdump_bitstring stdout payload
+    Bitstring.hexdump_bitstring stdout payload
 
   (* IPv6 packet header *)
   | { 6 : 4; tclass : 8; flow : 20;
@@ -45,11 +45,11 @@ let display pkt =
     printf "  next header: %d\n" nexthdr;
     printf "  ttl: %d\n" ttl;
     printf "  source address:\n";
-    Bitmatch.hexdump_bitstring stdout source;
+    Bitstring.hexdump_bitstring stdout source;
     printf "  destination address:\n";
-    Bitmatch.hexdump_bitstring stdout dest;
+    Bitstring.hexdump_bitstring stdout dest;
     printf "packet payload:\n";
-    Bitmatch.hexdump_bitstring stdout payload
+    Bitstring.hexdump_bitstring stdout payload
 
   | { version : 4 } ->
     eprintf "unknown IP version %d\n" version;
@@ -57,11 +57,11 @@ let display pkt =
 
   | { _ } as pkt ->
     eprintf "data is smaller than one nibble:\n";
-    Bitmatch.hexdump_bitstring stderr pkt;
+    Bitstring.hexdump_bitstring stderr pkt;
     exit 1
 
 let () =
-  let pkt = Bitmatch.bitstring_of_file "ping.ipv4" in
+  let pkt = Bitstring.bitstring_of_file "ping.ipv4" in
   display pkt;
-  let pkt = Bitmatch.bitstring_of_file "ping.ipv6" in
+  let pkt = Bitstring.bitstring_of_file "ping.ipv6" in
   display pkt

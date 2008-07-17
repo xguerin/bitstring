@@ -4,9 +4,9 @@
 
 open Printf
 
-(*let () = Bitmatch.debug := true*)
+(*let () = Bitstring.debug := true*)
 
-let bits = Bitmatch.bitstring_of_file "ext3_sb"
+let bits = Bitstring.bitstring_of_file "ext3_sb"
 
 (* The structure is straight from /usr/include/linux/ext3_fs.h *)
 

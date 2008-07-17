@@ -2,7 +2,7 @@
  * $Id$
  *)
 
-open Bitmatch_persistent
+open Bitstring_persistent
 
 open Camlp4.PreCast
 open Syntax

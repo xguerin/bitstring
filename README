@@ -1,4 +1,6 @@
-ocaml-bitmatch Copyright (C) 2008 Red Hat Inc, Richard W.M. Jones.
+ocaml-bitstring Copyright (C) 2008 Red Hat Inc, Richard W.M. Jones.
+
+This library was formerly known as 'bitmatch'.
 
 Please see the html subdirectory for developer documentation.
 

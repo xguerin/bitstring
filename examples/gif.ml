@@ -8,7 +8,7 @@ let () =
   if Array.length Sys.argv <= 1 then
     failwith "usage: gif input.gif";
   let filename = Sys.argv.(1) in
-  let bits = Bitmatch.bitstring_of_file filename in
+  let bits = Bitstring.bitstring_of_file filename in
 
   bitmatch bits with
   | { ("GIF87a"|"GIF89a") : 6*8 : string; (* GIF magic. *)

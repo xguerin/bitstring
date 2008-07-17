@@ -1,10 +1,10 @@
 /* This is an example import file, showing how to import the ext3
  * superblock automatically from Linux header files.
  *
- * Use: bitmatch-import-c ext3.c > ext3.bmpp
+ * Use: bitstring-import-c ext3.c > ext3.bmpp
  *
  * Tip: Add the --debug flag to that command line to see what's going on.
- * Also use bitmatch-objinfo to examine the bmpp file.
+ * Also use bitstring-objinfo to examine the bmpp file.
  */
 
 /* These are required by Linux in order to get the little/big-endian
@@ -21,6 +21,6 @@
 #include <linux/ext2_fs.h>
 
 /* This tells the importer program what structures and constants to import. */
-//typedef struct ext3_super_block BITMATCH_IMPORT(ext3_super_block);
-typedef struct ext2_super_block BITMATCH_IMPORT(ext3_super_block);
-BITMATCH_CONSTANT_INT32 (ext3_super_magic, EXT3_SUPER_MAGIC);
+//typedef struct ext3_super_block BITSTRING_IMPORT(ext3_super_block);
+typedef struct ext2_super_block BITSTRING_IMPORT(ext3_super_block);
+BITSTRING_CONSTANT_INT32 (ext3_super_magic, EXT3_SUPER_MAGIC);

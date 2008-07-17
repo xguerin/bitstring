@@ -1,4 +1,4 @@
-bitmatch_import_c.cmo: ../bitmatch_persistent.cmi ../bitmatch_config.cmo \
-    ../bitmatch.cmi 
-bitmatch_import_c.cmx: ../bitmatch_persistent.cmx ../bitmatch_config.cmx \
-    ../bitmatch.cmx 
+bitstring_import_c.cmo: ../bitstring_persistent.cmi ../bitstring_config.cmo \
+    ../bitstring.cmi 
+bitstring_import_c.cmx: ../bitstring_persistent.cmx ../bitstring_config.cmx \
+    ../bitstring.cmx 

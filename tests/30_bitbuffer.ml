@@ -1,4 +1,4 @@
-(* Test the Bitmatch.Buffer module and string_of_bitstring in
+(* Test the Bitstring.Buffer module and string_of_bitstring in
  * nasty non-aligned corner cases.
  * $Id$
  *)
@@ -31,20 +31,20 @@ let () =
        *                <---------------- len bits --------------->
        *)
       let bits =
-	let bits = Bitmatch.Buffer.create () in
-	Bitmatch.Buffer.add_bits bits str1 offset;
-	Bitmatch.Buffer.add_bits bits expected len;
-	Bitmatch.Buffer.contents bits in
+	let bits = Bitstring.Buffer.create () in
+	Bitstring.Buffer.add_bits bits str1 offset;
+	Bitstring.Buffer.add_bits bits expected len;
+	Bitstring.Buffer.contents bits in
 
       (* Create a sub bitstring corresponding to what we want to check. *)
       let subbits =
 	let bits, bitoffset, bitlen = bits in
 	(bits, bitoffset+offset, bitlen-offset) in
 
-      assert (Bitmatch.bitstring_length subbits = len);
+      assert (Bitstring.bitstring_length subbits = len);
 
       (* Now try to read out the substring using string_of_bitstring. *)
-      let actual = Bitmatch.string_of_bitstring subbits in
+      let actual = Bitstring.string_of_bitstring subbits in
       if actual <> expected then (
 	eprintf "MISMATCH between actual and expected, offset=%d, len=%d\n"
 	  offset len;
@@ -57,9 +57,9 @@ let () =
 	  eprintf " %02x" (Char.code actual.[i])
 	done;
 	eprintf "\nBITS:\n";
-	Bitmatch.hexdump_bitstring stderr bits;
+	Bitstring.hexdump_bitstring stderr bits;
 	eprintf "SUBBITS:\n";
-	Bitmatch.hexdump_bitstring stderr subbits;
+	Bitstring.hexdump_bitstring stderr subbits;
 	exit 1
       );
     done

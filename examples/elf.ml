@@ -6,7 +6,7 @@ open Printf
 
 let () =
   let filename = "/bin/ls" in
-  let bits = Bitmatch.bitstring_of_file filename in
+  let bits = Bitstring.bitstring_of_file filename in
 
   bitmatch bits with
   | { 0x7f : 8; "ELF" : 24 : string;	(* ELF magic number *)

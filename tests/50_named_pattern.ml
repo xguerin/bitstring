@@ -3,7 +3,7 @@
  *)
 
 open Printf
-open Bitmatch
+open Bitstring
 
 (* A byte+length Pascal string. *)
 let bitmatch pascal_string =

@@ -2,4 +2,4 @@
  * $Id$
  *)
 
-let _ = Bitmatch.extract_bit
+let _ = Bitstring.extract_bit

@@ -4,7 +4,7 @@
  *)
 
 open Printf
-open Bitmatch
+open Bitstring
 
 let make_bits si n sj m sk = (
   let pad1 = ones_bitstring (n-64) in

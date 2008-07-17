@@ -1,4 +1,4 @@
-(* Bitmatch syntax extension.
+(* Bitstring syntax extension.
  * Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,12 +20,12 @@
 
 open Printf
 
-open Bitmatch
-module P = Bitmatch_persistent
+open Bitstring
+module P = Bitstring_persistent
 
 let () =
   if Array.length Sys.argv <= 1 then
-    failwith "bitmatch_objinfo filename.bmpp";
+    failwith "bitstring-objinfo filename.bmpp";
   let filename = Sys.argv.(1) in
   let chan = open_in filename in
   let names = ref [] in

@@ -1,4 +1,4 @@
-# Bitmatch syntax extension.
+# Bitstring CIL tools for processing C code.
 # Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
 #
 # This library is free software; you can redistribute it and/or
@@ -27,21 +27,21 @@ INSTALL		= @INSTALL@
 
 OCAMLCFLAGS	= -g
 OCAMLCPACKAGES	= -package unix,str,extlib,cil -I +camlp4 -I ..
-OCAMLCLIBS	= $(OCAMLCPACKAGES) camlp4lib.cma -linkpkg ../bitmatch.cma ../bitmatch_persistent.cma
+OCAMLCLIBS	= $(OCAMLCPACKAGES) camlp4lib.cma -linkpkg ../bitstring.cma ../bitstring_persistent.cma
 OCAMLOPTFLAGS	=
 OCAMLOPTPACKAGES = $(OCAMLCPACKAGES)
-OCAMLOPTLIBS	= $(OCAMLOPTPACKAGES) camlp4lib.cmxa -linkpkg ../bitmatch.cmxa ../bitmatch_persistent.cmxa
+OCAMLOPTLIBS	= $(OCAMLOPTPACKAGES) camlp4lib.cmxa -linkpkg ../bitstring.cmxa ../bitstring_persistent.cmxa
 
-PP		= -pp "camlp4o -I .. bitmatch.cma bitmatch_persistent.cma pa_bitmatch.cmo"
+PP		= -pp "camlp4o -I .. bitstring.cma bitstring_persistent.cma pa_bitstring.cmo"
 
 OCAMLDOCFLAGS	= -html -sort
 
-all:		bitmatch-import-c bitmatch-import-c.opt
+all:		bitstring-import-c bitstring-import-c.opt
 
-bitmatch-import-c: bitmatch_import_c.cmo
+bitstring-import-c: bitstring_import_c.cmo
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCLIBS) $< -o $@
 
-bitmatch-import-c.opt: bitmatch_import_c.cmx
+bitstring-import-c.opt: bitstring_import_c.cmx
 	$(OCAMLFIND) ocamlopt $(OCAMLOPTFLAGS) $(OCAMLOPTLIBS) $< -o $@
 
 test:
@@ -67,9 +67,9 @@ ext3: ext3.cmo
 ext3.cmo: ext3.ml ext3.bmpp
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) $(PP) -c $< -o $@
 
-ext3.bmpp: ext3.c bitmatch-import-c
+ext3.bmpp: ext3.c bitstring-import-c
 	rm -f $@.new
-	./bitmatch-import-c $(DEBUG) $< > $@.new
+	./bitstring-import-c $(DEBUG) $< > $@.new
 	mv $@.new $@
 
 task_struct: task_struct.cmo
@@ -78,17 +78,17 @@ task_struct: task_struct.cmo
 task_struct.cmo: task_struct.ml task_struct.bmpp
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) $(PP) -c $< -o $@
 
-task_struct.bmpp: task_struct.c bitmatch-import-c
+task_struct.bmpp: task_struct.c bitstring-import-c
 	cd $(LINUX_HEADERS) && ln -sf asm-x86 asm
 	rm -f $@.new
-	./bitmatch-import-c $(DEBUG) $(LINUX_INCLUDES) $< > $@.new
+	./bitstring-import-c $(DEBUG) $(LINUX_INCLUDES) $< > $@.new
 	mv $@.new $@
 
 # Clean.
 
 clean:
 	rm -f core *~ *.cmi *.cmo *.cmx *.cma *.cmxa *.a *.o *.bmpp
-	rm -f bitmatch-import-c bitmatch-import-c.opt
+	rm -f bitstring-import-c bitstring-import-c.opt
 
 distclean: clean
 
@@ -107,7 +107,7 @@ install:
 
 depend: .depend
 
-.depend: bitmatch_import_c.ml
+.depend: bitstring_import_c.ml
 	rm -f .depend
 	$(OCAMLFIND) ocamldep $(OCAMLCPACKAGES) $^ > $@
 

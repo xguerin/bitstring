@@ -1,4 +1,4 @@
-(* Bitmatch syntax extension.
+(* Bitstring syntax extension.
  * Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
  *
  * This library is free software; you can redistribute it and/or
@@ -25,12 +25,12 @@ open Camlp4.PreCast
 open Syntax
 open Ast
 
-open Bitmatch
-module P = Bitmatch_persistent
+open Bitstring
+module P = Bitstring_persistent
 
 (* If this is true then we emit some debugging code which can
  * be useful to tell what is happening during matches.  You
- * also need to do 'Bitmatch.debug := true' in your main program.
+ * also need to do 'Bitstring.debug := true' in your main program.
  *
  * If this is false then no extra debugging code is emitted.
  *)
@@ -67,7 +67,7 @@ let gensym =
   let i = ref 1000 in
   fun name ->
     incr i; let i = !i in
-    sprintf "__pabitmatch_%s_%d" name i
+    sprintf "__pabitstring_%s_%d" name i
 
 (* Used to keep track of which qualifiers we've seen in parse_field. *)
 type whatset_t = {
@@ -123,7 +123,7 @@ let parse_field _loc field qs =
 		match expr with
 		| <:expr< $lid:id$ >> -> id
 		| _ ->
-		    failwith "pa_bitmatch: internal error: save_offset_to only supports simple identifiers at the moment.  In future we should support full patterns." in
+		    failwith "pa_bitstring: internal error: save_offset_to only supports simple identifiers at the moment.  In future we should support full patterns." in
 	      let field = P.set_save_offset_to_lident field id in
 	      { whatset with save_offset_to_set = true }, field
 	  | "save_offset_to", None ->
@@ -174,16 +174,16 @@ let parse_field _loc field qs =
   field
 
 (* Choose the right constructor function. *)
-let build_bitmatch_call _loc funcname length endian signed =
+let build_bitstring_call _loc funcname length endian signed =
   match length, endian, signed with
     (* XXX The meaning of signed/unsigned breaks down at
      * 31, 32, 63 and 64 bits.
      *)
-  | (Some 1, _, _) -> <:expr< Bitmatch.$lid:funcname ^ "_bit"$ >>
+  | (Some 1, _, _) -> <:expr< Bitstring.$lid:funcname ^ "_bit"$ >>
   | (Some (2|3|4|5|6|7|8), _, sign) ->
       let call = Printf.sprintf "%s_char_%s"
         funcname (if sign then "signed" else "unsigned") in
-      <:expr< Bitmatch.$lid:call$ >>
+      <:expr< Bitstring.$lid:call$ >>
   | (len, endian, signed) ->
       let t = match len with
       | Some i when i <= 31 -> "int"
@@ -198,21 +198,21 @@ let build_bitmatch_call _loc funcname length endian signed =
           | NativeEndian -> "ne" in
           let call = Printf.sprintf "%s_%s_%s_%s"
             funcname t endianness sign in
-          <:expr< Bitmatch.$lid:call$ >>
+          <:expr< Bitstring.$lid:call$ >>
       | P.EndianExpr expr ->
           let call = Printf.sprintf "%s_%s_%s_%s"
             funcname t "ee" sign in
-          <:expr< Bitmatch.$lid:call$ $expr$ >>
+          <:expr< Bitstring.$lid:call$ $expr$ >>
 
 (* Generate the code for a constructor, ie. 'BITSTRING ...'. *)
 let output_constructor _loc fields =
-  (* This function makes code to raise a Bitmatch.Construct_failure exception
+  (* This function makes code to raise a Bitstring.Construct_failure exception
    * containing a message and the current _loc context.
    * (Thanks to Bluestorm for suggesting this).
    *)
   let construct_failure _loc msg =
     <:expr<
-      Bitmatch.Construct_failure
+      Bitstring.Construct_failure
         ($`str:msg$,
 	 $`str:Loc.file_name _loc$,
 	 $`int:Loc.start_line _loc$,
@@ -271,9 +271,9 @@ let output_constructor _loc fields =
       let flen_is_const = expr_is_constant flen in
 
       let int_construct_const (i, endian, signed) =
-        build_bitmatch_call _loc "construct" (Some i) endian signed in
+        build_bitstring_call _loc "construct" (Some i) endian signed in
       let int_construct (endian, signed) =
-	build_bitmatch_call _loc "construct" None endian signed in
+	build_bitstring_call _loc "construct" None endian signed in
 
       let expr =
 	match t, flen_is_const with
@@ -319,7 +319,7 @@ let output_constructor _loc fields =
 	    <:expr<
 	      let $lid:bs$ = $fexpr$ in
 	      if String.length $lid:bs$ = $`int:j$ then
-		Bitmatch.construct_string $lid:buffer$ $lid:bs$
+		Bitstring.construct_string $lid:buffer$ $lid:bs$
 	      else
 		$raise_construct_failure _loc "length of string does not match declaration"$
 	    >>
@@ -328,7 +328,7 @@ let output_constructor _loc fields =
 	 * with no checks.
 	 *)
 	| P.String, Some (-1) ->
-	    <:expr< Bitmatch.construct_string $lid:buffer$ $fexpr$ >>
+	    <:expr< Bitstring.construct_string $lid:buffer$ $fexpr$ >>
 
 	(* String, constant length = 0 is probably an error, and so is
 	 * any other value.
@@ -349,7 +349,7 @@ let output_constructor _loc fields =
 		if $lid:bslen$ land 7 = 0 then (
 		  let $lid:bs$ = $fexpr$ in
 		  if String.length $lid:bs$ = ($lid:bslen$ lsr 3) then
-		    Bitmatch.construct_string $lid:buffer$ $lid:bs$
+		    Bitstring.construct_string $lid:buffer$ $lid:bs$
 		  else
 		    $raise_construct_failure _loc "length of string does not match declaration"$
 		) else
@@ -363,8 +363,8 @@ let output_constructor _loc fields =
 	    let bs = gensym "bs" in
 	    <:expr<
 	      let $lid:bs$ = $fexpr$ in
-	      if Bitmatch.bitstring_length $lid:bs$ = $`int:i$ then
-		Bitmatch.construct_bitstring $lid:buffer$ $lid:bs$
+	      if Bitstring.bitstring_length $lid:bs$ = $`int:i$ then
+		Bitstring.construct_bitstring $lid:buffer$ $lid:bs$
 	      else
 		$raise_construct_failure _loc "length of bitstring does not match declaration"$
 	    >>
@@ -373,7 +373,7 @@ let output_constructor _loc fields =
 	 * with no checks.
 	 *)
 	| P.Bitstring, Some (-1) ->
-	    <:expr< Bitmatch.construct_bitstring $lid:buffer$ $fexpr$ >>
+	    <:expr< Bitstring.construct_bitstring $lid:buffer$ $fexpr$ >>
 
 	(* Bitstring, constant length < -1 is an error. *)
 	| P.Bitstring, Some _ ->
@@ -390,8 +390,8 @@ let output_constructor _loc fields =
 	      let $lid:bslen$ = $flen$ in
 	      if $lid:bslen$ >= 0 then (
 		let $lid:bs$ = $fexpr$ in
-		if Bitmatch.bitstring_length $lid:bs$ = $lid:bslen$ then
-		  Bitmatch.construct_bitstring $lid:buffer$ $lid:bs$
+		if Bitstring.bitstring_length $lid:bs$ = $lid:bslen$ then
+		  Bitstring.construct_bitstring $lid:buffer$ $lid:bs$
 		else
 		  $raise_construct_failure _loc "length of bitstring does not match declaration"$
 	      ) else
@@ -415,9 +415,9 @@ let output_constructor _loc fields =
 
   let expr =
     <:expr<
-      let $lid:buffer$ = Bitmatch.Buffer.create () in
+      let $lid:buffer$ = Bitstring.Buffer.create () in
       $fields$;
-      Bitmatch.Buffer.contents $lid:buffer$
+      Bitstring.Buffer.contents $lid:buffer$
     >> in
 
   if !exn_used then
@@ -506,9 +506,9 @@ let output_bitmatch _loc bs cases =
 
 	(* Now build the code which matches a field. *)
 	let int_extract_const (i, endian, signed) =
-          build_bitmatch_call _loc "extract" (Some i) endian signed in
+          build_bitstring_call _loc "extract" (Some i) endian signed in
 	let int_extract (endian, signed) =
-	  build_bitmatch_call _loc "extract" None endian signed in
+	  build_bitstring_call _loc "extract" None endian signed in
 
 	let expr =
 	  match t, flen_is_const with
@@ -548,9 +548,9 @@ let output_bitmatch _loc bs cases =
 	      <:expr<
 		if $lid:len$ >= $`int:i$ then (
 		  let $lid:bs$, $lid:off$, $lid:len$ =
-		    Bitmatch.extract_bitstring $lid:data$ $lid:off$ $lid:len$
+		    Bitstring.extract_bitstring $lid:data$ $lid:off$ $lid:len$
 		      $`int:i$ in
-		  match Bitmatch.string_of_bitstring $lid:bs$ with
+		  match Bitstring.string_of_bitstring $lid:bs$ with
 		  | $fpatt$ when true -> $expr$
 		  | _ -> ()
 		)
@@ -563,8 +563,8 @@ let output_bitmatch _loc bs cases =
 	      let bs = gensym "bs" in
 	      <:expr<
 		let $lid:bs$, $lid:off$, $lid:len$ =
-		  Bitmatch.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
-		match Bitmatch.string_of_bitstring $lid:bs$ with
+		  Bitstring.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
+		match Bitstring.string_of_bitstring $lid:bs$ with
 		| $fpatt$ when true -> $expr$
 		| _ -> ()
 	      >>
@@ -581,9 +581,9 @@ let output_bitmatch _loc bs cases =
 		if $flen$ >= 0 && $flen$ <= $lid:len$
 		  && $flen$ land 7 = 0 then (
 		    let $lid:bs$, $lid:off$, $lid:len$ =
-		      Bitmatch.extract_bitstring
+		      Bitstring.extract_bitstring
 			$lid:data$ $lid:off$ $lid:len$ $flen$ in
-		    match Bitmatch.string_of_bitstring $lid:bs$ with
+		    match Bitstring.string_of_bitstring $lid:bs$ with
 		    | $fpatt$ when true -> $expr$
 		    | _ -> ()
 		  )
@@ -603,7 +603,7 @@ let output_bitmatch _loc bs cases =
 	      <:expr<
 		if $lid:len$ >= $`int:i$ then (
 		  let $lid:ident$, $lid:off$, $lid:len$ =
-		    Bitmatch.extract_bitstring $lid:data$ $lid:off$ $lid:len$
+		    Bitstring.extract_bitstring $lid:data$ $lid:off$ $lid:len$
 		      $`int:i$ in
 		  $expr$
 		)
@@ -621,7 +621,7 @@ let output_bitmatch _loc bs cases =
 		    fail "cannot compare a bitstring to a constant" in
 	      <:expr<
 		let $lid:ident$, $lid:off$, $lid:len$ =
-		  Bitmatch.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
+		  Bitstring.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
 		  $expr$
 	      >>
 
@@ -641,7 +641,7 @@ let output_bitmatch _loc bs cases =
 	      <:expr<
 		if $flen$ >= 0 && $flen$ <= $lid:len$ then (
 		  let $lid:ident$, $lid:off$, $lid:len$ =
-		    Bitmatch.extract_bitstring $lid:data$ $lid:off$ $lid:len$
+		    Bitstring.extract_bitstring $lid:data$ $lid:off$ $lid:len$
 		      $flen$ in
 		  $expr$
 		)
@@ -779,11 +779,11 @@ let output_bitmatch _loc bs cases =
 	    let field = P.string_of_pattern_field field in
 
 	    <:expr<
-	      if !Bitmatch.debug then (
-		Printf.eprintf "PA_BITMATCH: TEST:\n";
+	      if !Bitstring.debug then (
+		Printf.eprintf "PA_BITSTRING: TEST:\n";
 		Printf.eprintf "  %s\n" $str:field$;
 		Printf.eprintf "  off %d len %d\n%!" $lid:off$ $lid:len$;
-		(*Bitmatch.hexdump_bitstring stderr
+		(*Bitstring.hexdump_bitstring stderr
 		  ($lid:data$,$lid:off$,$lid:len$);*)
 	      );
 	      $expr$
@@ -865,7 +865,7 @@ let expand_named_pattern _loc name =
     locfail _loc (sprintf "named pattern not found: %s" name)
 
 (* Add named patterns from a file.  See the documentation on the
- * directory search path in bitmatch_persistent.mli
+ * directory search path in bitstring_persistent.mli
  *)
 let load_patterns_from_file _loc filename =
   let chan =
@@ -874,7 +874,7 @@ let load_patterns_from_file _loc filename =
       try open_in filename
       with _ ->
 	(* Try OCaml library directory. *)
-	try open_in (Filename.concat Bitmatch_config.ocamllibdir filename)
+	try open_in (Filename.concat Bitstring_config.ocamllibdir filename)
 	with exn -> Loc.raise _loc exn
     ) else (
       try open_in filename

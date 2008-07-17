@@ -11,8 +11,8 @@
 #define _Bool unsigned
 #endif
 
-#define BITMATCH_IMPORT(name) __bitmatch_import_##name
-#define BITMATCH_CONSTANT_STRING(name,val) \
-  char *__bitmatch_constant_##name = val
-#define BITMATCH_CONSTANT_INT32(name,val) \
-  int __bitmatch_constant_##name = val
+#define BITSTRING_IMPORT(name) __bitstring_import_##name
+#define BITSTRING_CONSTANT_STRING(name,val) \
+  char *__bitstring_constant_##name = val
+#define BITSTRING_CONSTANT_INT32(name,val) \
+  int __bitstring_constant_##name = val

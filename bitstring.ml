@@ -1,4 +1,4 @@
-(* Bitmatch library.
+(* Bitstring library.
  * Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
  *
  * This library is free software; you can redistribute it and/or
@@ -21,11 +21,11 @@
 
 open Printf
 
-include Bitmatch_types
-include Bitmatch_config
+include Bitstring_types
+include Bitstring_config
 
 (* Enable runtime debug messages.  Must also have been enabled
- * in pa_bitmatch.ml.
+ * in pa_bitstring.ml.
  *)
 let debug = ref false
 
@@ -166,7 +166,7 @@ module I = struct
     else if bits = 31 then
       minus_one
     else
-      invalid_arg "Bitmatch.I.mask"
+      invalid_arg "Bitstring.I.mask"
 
   (* Byte swap an int of a given size. *)
   let byteswap v bits =
@@ -237,7 +237,7 @@ module I32 = struct
     else if bits = 32 then
       minus_one
     else
-      invalid_arg "Bitmatch.I32.mask"
+      invalid_arg "Bitstring.I32.mask"
 
   (* Byte swap an int of a given size. *)
   let byteswap v bits =
@@ -308,7 +308,7 @@ module I64 = struct
     else if bits = 64 then
       minus_one
     else
-      invalid_arg "Bitmatch.I64.mask"
+      invalid_arg "Bitstring.I64.mask"
 
   (* Byte swap an int of a given size. *)
   (* let byteswap v bits = *)
@@ -661,7 +661,7 @@ module Buffer = struct
 
   (* Add exactly 8 bits. *)
   let add_byte ({ buf = buf; len = len; last = last } as t) byte =
-    if byte < 0 || byte > 255 then invalid_arg "Bitmatch.Buffer.add_byte";
+    if byte < 0 || byte > 255 then invalid_arg "Bitstring.Buffer.add_byte";
     let shift = len land 7 in
     if shift = 0 then
       (* Target buffer is byte-aligned. *)
@@ -693,7 +693,7 @@ module Buffer = struct
    * to call add_bit so it's slow.
    *)
   let _add_bits t c slen =
-    if slen < 1 || slen >= 8 then invalid_arg "Bitmatch.Buffer._add_bits";
+    if slen < 1 || slen >= 8 then invalid_arg "Bitstring.Buffer._add_bits";
     for i = slen-1 downto 0 do
       let bit = c land (1 lsl i) <> 0 in
       add_bit t bit

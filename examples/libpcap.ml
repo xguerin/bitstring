@@ -16,7 +16,7 @@ open Printf
 
 let rec main () =
   if Array.length Sys.argv <= 1 then failwith "libpcap dumpfile";
-  let bits = Bitmatch.bitstring_of_file Sys.argv.(1) in
+  let bits = Bitstring.bitstring_of_file Sys.argv.(1) in
   let endian, file_header, bits = libpcap_header bits in
 
   (* Read the packets and print them out. *)
@@ -31,8 +31,8 @@ let rec main () =
 
 (* Determine the endianness (at runtime) from the magic number. *)
 and endian_of = function
-  | 0xa1b2c3d4_l -> Bitmatch.BigEndian
-  | 0xd4c3b2a1_l -> Bitmatch.LittleEndian
+  | 0xa1b2c3d4_l -> Bitstring.BigEndian
+  | 0xd4c3b2a1_l -> Bitstring.LittleEndian
   | _ -> assert false
 
 and libpcap_header bits =
@@ -102,11 +102,11 @@ and decode_and_print_packet file_header pkt_header pkt_data =
 	    printf "IPv6 ";
 
 	| { _ } ->
-	    printf "\n"; Bitmatch.hexdump_bitstring stdout packet
+	    printf "\n"; Bitstring.hexdump_bitstring stdout packet
        )
 
    | { _ } ->
-       printf "\n"; Bitmatch.hexdump_bitstring stdout pkt_data
+       printf "\n"; Bitstring.hexdump_bitstring stdout pkt_data
   );
   printf "\n"
 

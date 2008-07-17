@@ -21,12 +21,12 @@ let () =
 		    Random.int64 (Int64.sub (Int64.shift_left 1L bitlen) 1L))
 	  (range 0 (len-1)) in
 
-      let bits = Bitmatch.Buffer.create () in
+      let bits = Bitstring.Buffer.create () in
       List.iter (fun i ->
-		   Bitmatch.construct_int64_be_unsigned bits i bitlen
+		   Bitstring.construct_int64_be_unsigned bits i bitlen
 		     (Failure "constructing string"))
 	expected;
-      let bits = Bitmatch.Buffer.contents bits in
+      let bits = Bitstring.Buffer.contents bits in
 
       (* Now read the bitstring as integers.
        * In each case check the result against what we generated ('expected').
@@ -35,7 +35,7 @@ let () =
 	let rec loop bits =
 	  bitmatch bits with
 	  | { i : bitlen; rest : -1 : bitstring }
-	      when Bitmatch.bitstring_length rest = 0 -> [i]
+	      when Bitstring.bitstring_length rest = 0 -> [i]
 	  | { i : bitlen; rest : -1 : bitstring } -> i :: loop rest
 	  | { _ } ->
 	      failwith (sprintf "loop failed with len = %d, bitlen = %d"

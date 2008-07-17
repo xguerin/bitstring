@@ -1,4 +1,4 @@
-(** Bitmatch library. *)
+(** Bitstring library. *)
 (* Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
  *
  * This library is free software; you can redistribute it and/or
@@ -25,12 +25,14 @@
 
    {2 Introduction}
 
-   Bitmatch adds Erlang-style bitstrings and matching over bitstrings
+   Bitstring adds Erlang-style bitstrings and matching over bitstrings
    as a syntax extension and library for OCaml.  You can use
    this module to both parse and generate binary formats, for
    example, communications protocols, disk formats and binary files.
 
-   {{:http://code.google.com/p/bitmatch/}OCaml bitmatch website}
+   {{:http://code.google.com/p/bitstring/}OCaml bitstring website}
+
+   This library used to be called "bitmatch".
 
    {2 Examples}
 
@@ -76,9 +78,9 @@ let display pkt =
     printf "  checksum: %d\n" checksum;
     printf "  source: %lx  dest: %lx\n" source dest;
     printf "  header options + padding:\n";
-    Bitmatch.hexdump_bitstring stdout options;
+    Bitstring.hexdump_bitstring stdout options;
     printf "  packet payload:\n";
-    Bitmatch.hexdump_bitstring stdout payload
+    Bitstring.hexdump_bitstring stdout payload
 
   | { version : 4 } ->
     eprintf "unknown IP version %d\n" version;
@@ -86,7 +88,7 @@ let display pkt =
 
   | { _ } as pkt ->
     eprintf "data is smaller than one nibble:\n";
-    Bitmatch.hexdump_bitstring stderr pkt;
+    Bitstring.hexdump_bitstring stderr pkt;
     exit 1
 ]}
 
@@ -94,7 +96,7 @@ let display pkt =
    {{:http://lxr.linux.no/linux/include/linux/ext3_fs.h}Linux EXT3 filesystem superblocks}:
 
 {[
-let bits = Bitmatch.bitstring_of_file "tests/ext3_sb"
+let bits = Bitstring.bitstring_of_file "tests/ext3_sb"
 
 let () =
   bitmatch bits with
@@ -241,7 +243,7 @@ bitmatch bits with
 {[
 | { n : 4;
     rest : -1 : bitstring }
-    when Bitmatch.bitstring_length rest = 0 -> ...
+    when Bitstring.bitstring_length rest = 0 -> ...
 
    (* Only matches exactly 4 bits. *)
 ]}
@@ -348,7 +350,7 @@ let bits =
       the integer 1, and the following 12 bits containing the integer 10,
       arranged in network byte order. *)
 
-Bitmatch.hexdump_bitstring stdout bits ;;
+Bitstring.hexdump_bitstring stdout bits ;;
 
    (* Prints:
 
@@ -526,24 +528,24 @@ bitmatch bits with
 
    {2 Named patterns and persistent patterns}
 
-   Please see {!Bitmatch_persistent} for documentation on this subject.
+   Please see {!Bitstring_persistent} for documentation on this subject.
 
    {2 Compiling}
 
    Using the compiler directly you can do:
 
    {v
-   ocamlc -I +bitmatch \
-     -pp "camlp4of bitmatch.cma bitmatch_persistent.cma \
-            `ocamlc -where`/bitmatch/pa_bitmatch.cmo" \
-     unix.cma bitmatch.cma test.ml -o test
+   ocamlc -I +bitstring \
+     -pp "camlp4of bitstring.cma bitstring_persistent.cma \
+            `ocamlc -where`/bitstring/pa_bitstring.cmo" \
+     unix.cma bitstring.cma test.ml -o test
    v}
 
    Simpler method using findlib:
 
    {v
    ocamlfind ocamlc \
-     -package bitmatch,bitmatch.syntax -syntax bitmatch.syntax \
+     -package bitstring,bitstring.syntax -syntax bitstring.syntax \
      -linkpkg test.ml -o test
    v}
 
@@ -578,7 +580,7 @@ bitmatch bits with
 
    However the above does not necessarily apply to strings used in
    matching, since they may cause the library to use the
-   {!Bitmatch.string_of_bitstring} function, which allocates a string.
+   {!Bitstring.string_of_bitstring} function, which allocates a string.
    So you should take care if you use the [string] type particularly
    with a computed length that is derived from external input.
 
@@ -611,9 +613,10 @@ bitmatch bits with
    Note that the when-clause is evaluated {i last}, so if you are
    relying on the when-clause to filter cases then your code may do a
    lot of extra and unncessary pattern-matching work on fields which
-   may never be needed just to evaluate the when-clause.  You can
-   usually rearrange the code to do only the first part of the match,
-   followed by the when-clause, followed by a second inner bitmatch.
+   may never be needed just to evaluate the when-clause.  Either
+   rearrange the code to do only the first part of the match,
+   followed by the when-clause, followed by a second inner bitmatch,
+   or use a [check()] qualifier within fields.
 
    {3 Safety}
 
@@ -850,7 +853,7 @@ end
 (** {3 Miscellaneous} *)
 
 val package : string
-(** The package name, always ["ocaml-bitmatch"] *)
+(** The package name, always ["ocaml-bitstring"] *)
 
 val version : string
 (** The package version as a string. *)
@@ -858,7 +861,7 @@ val version : string
 val debug : bool ref
 (** Set this variable to true to enable extended debugging.
     This only works if debugging was also enabled in the
-    [pa_bitmatch.ml] file at compile time, otherwise it
+    [pa_bitstring.ml] file at compile time, otherwise it
     does nothing. *)
 
 (**/**)

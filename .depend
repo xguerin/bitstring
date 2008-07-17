@@ -1,9 +1,9 @@
-bitmatch.cmo: bitmatch_types.cmo bitmatch_config.cmo bitmatch.cmi 
-bitmatch.cmx: bitmatch_types.cmx bitmatch_config.cmx bitmatch.cmi 
-bitmatch_objinfo.cmo: bitmatch_persistent.cmi bitmatch.cmi 
-bitmatch_objinfo.cmx: bitmatch_persistent.cmx bitmatch.cmx 
-bitmatch_persistent.cmo: bitmatch.cmi bitmatch_persistent.cmi 
-bitmatch_persistent.cmx: bitmatch.cmx bitmatch_persistent.cmi 
-bitmatch_persistent.cmi: bitmatch.cmi 
-create_test_pattern.cmo: bitmatch_persistent.cmi 
-create_test_pattern.cmx: bitmatch_persistent.cmx 
+bitstring.cmo: bitstring_types.cmo bitstring_config.cmo bitstring.cmi 
+bitstring.cmx: bitstring_types.cmx bitstring_config.cmx bitstring.cmi 
+bitstring_objinfo.cmo: bitstring_persistent.cmi bitstring.cmi 
+bitstring_objinfo.cmx: bitstring_persistent.cmx bitstring.cmx 
+bitstring_persistent.cmo: bitstring.cmi bitstring_persistent.cmi 
+bitstring_persistent.cmx: bitstring.cmx bitstring_persistent.cmi 
+bitstring_persistent.cmi: bitstring.cmi 
+create_test_pattern.cmo: bitstring_persistent.cmi 
+create_test_pattern.cmx: bitstring_persistent.cmx 
