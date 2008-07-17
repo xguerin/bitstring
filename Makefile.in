@@ -165,7 +165,7 @@ doc:
 	rm -rf html
 	mkdir html
 	$(OCAMLDOC) $(OCAMLDOCFLAGS) -d html -I +camlp4 \
-	  bitstring.mli bitstring_persistent.mli
+	  bitstring.mli bitstring_persistent.mli bitmatch.ml
 endif
 
 # Install.
