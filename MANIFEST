@@ -46,4 +46,7 @@ tests/50_named_pattern.ml
 tests/51_open_pattern.ml
 tests/60_simple_offset.ml
 tests/61_offset_string.ml
+tests/62_offset_padding.ml
+tests/65_save_offset_to.ml
+tests/70_check_and_bind.ml
 TODO
