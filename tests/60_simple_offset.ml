@@ -1,5 +1,5 @@
 (* Simple offset test
- * $Id: 50_named_pattern.ml 86 2008-06-13 15:56:04Z richard.wm.jones $
+ * $Id$
  *)
 
 open Printf
