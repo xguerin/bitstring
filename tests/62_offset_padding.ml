@@ -28,8 +28,8 @@ let test_bits bits p i n j m k =
       j' : 8 : offset(n);
       k' : 8 : offset(m) } when i = i' && j = j' && k = k' -> () (* ok *)
   | { _ } ->
-      failwith (sprintf "60_simple_offset: test_bits: failed %d %d %d %d %d"
-		  i n j m k)
+      failwith (sprintf "62_offset_padding: test_bits: failed %d %d %d %d %d %d"
+		  p i n j m k)
 
 let () =
   for p = 1 to 4 do
