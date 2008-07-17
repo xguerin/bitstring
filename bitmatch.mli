@@ -600,7 +600,46 @@ exception Construct_failure of string * string * int * int
     location of the [BITSTRING] constructor that failed.
 *)
 
-(** {3 Bitstrings} *)
+(** {3 Bitstring manipulation} *)
+
+val bitstring_length : bitstring -> int
+(** [bitstring_length bitstring] returns the length of
+    the bitstring in bits.
+
+    Note this just returns the third field in the {!bitstring} tuple. *)
+
+val subbitstring : bitstring -> int -> int -> bitstring
+(** [subbitstring bits off len] returns a sub-bitstring
+    of the bitstring, starting at offset [off] bits and
+    with length [len] bits.
+
+    If the original bitstring is not long enough to do this
+    then the function raises [Invalid_argument "subbitstring"].
+
+    Note that this function just changes the offset and length
+    fields of the {!bitstring} tuple, so is very efficient. *)
+
+val dropbits : int -> bitstring -> bitstring
+(** Drop the first n bits of the bitstring and return a new
+    bitstring which is shorter by n bits.
+
+    If the length of the original bitstring is less than n bits,
+    this raises [Invalid_argument "dropbits"].
+
+    Note that this function just changes the offset and length
+    fields of the {!bitstring} tuple, so is very efficient. *)
+
+val takebits : int -> bitstring -> bitstring
+(** Take the first n bits of the bitstring and return a new
+    bitstring which is exactly n bits long.
+
+    If the length of the original bitstring is less than n bits,
+    this raises [Invalid_argument "takebits"].
+
+    Note that this function just changes the offset and length
+    fields of the {!bitstring} tuple, so is very efficient. *)
+
+(** {3 Constructing bitstrings} *)
 
 val empty_bitstring : bitstring
 (** [empty_bitstring] is the empty, zero-length bitstring. *)
@@ -668,9 +707,7 @@ val bitstring_of_file_descr_max : Unix.file_descr -> int -> bitstring
     [max] bytes from the channel (or fewer if the end of input
     occurs before that). *)
 
-val bitstring_length : bitstring -> int
-(** [bitstring_length bitstring] returns the length of
-    the bitstring in bits. *)
+(** {3 Converting bitstrings} *)
 
 val string_of_bitstring : bitstring -> string
 (** [string_of_bitstring bitstring] converts a bitstring to a string

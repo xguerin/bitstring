@@ -126,6 +126,21 @@ let bitstring_of_file fname =
 
 let bitstring_length (_, _, len) = len
 
+let subbitstring (data, off, len) off' len' =
+  let off = off + off' in
+  if len < off' + len' then invalid_arg "subbitstring";
+  (data, off, len')
+
+let dropbits n (data, off, len) =
+  let off = off + n in
+  let len = len - n in
+  if len < 0 then invalid_arg "dropbits";
+  (data, off, len)
+
+let takebits n (data, off, len) =
+  if len < n then invalid_arg "takebits";
+  (data, off, n)
+
 (*----------------------------------------------------------------------*)
 (* Bitwise functions.
  *
