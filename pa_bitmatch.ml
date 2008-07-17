@@ -387,8 +387,26 @@ let output_constructor _loc fields =
  * the list of cases to test against.
  *)
 let output_bitmatch _loc bs cases =
-  let data = gensym "data" and off = gensym "off" and len = gensym "len" in
-  let result = gensym "result" in
+  (* These symbols are used through the generated code to record our
+   * current position within the bitstring:
+   *
+   *   data - original bitstring data (string, never changes)
+   *
+   *   off  - current offset within data (int, increments as we move through
+   *            the bitstring)
+   *   len  - current remaining length within data (int, decrements as
+   *            we move through the bitstring)
+   *
+   *   original_off - saved offset at the start of the match (never changes)
+   *   original_len - saved length at the start of the match (never changes)
+   *)
+  let data = gensym "data"
+  and off = gensym "off"
+  and len = gensym "len"
+  and original_off = gensym "original_off"
+  and original_len = gensym "original_len"
+  (* This is where the result will be stored (a reference). *)
+  and result = gensym "result" in
 
   (* This generates the field extraction code for each
    * field in a single case.  There must be enough remaining data
@@ -397,8 +415,8 @@ let output_bitmatch _loc bs cases =
    * As we go through the fields, symbols 'data', 'off' and 'len'
    * track our position and remaining length in the bitstring.
    *
-   * The whole thing is a lot of nested 'if' statements. Code
-   * is generated from the inner-most (last) field outwards.
+   * The whole thing is a lot of nested 'if'/'match' statements.
+   * Code is generated from the inner-most (last) field outwards.
    *)
   let rec output_field_extraction inner = function
     | [] -> inner
@@ -668,7 +686,8 @@ let output_bitmatch _loc bs cases =
 	      | _ ->
 		  let move = gensym "move" in
 		  <:expr<
-		    let $lid:move$ = $offset_expr$ - $lid:off$ in
+		    let $lid:move$ =
+		      $offset_expr$ - ($lid:off$ - $lid:original_off$) in
 		    if $lid:move$ >= 0 then (
 		      let $lid:off$ = $lid:off$ + $lid:move$ in
 		      let $lid:len$ = $lid:len$ - $lid:move$ in
@@ -742,7 +761,11 @@ let output_bitmatch _loc bs cases =
   let loc_char = string_of_int (Loc.start_off _loc - Loc.start_bol _loc) in
 
   <:expr<
-    let ($lid:data$, $lid:off$, $lid:len$) = $bs$ in
+    (* Note we save the original offset/length at the start of the match
+     * in 'original_off'/'original_len' symbols.  'data' never changes.
+     *)
+    let ($lid:data$, $lid:original_off$, $lid:original_len$) = $bs$ in
+    let $lid:off$ = $lid:original_off$ and $lid:len$ = $lid:original_len$ in
     let $lid:result$ = ref None in
     (try
       $cases$
