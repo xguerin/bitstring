@@ -441,11 +441,11 @@ val set_no_offset : 'a field -> 'a field
     follow the previous field, or if it is the first field will
     be at offset zero. *)
 
-val set_when : 'a field -> expr -> 'a field
-(** Set the when-expression for a field to the given expression. *)
+val set_check : 'a field -> expr -> 'a field
+(** Set the check expression for a field to the given expression. *)
 
-val set_no_when : 'a field -> 'a field
-(** Remove the when-expression from a field. *)
+val set_no_check : 'a field -> 'a field
+(** Remove the check expression from a field. *)
 
 val set_bind : 'a field -> expr -> 'a field
 (** Set the bind-expression for a field to the given expression. *)
@@ -529,8 +529,8 @@ val get_location : 'a field -> loc_t
 val get_offset : 'a field -> expr option
 (** Get the offset expression of a field, or [None] if there is none. *)
 
-val get_when : 'a field -> expr option
-(** Get the when expression of a field, or [None] if there is none. *)
+val get_check : 'a field -> expr option
+(** Get the check expression of a field, or [None] if there is none. *)
 
 val get_bind : 'a field -> expr option
 (** Get the bind expression of a field, or [None] if there is none. *)

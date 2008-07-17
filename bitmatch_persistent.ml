@@ -40,7 +40,7 @@ type 'a field = {
   t : field_type;			(* type *)
   _loc : Loc.t;				(* location in source code *)
   offset : expr option;			(* offset expression *)
-  when_ : expr option;			(* when qualifier [patterns only] *)
+  check : expr option;			(* check expression [patterns only] *)
   bind : expr option;			(* bind expression [patterns only] *)
   save_offset_to : patt option;		(* save_offset_to [patterns only] *)
 }
@@ -112,7 +112,7 @@ let expr_printer = function
 let _string_of_field { flen = flen;
 		       endian = endian; signed = signed; t = t;
 		       _loc = _loc;
-		       offset = offset; when_ = when_; bind = bind;
+		       offset = offset; check = check; bind = bind;
 		       save_offset_to = save_offset_to } =
   let flen =
     match expr_is_constant flen with
@@ -133,10 +133,10 @@ let _string_of_field { flen = flen;
 	| Some i -> sprintf ", offset(%d)" i
 	| None -> sprintf ", offset([expr])" in
 
-  let when_ =
-    match when_ with
+  let check =
+    match check with
     | None -> ""
-    | Some expr -> sprintf ", when([expr])" in
+    | Some expr -> sprintf ", check([expr])" in
 
   let bind =
     match bind with
@@ -156,7 +156,7 @@ let _string_of_field { flen = flen;
   let loc_char = Loc.start_off _loc - Loc.start_bol _loc in
 
   sprintf "%s : %s, %s, %s%s%s%s%s (* %S:%d %d *)"
-    flen t endian signed offset when_ bind save_offset_to
+    flen t endian signed offset check bind save_offset_to
     loc_fname loc_line loc_char
 
 let rec string_of_pattern_field ({ field = patt } as field) =
@@ -194,7 +194,7 @@ let create_pattern_field _loc =
     t = Int;
     _loc = _loc;
     offset = None;
-    when_ = None;
+    check = None;
     bind = None;
     save_offset_to = None;
   }
@@ -228,8 +228,8 @@ let set_offset_int field i =
   { field with offset = Some <:expr< $`int:i$ >> }
 let set_offset field expr = { field with offset = Some expr }
 let set_no_offset field = { field with offset = None }
-let set_when field expr = { field with when_ = Some expr }
-let set_no_when field = { field with when_ = None }
+let set_check field expr = { field with check = Some expr }
+let set_no_check field = { field with check = None }
 let set_bind field expr = { field with bind = Some expr }
 let set_no_bind field = { field with bind = None }
 let set_save_offset_to field patt = { field with save_offset_to = Some patt }
@@ -247,7 +247,7 @@ let create_constructor_field _loc =
     t = Int;
     _loc = _loc;
     offset = None;
-    when_ = None;
+    check = None;
     bind = None;
     save_offset_to = None;
   }
@@ -273,6 +273,6 @@ let get_signed field = field.signed
 let get_type field = field.t
 let get_location field = field._loc
 let get_offset field = field.offset
-let get_when field = field.when_
+let get_check field = field.check
 let get_bind field = field.bind
 let get_save_offset_to field = field.save_offset_to

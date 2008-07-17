@@ -446,23 +446,28 @@ bitmatch bits with
    Note that moving the offset backwards, and moving the offset in
    [BITSTRING] constructors, are both not supported at present.
 
-   {3 When-qualifiers}
+   {3 Check expressions}
 
-   You can add a [when(expr)] qualifier to bitmatch patterns.
-   If the expression evaluates to false then the current match case fails.
+   You can add a [check(expr)] qualifier to bitmatch patterns.
+   If the expression evaluates to false then the current match case
+   fails to match (in other words, we fall through to the next
+   match case - there is no error).
 
    For example:
 {[
 bitmatch bits with
-| { field : 16 : when (field > 100) } -> ...
+| { field : 16 : check (field > 100) } -> ...
 ]}
 
-   Note the difference between a when-qualifier and a when-clause
+   Note the difference between a check expression and a when-clause
    is that the when-clause is evaluated after all the fields have
-   been matched.  On the other hand a when-qualifier is evaluated
+   been matched.  On the other hand a check expression is evaluated
    after the individual field has been matched, which means it is
-   potentially more efficient (if the when-qualifier fails then
+   potentially more efficient (if the check expression fails then
    we don't waste any time matching later fields).
+
+   We wanted to use the notation [when(expr)] here, but because
+   [when] is a reserved word we could not do this.
 
    {3 Bind expressions}
 
@@ -488,22 +493,22 @@ bitmatch bits with
    (* remaining fields *)
 ]}
 
-   {3 Order of evaluation of when() and bind()}
+   {3 Order of evaluation of check() and bind()}
 
-   The choice is arbitrary, but we have chosen that when-qualifiers
+   The choice is arbitrary, but we have chosen that check expressions
    are evaluated first, and bind expressions are evaluated after.
 
    This means that the result of bind() is {i not} available in
-   the when-qualifier.
+   the check expression.
 
-   Note that this rule applies whatever order the when() and bind()
-   appear in the source code.
+   Note that this rule applies regardless of the order of check()
+   and bind() in the source code.
 
    {3 save_offset_to}
 
    Use [save_offset_to(variable)] to save the current bit offset
    within the match to a variable (strictly speaking, to a pattern).
-   This variable is then made available in any [when()] and [bind()]
+   This variable is then made available in any [check()] and [bind()]
    clauses in the current field, {i and} to any later fields, and
    to the code after the [->].
 

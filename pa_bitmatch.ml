@@ -72,12 +72,12 @@ let gensym =
 (* Used to keep track of which qualifiers we've seen in parse_field. *)
 type whatset_t = {
   endian_set : bool; signed_set : bool; type_set : bool;
-  offset_set : bool; when_set : bool; bind_set : bool;
+  offset_set : bool; check_set : bool; bind_set : bool;
   save_offset_to_set : bool;
 }
 let noneset = {
   endian_set = false; signed_set = false; type_set = false;
-  offset_set = false; when_set = false; bind_set = false;
+  offset_set = false; check_set = false; bind_set = false;
   save_offset_to_set = false
 }
 
@@ -104,12 +104,12 @@ let parse_field _loc field qs =
 	      { whatset with offset_set = true }, field
           | "offset", None ->
 	      fail "qualifier 'offset' should be followed by an expression"
-	  | "when", Some expr ->
-	      check whatset.when_set "a when-qualifier has been set already";
-	      let field = P.set_when field expr in
-	      { whatset with when_set = true }, field
-	  | "when", None ->
-	      fail "qualifier 'when' should be followed by an expression"
+	  | "check", Some expr ->
+	      check whatset.check_set "a check-qualifier has been set already";
+	      let field = P.set_check field expr in
+	      { whatset with check_set = true }, field
+	  | "check", None ->
+	      fail "qualifier 'check' should be followed by an expression"
 	  | "bind", Some expr ->
 	      check whatset.bind_set "a bind expression has been set already";
 	      let field = P.set_bind field expr in
@@ -247,7 +247,7 @@ let output_constructor _loc fields =
 
       let fail = locfail _loc in
 
-      (* offset(), when(), bind(), save_offset_to() not supported in
+      (* offset(), check(), bind(), save_offset_to() not supported in
        * constructors.
        *
        * Implementation of forward-only offsets is fairly
@@ -258,8 +258,8 @@ let output_constructor _loc fields =
        *)
       if P.get_offset field <> None then
 	fail "offset expressions are not supported in BITSTRING constructors";
-      if P.get_when field <> None then
-	fail "when expressions are not supported in BITSTRING constructors";
+      if P.get_check field <> None then
+	fail "check expressions are not supported in BITSTRING constructors";
       if P.get_bind field <> None then
 	fail "bind expressions are not supported in BITSTRING constructors";
       if P.get_save_offset_to field <> None then
@@ -482,6 +482,29 @@ let output_bitmatch _loc bs cases =
 	 *)
 	let flen_is_const = expr_is_constant flen in
 
+	(* Surround the inner expression by check and bind clauses, so:
+	 *   if $check$ then
+	 *     let $bind...$ in
+	 *       $inner$
+	 * where the check and bind are switched on only if they are
+	 * present in the field.  (In the common case when neither
+	 * clause is present, expr = inner).  Note the order of the
+	 * check & bind is visible to the user and defined in the
+	 * documentation, so it must not change.
+	 *)
+	let expr = inner in
+	let expr =
+	  match P.get_bind field with
+	  | None -> expr
+	  | Some bind_expr ->
+	      <:expr< let $fpatt$ = $bind_expr$ in $expr$ >> in
+	let expr =
+	  match P.get_check field with
+	  | None -> expr
+	  | Some check_expr ->
+	      <:expr< if $check_expr$ then $expr$ >> in
+
+	(* Now build the code which matches a field. *)
 	let int_extract_const (i, endian, signed) =
           build_bitmatch_call _loc "extract" (Some i) endian signed in
 	let int_extract (endian, signed) =
@@ -497,7 +520,7 @@ let output_bitmatch _loc bs cases =
 		if $lid:len$ >= $`int:i$ then (
 		  let $lid:v$, $lid:off$, $lid:len$ =
 		    $extract_fn$ $lid:data$ $lid:off$ $lid:len$ $`int:i$ in
-		  match $lid:v$ with $fpatt$ when true -> $inner$ | _ -> ()
+		  match $lid:v$ with $fpatt$ when true -> $expr$ | _ -> ()
 		)
 	      >>
 
@@ -515,7 +538,7 @@ let output_bitmatch _loc bs cases =
 		if $flen$ >= 1 && $flen$ <= 64 && $flen$ <= $lid:len$ then (
 		  let $lid:v$, $lid:off$, $lid:len$ =
 		    $extract_fn$ $lid:data$ $lid:off$ $lid:len$ $flen$ in
-		  match $lid:v$ with $fpatt$ when true -> $inner$ | _ -> ()
+		  match $lid:v$ with $fpatt$ when true -> $expr$ | _ -> ()
 		)
 	      >>
 
@@ -528,7 +551,7 @@ let output_bitmatch _loc bs cases =
 		    Bitmatch.extract_bitstring $lid:data$ $lid:off$ $lid:len$
 		      $`int:i$ in
 		  match Bitmatch.string_of_bitstring $lid:bs$ with
-		  | $fpatt$ when true -> $inner$
+		  | $fpatt$ when true -> $expr$
 		  | _ -> ()
 		)
 	      >>
@@ -542,7 +565,7 @@ let output_bitmatch _loc bs cases =
 		let $lid:bs$, $lid:off$, $lid:len$ =
 		  Bitmatch.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
 		match Bitmatch.string_of_bitstring $lid:bs$ with
-		| $fpatt$ when true -> $inner$
+		| $fpatt$ when true -> $expr$
 		| _ -> ()
 	      >>
 
@@ -561,7 +584,7 @@ let output_bitmatch _loc bs cases =
 		      Bitmatch.extract_bitstring
 			$lid:data$ $lid:off$ $lid:len$ $flen$ in
 		    match Bitmatch.string_of_bitstring $lid:bs$ with
-		    | $fpatt$ when true -> $inner$
+		    | $fpatt$ when true -> $expr$
 		    | _ -> ()
 		  )
 	      >>
@@ -582,7 +605,7 @@ let output_bitmatch _loc bs cases =
 		  let $lid:ident$, $lid:off$, $lid:len$ =
 		    Bitmatch.extract_bitstring $lid:data$ $lid:off$ $lid:len$
 		      $`int:i$ in
-		  $inner$
+		  $expr$
 		)
 	      >>
 
@@ -599,7 +622,7 @@ let output_bitmatch _loc bs cases =
 	      <:expr<
 		let $lid:ident$, $lid:off$, $lid:len$ =
 		  Bitmatch.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
-		  $inner$
+		  $expr$
 	      >>
 
 	  | P.Bitstring, Some _ ->
@@ -620,7 +643,7 @@ let output_bitmatch _loc bs cases =
 		  let $lid:ident$, $lid:off$, $lid:len$ =
 		    Bitmatch.extract_bitstring $lid:data$ $lid:off$ $lid:len$
 		      $flen$ in
-		  $inner$
+		  $expr$
 		)
 	      >>
 	in
