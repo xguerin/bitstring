@@ -419,7 +419,9 @@ Bitmatch.hexdump_bitstring stdout bits ;;
    still need to be a runtime check to enforce the
    size).
 
-   {2:computedoffsets Computed offsets}
+   {2 Advanced pattern-matching features}
+
+   {3:computedoffsets Computed offsets}
 
    You can add an [offset(..)] qualifier to bitmatch patterns in order
    to move the current offset within the bitstring forwards.
@@ -443,6 +445,79 @@ bitmatch bits with
 
    Note that moving the offset backwards, and moving the offset in
    [BITSTRING] constructors, are both not supported at present.
+
+   {3 When-qualifiers}
+
+   You can add a [when(expr)] qualifier to bitmatch patterns.
+   If the expression evaluates to false then the current match case fails.
+
+   For example:
+{[
+bitmatch bits with
+| { field : 16 : when (field > 100) } -> ...
+]}
+
+   Note the difference between a when-qualifier and a when-clause
+   is that the when-clause is evaluated after all the fields have
+   been matched.  On the other hand a when-qualifier is evaluated
+   after the individual field has been matched, which means it is
+   potentially more efficient (if the when-qualifier fails then
+   we don't waste any time matching later fields).
+
+   {3 Bind expressions}
+
+   A bind expression is used to change the value of a matched
+   field.  For example:
+{[
+bitmatch bits with
+| { len : 16 : bind (len * 8);
+    field : len : bitstring } -> ...
+]}
+
+   In the example, after 'len' has been matched, its value would
+   be multiplied by 8, so the width of 'field' is the matched
+   value multiplied by 8.
+
+   In the general case:
+{[
+| { field : ... : bind (expr) } -> ...
+]}
+   evaluates the following after the field has been matched:
+{[
+   let field = expr in
+   (* remaining fields *)
+]}
+
+   {3 Order of evaluation of when() and bind()}
+
+   The choice is arbitrary, but we have chosen that when-qualifiers
+   are evaluated first, and bind expressions are evaluated after.
+
+   This means that the result of bind() is {i not} available in
+   the when-qualifier.
+
+   Note that this rule applies whatever order the when() and bind()
+   appear in the source code.
+
+   {3 save_offset_to}
+
+   Use [save_offset_to(variable)] to save the current bit offset
+   within the match to a variable (strictly speaking, to a pattern).
+   This variable is then made available in any [when()] and [bind()]
+   clauses in the current field, {i and} to any later fields, and
+   to the code after the [->].
+
+   For example:
+{[
+bitmatch bits with
+| { len : 16;
+    _ : len : bitstring;
+    field : 16 : save_offset_to (field_offset) } ->
+      printf "field is at bit offset %d in the match\n" field_offset
+]}
+
+   (In that example, [field_offset] should always have the value
+   [len+16]).
 
    {2 Named patterns and persistent patterns}
 

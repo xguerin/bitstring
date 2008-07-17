@@ -441,6 +441,27 @@ val set_no_offset : 'a field -> 'a field
     follow the previous field, or if it is the first field will
     be at offset zero. *)
 
+val set_when : 'a field -> expr -> 'a field
+(** Set the when-expression for a field to the given expression. *)
+
+val set_no_when : 'a field -> 'a field
+(** Remove the when-expression from a field. *)
+
+val set_bind : 'a field -> expr -> 'a field
+(** Set the bind-expression for a field to the given expression. *)
+
+val set_no_bind : 'a field -> 'a field
+(** Remove the bind-expression from a field. *)
+
+val set_save_offset_to : 'a field -> patt -> 'a field
+(** Set the save_offset_to pattern for a field to the given pattern. *)
+
+val set_save_offset_to_lident : 'a field -> string -> 'a field
+(** Set the save_offset_to pattern for a field to identifier. *)
+
+val set_no_save_offset_to : 'a field -> 'a field
+(** Remove the save_offset_to from a field. *)
+
 (** {3 Create constructor fields}
 
     These fields are used in constructors ([BITSTRING]). *)
@@ -507,3 +528,12 @@ val get_location : 'a field -> loc_t
 
 val get_offset : 'a field -> expr option
 (** Get the offset expression of a field, or [None] if there is none. *)
+
+val get_when : 'a field -> expr option
+(** Get the when expression of a field, or [None] if there is none. *)
+
+val get_bind : 'a field -> expr option
+(** Get the bind expression of a field, or [None] if there is none. *)
+
+val get_save_offset_to : 'a field -> patt option
+(** Get the save_offset_to pattern of a field, or [None] if there is none. *)

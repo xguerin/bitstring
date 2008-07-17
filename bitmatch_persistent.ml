@@ -40,6 +40,9 @@ type 'a field = {
   t : field_type;			(* type *)
   _loc : Loc.t;				(* location in source code *)
   offset : expr option;			(* offset expression *)
+  when_ : expr option;			(* when qualifier [patterns only] *)
+  bind : expr option;			(* bind expression [patterns only] *)
+  save_offset_to : patt option;		(* save_offset_to [patterns only] *)
 }
 and field_type = Int | String | Bitstring (* field type *)
 and endian_expr =
@@ -109,7 +112,8 @@ let expr_printer = function
 let _string_of_field { flen = flen;
 		       endian = endian; signed = signed; t = t;
 		       _loc = _loc;
-		       offset = offset } =
+		       offset = offset; when_ = when_; bind = bind;
+		       save_offset_to = save_offset_to } =
   let flen =
     match expr_is_constant flen with
     | Some i -> string_of_int i
@@ -129,12 +133,31 @@ let _string_of_field { flen = flen;
 	| Some i -> sprintf ", offset(%d)" i
 	| None -> sprintf ", offset([expr])" in
 
+  let when_ =
+    match when_ with
+    | None -> ""
+    | Some expr -> sprintf ", when([expr])" in
+
+  let bind =
+    match bind with
+    | None -> ""
+    | Some expr -> sprintf ", bind([expr])" in
+
+  let save_offset_to =
+    match save_offset_to with
+    | None -> ""
+    | Some patt ->
+	match patt with
+	| <:patt< $lid:id$ >> -> sprintf ", save_offset_to(%s)" id
+	| _ -> sprintf ", save_offset_to([patt])" in
+
   let loc_fname = Loc.file_name _loc in
   let loc_line = Loc.start_line _loc in
   let loc_char = Loc.start_off _loc - Loc.start_bol _loc in
 
-  sprintf "%s : %s, %s, %s%s (* %S:%d %d *)"
-    flen t endian signed offset loc_fname loc_line loc_char
+  sprintf "%s : %s, %s, %s%s%s%s%s (* %S:%d %d *)"
+    flen t endian signed offset when_ bind save_offset_to
+    loc_fname loc_line loc_char
 
 let rec string_of_pattern_field ({ field = patt } as field) =
   sprintf "%s : %s" (patt_printer patt) (_string_of_field field)
@@ -171,6 +194,9 @@ let create_pattern_field _loc =
     t = Int;
     _loc = _loc;
     offset = None;
+    when_ = None;
+    bind = None;
+    save_offset_to = None;
   }
 
 let set_lident_patt field id =
@@ -202,6 +228,15 @@ let set_offset_int field i =
   { field with offset = Some <:expr< $`int:i$ >> }
 let set_offset field expr = { field with offset = Some expr }
 let set_no_offset field = { field with offset = None }
+let set_when field expr = { field with when_ = Some expr }
+let set_no_when field = { field with when_ = None }
+let set_bind field expr = { field with bind = Some expr }
+let set_no_bind field = { field with bind = None }
+let set_save_offset_to field patt = { field with save_offset_to = Some patt }
+let set_save_offset_to_lident field id =
+  let _loc = field._loc in
+  { field with save_offset_to = Some <:patt< $lid:id$ >> }
+let set_no_save_offset_to field = { field with save_offset_to = None }
 
 let create_constructor_field _loc =
   {
@@ -212,6 +247,9 @@ let create_constructor_field _loc =
     t = Int;
     _loc = _loc;
     offset = None;
+    when_ = None;
+    bind = None;
+    save_offset_to = None;
   }
 
 let set_lident_expr field id =
@@ -235,3 +273,6 @@ let get_signed field = field.signed
 let get_type field = field.t
 let get_location field = field._loc
 let get_offset field = field.offset
+let get_when field = field.when_
+let get_bind field = field.bind
+let get_save_offset_to field = field.save_offset_to

@@ -69,30 +69,65 @@ let gensym =
     incr i; let i = !i in
     sprintf "__pabitmatch_%s_%d" name i
 
+(* Used to keep track of which qualifiers we've seen in parse_field. *)
+type whatset_t = {
+  endian_set : bool; signed_set : bool; type_set : bool;
+  offset_set : bool; when_set : bool; bind_set : bool;
+  save_offset_to_set : bool;
+}
+let noneset = {
+  endian_set = false; signed_set = false; type_set = false;
+  offset_set = false; when_set = false; bind_set = false;
+  save_offset_to_set = false
+}
+
 (* Deal with the qualifiers which appear for a field of both types. *)
 let parse_field _loc field qs =
   let fail = locfail _loc in
 
-  let endian_set, signed_set, type_set, offset_set, field =
+  let whatset, field =
     match qs with
-    | None -> (false, false, false, false, field)
+    | None -> noneset, field
     | Some qs ->
         let check already_set msg = if already_set then fail msg in
-        let apply_qualifier
-	    (endian_set, signed_set, type_set, offset_set, field) =
+        let apply_qualifier (whatset, field) =
 	  function
           | "endian", Some expr ->
-              check endian_set "an endian flag has been set already";
+              check whatset.endian_set "an endian flag has been set already";
               let field = P.set_endian_expr field expr in
-	      (true, signed_set, type_set, offset_set, field)
+	      { whatset with endian_set = true }, field
           | "endian", None ->
 	      fail "qualifier 'endian' should be followed by an expression"
           | "offset", Some expr ->
-              check offset_set "an offset has been set already";
+              check whatset.offset_set "an offset has been set already";
               let field = P.set_offset field expr in
-	      (endian_set, signed_set, type_set, true, field)
+	      { whatset with offset_set = true }, field
           | "offset", None ->
 	      fail "qualifier 'offset' should be followed by an expression"
+	  | "when", Some expr ->
+	      check whatset.when_set "a when-qualifier has been set already";
+	      let field = P.set_when field expr in
+	      { whatset with when_set = true }, field
+	  | "when", None ->
+	      fail "qualifier 'when' should be followed by an expression"
+	  | "bind", Some expr ->
+	      check whatset.bind_set "a bind expression has been set already";
+	      let field = P.set_bind field expr in
+	      { whatset with bind_set = true }, field
+	  | "bind", None ->
+	      fail "qualifier 'bind' should be followed by an expression"
+	  | "save_offset_to", Some expr (* XXX should be a pattern *) ->
+	      check whatset.save_offset_to_set
+		"a save_offset_to-qualifier has been set already";
+	      let id =
+		match expr with
+		| <:expr< $lid:id$ >> -> id
+		| _ ->
+		    failwith "pa_bitmatch: internal error: save_offset_to only supports simple identifiers at the moment.  In future we should support full patterns." in
+	      let field = P.set_save_offset_to_lident field id in
+	      { whatset with save_offset_to_set = true }, field
+	  | "save_offset_to", None ->
+	      fail "qualifier 'save_offset_to' should be followed by a binding expression"
           | s, Some _ ->
 	      fail (s ^ ": unknown qualifier, or qualifier should not be followed by an expression")
           | qual, None ->
@@ -104,33 +139,37 @@ let parse_field _loc field qs =
 				"string", P.set_type_string;
 				"bitstring", P.set_type_bitstring] in
               if List.mem_assoc qual endian_quals then (
-		check endian_set "an endian flag has been set already";
+		check whatset.endian_set "an endian flag has been set already";
 		let field = P.set_endian field (List.assoc qual endian_quals) in
-		(true, signed_set, type_set, offset_set, field)
+		{ whatset with endian_set = true }, field
               ) else if List.mem_assoc qual sign_quals then (
-		check signed_set "a signed flag has been set already";
+		check whatset.signed_set "a signed flag has been set already";
 		let field = P.set_signed field (List.assoc qual sign_quals) in
-		(endian_set, true, type_set, offset_set, field)
+		{ whatset with signed_set = true }, field
               ) else if List.mem_assoc qual type_quals then (
-		check type_set "a type flag has been set already";
-		let field = List.assoc qual type_quals field in
-		(endian_set, signed_set, true, offset_set, field)
+		check whatset.type_set "a type flag has been set already";
+		let field = (List.assoc qual type_quals) field in
+		{ whatset with type_set = true }, field
               ) else
 		fail (qual ^ ": unknown qualifier, or qualifier should be followed by an expression") in
-        List.fold_left apply_qualifier (false, false, false, false, field) qs in
+        List.fold_left apply_qualifier (noneset, field) qs in
 
   (* If type is set to string or bitstring then endianness and
    * signedness qualifiers are meaningless and must not be set.
    *)
   let () =
     let t = P.get_type field in
-    if (t = P.Bitstring || t = P.String) && (endian_set || signed_set) then
-      fail "string types and endian or signed qualifiers cannot be mixed" in
+    if (t = P.Bitstring || t = P.String) &&
+      (whatset.endian_set || whatset.signed_set) then
+	fail "string types and endian or signed qualifiers cannot be mixed" in
 
   (* Default endianness, signedness, type if not set already. *)
-  let field = if endian_set then field else P.set_endian field BigEndian in
-  let field = if signed_set then field else P.set_signed field false in
-  let field = if type_set then field else P.set_type_int field in
+  let field =
+    if whatset.endian_set then field else P.set_endian field BigEndian in
+  let field =
+    if whatset.signed_set then field else P.set_signed field false in
+  let field =
+    if whatset.type_set then field else P.set_type_int field in
 
   field
 
@@ -140,7 +179,7 @@ let build_bitmatch_call _loc funcname length endian signed =
     (* XXX The meaning of signed/unsigned breaks down at
      * 31, 32, 63 and 64 bits.
      *)
-  | (Some 1, _, _) -> <:expr<Bitmatch.$lid:funcname ^ "_bit"$ >>
+  | (Some 1, _, _) -> <:expr< Bitmatch.$lid:funcname ^ "_bit"$ >>
   | (Some (2|3|4|5|6|7|8), _, sign) ->
       let call = Printf.sprintf "%s_char_%s"
         funcname (if sign then "signed" else "unsigned") in
@@ -205,19 +244,26 @@ let output_constructor _loc fields =
       let signed = P.get_signed field in
       let t = P.get_type field in
       let _loc = P.get_location field in
-      let offset = P.get_offset field in
 
       let fail = locfail _loc in
 
-      (* offset() not supported in constructors.  Implementation of
-       * forward-only offsets is fairly straightforward: we would
-       * need to just calculate the length of padding here and add
-       * it to what has been constructed.  For general offsets,
-       * including going backwards, that would require a rethink in
-       * how we construct bitstrings.
+      (* offset(), when(), bind(), save_offset_to() not supported in
+       * constructors.
+       *
+       * Implementation of forward-only offsets is fairly
+       * straightforward: we would need to just calculate the length of
+       * padding here and add it to what has been constructed.  For
+       * general offsets, including going backwards, that would require
+       * a rethink in how we construct bitstrings.
        *)
-      if offset <> None then
+      if P.get_offset field <> None then
 	fail "offset expressions are not supported in BITSTRING constructors";
+      if P.get_when field <> None then
+	fail "when expressions are not supported in BITSTRING constructors";
+      if P.get_bind field <> None then
+	fail "bind expressions are not supported in BITSTRING constructors";
+      if P.get_save_offset_to field <> None then
+	fail "save_offset_to is not supported in BITSTRING constructors";
 
       (* Is flen an integer constant?  If so, what is it?  This
        * is very simple-minded and only detects simple constants.
@@ -227,7 +273,7 @@ let output_constructor _loc fields =
       let int_construct_const (i, endian, signed) =
         build_bitmatch_call _loc "construct" (Some i) endian signed in
       let int_construct (endian, signed) =
-       build_bitmatch_call _loc "construct" None endian signed in
+	build_bitmatch_call _loc "construct" None endian signed in
 
       let expr =
 	match t, flen_is_const with
@@ -427,7 +473,6 @@ let output_bitmatch _loc bs cases =
 	let signed = P.get_signed field in
 	let t = P.get_type field in
 	let _loc = P.get_location field in
-	let offset = P.get_offset field in
 
 	let fail = locfail _loc in
 
@@ -437,10 +482,10 @@ let output_bitmatch _loc bs cases =
 	 *)
 	let flen_is_const = expr_is_constant flen in
 
-      let int_extract_const (i, endian, signed) =
-        build_bitmatch_call _loc "extract" (Some i) endian signed in
-      let int_extract (endian, signed) =
-       build_bitmatch_call _loc "extract" None endian signed in
+	let int_extract_const (i, endian, signed) =
+          build_bitmatch_call _loc "extract" (Some i) endian signed in
+	let int_extract (endian, signed) =
+	  build_bitmatch_call _loc "extract" None endian signed in
 
 	let expr =
 	  match t, flen_is_const with
@@ -593,7 +638,7 @@ let output_bitmatch _loc bs cases =
 	 * In all cases, the off and len fields get updated.
 	 *)
 	let expr =
-	  match offset with
+	  match P.get_offset field with
 	  | None -> expr (* common case: there was no offset expression *)
 	  | Some offset_expr ->
 	      (* This will be [Some i] if offset is a constant expression
@@ -694,6 +739,16 @@ let output_bitmatch _loc bs cases =
 		      if $lid:len$ >= 0 then $expr$
 		    )
 		  >> in (* end of computed offset code *)
+
+	(* save_offset_to(patt) saves the current offset into a variable. *)
+	let expr =
+	  match P.get_save_offset_to field with
+	  | None -> expr (* no save_offset_to *)
+	  | Some patt ->
+	      <:expr<
+		let $patt$ = $lid:off$ - $lid:original_off$ in
+		$expr$
+	      >> in
 
 	(* Emit extra debugging code. *)
 	let expr =
