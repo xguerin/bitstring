@@ -908,17 +908,23 @@ val construct_char_unsigned : Buffer.t -> int -> int -> exn -> unit
 
 val construct_int_be_unsigned : Buffer.t -> int -> int -> exn -> unit
 
+val construct_int_le_unsigned : Buffer.t -> int -> int -> exn -> unit
+
 val construct_int_ne_unsigned : Buffer.t -> int -> int -> exn -> unit
 
 val construct_int_ee_unsigned : endian -> Buffer.t -> int -> int -> exn -> unit
 
 val construct_int32_be_unsigned : Buffer.t -> int32 -> int -> exn -> unit
 
+val construct_int32_le_unsigned : Buffer.t -> int32 -> int -> exn -> unit
+
 val construct_int32_ne_unsigned : Buffer.t -> int32 -> int -> exn -> unit
 
 val construct_int32_ee_unsigned : endian -> Buffer.t -> int32 -> int -> exn -> unit
 
 val construct_int64_be_unsigned : Buffer.t -> int64 -> int -> exn -> unit
+
+val construct_int64_le_unsigned : Buffer.t -> int64 -> int -> exn -> unit
 
 val construct_int64_ne_unsigned : Buffer.t -> int64 -> int -> exn -> unit
 

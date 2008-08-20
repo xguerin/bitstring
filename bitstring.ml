@@ -208,6 +208,19 @@ module I = struct
       let lsb = v land (mask bits) in
       g (to_int lsb) bits
     )
+
+  (* Call function g on the top bits, then f on each full byte
+   * (little endian - so start at root).
+   *)
+  let rec map_bytes_le g f v bits =
+    if bits >= 8 then (
+      let lsb = v land ff in
+      f (to_int lsb);
+      map_bytes_le g f (v >> 8) (bits-8)
+    ) else if bits > 0 then (
+      let lsb = v land (mask bits) in
+      g (to_int lsb) bits
+    )
 end
 
 module I32 = struct
@@ -279,6 +292,19 @@ module I32 = struct
       let lsb = v land (mask bits) in
       g (to_int lsb) bits
     )
+
+  (* Call function g on the top bits, then f on each full byte
+   * (little endian - so start at root).
+   *)
+  let rec map_bytes_le g f v bits =
+    if bits >= 8 then (
+      let lsb = v land ff in
+      f (to_int lsb);
+      map_bytes_le g f (v >> 8) (bits-8)
+    ) else if bits > 0 then (
+      let lsb = v land (mask bits) in
+      g (to_int lsb) bits
+    )
 end
 
 module I64 = struct
@@ -326,6 +352,19 @@ module I64 = struct
       map_bytes_be g f (v >> 8) (bits-8);
       let lsb = v land ff in
       f (to_int lsb)
+    ) else if bits > 0 then (
+      let lsb = v land (mask bits) in
+      g (to_int lsb) bits
+    )
+
+  (* Call function g on the top bits, then f on each full byte
+   * (little endian - so start at root).
+   *)
+  let rec map_bytes_le g f v bits =
+    if bits >= 8 then (
+      let lsb = v land ff in
+      f (to_int lsb);
+      map_bytes_le g f (v >> 8) (bits-8)
     ) else if bits > 0 then (
       let lsb = v land (mask bits) in
       g (to_int lsb) bits
@@ -760,16 +799,21 @@ let construct_int_be_unsigned buf v flen exn =
   (* Add the bytes. *)
   I.map_bytes_be (Buffer._add_bits buf) (Buffer.add_byte buf) v flen
 
+(* Construct a field of up to 31 bits. *)
+let construct_int_le_unsigned buf v flen exn =
+  (* Check value is within range. *)
+  if not (I.range_unsigned v flen) then raise exn;
+  (* Add the bytes. *)
+  I.map_bytes_le (Buffer._add_bits buf) (Buffer.add_byte buf) v flen
+
 let construct_int_ne_unsigned =
   if nativeendian = BigEndian
   then construct_int_be_unsigned
-  else (*construct_int_le_unsigned*)
-    fun _ _ _ _ -> failwith "construct_int_le_unsigned"
+  else construct_int_le_unsigned
 
 let construct_int_ee_unsigned = function
   | BigEndian -> construct_int_be_unsigned
-  | LittleEndian -> (*construct_int_le_unsigned*)
-      (fun _ _ _ _ -> failwith "construct_int_le_unsigned")
+  | LittleEndian -> construct_int_le_unsigned
   | NativeEndian -> construct_int_ne_unsigned
 
 (* Construct a field of exactly 32 bits. *)
@@ -809,6 +853,13 @@ let construct_int64_be_unsigned buf v flen exn =
   if not (I64.range_unsigned v flen) then raise exn;
   (* Add the bytes. *)
   I64.map_bytes_be (Buffer._add_bits buf) (Buffer.add_byte buf) v flen
+
+(* Construct a field of up to 64 bits. *)
+let construct_int64_le_unsigned buf v flen exn =
+  (* Check value is within range. *)
+  if not (I64.range_unsigned v flen) then raise exn;
+  (* Add the bytes. *)
+  I64.map_bytes_le (Buffer._add_bits buf) (Buffer.add_byte buf) v flen
 
 let construct_int64_ne_unsigned =
   if nativeendian = BigEndian
