@@ -24,6 +24,8 @@ OCAMLFIND	= @OCAMLFIND@
 OCAMLMKLIB	= @OCAMLMKLIB@
 OCAMLDOC	= @OCAMLDOC@
 INSTALL		= @INSTALL@
+TIME		= @TIME@
+GPROF		= @GPROF@
 
 pkg_cil		= @pkg_cil@
 pkg_extlib	= @pkg_extlib@
@@ -45,6 +47,8 @@ endif
 EXAMPLES	= $(patsubst %.ml,%,$(wildcard examples/*.ml))
 
 TESTS		= $(patsubst %.ml,%,$(wildcard tests/*.ml))
+
+BENCHMARKS	= $(patsubst %.ml,%,$(wildcard benchmarks/*.ml))
 
 all:	bitstring.cma bitstring_persistent.cma \
 	bitstring.cmxa bitstring_persistent.cmxa \
@@ -143,12 +147,44 @@ print-examples: pa_bitstring.cmo
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	done
 
+# Benchmarks.
+
+ifneq ($(TIME),no)
+
+benchmarks: pa_bitstring.cmo bitstring.cma bitstring_persistent.cma
+	@for f in $(BENCHMARKS); do \
+	  $(OCAMLFIND) ocamlopt $(OCAMLOPTFLAGS) $(PP) \
+	    -package unix -linkpkg -I . bitstring.cmxa $$f.ml -o $$f.opt; \
+	  if [ $$? -ne 0 ]; then exit 1; fi; \
+	  $(TIME) -f "$$f: %e seconds" $$f.opt; \
+	  if [ $$? -ne 0 ]; then exit 1; fi; \
+	done
+ifneq ($(GPROF),no)
+	@for f in $(BENCHMARKS); do \
+	  $(OCAMLFIND) ocamlopt $(OCAMLOPTFLAGS) $(PP) -p \
+	    -package unix -linkpkg -I . bitstring.cmxa $$f.ml -o $$f.opt.p; \
+	  if [ $$? -ne 0 ]; then exit 1; fi; \
+	  rm -f gmon.out; \
+	  $$f.opt.p; \
+	  if [ $$? -ne 0 ]; then exit 1; fi; \
+	  gprof $$f.opt.p > $$f.profile; \
+	  if [ $$? -ne 0 ]; then exit 1; fi; \
+	  echo "Wrote profile of $$f"; \
+	  echo "    to $$f.profile"; \
+	  rm -f gmon.out; \
+	done
+endif
+
+endif
+
 # Clean.
 
 clean:
 	rm -f core *~ *.cmi *.cmo *.cmx *.cma *.cmxa *.a *.o
 	rm -f tests/*~ tests/*.cmi tests/*.cmo $(TESTS)
 	rm -f examples/*~ examples/*.cmi examples/*.cmo $(EXAMPLES)
+	rm -f benchmarks/*~ benchmarks/*.cmi benchmarks/*.cmo
+	rm -f benchmarks/*.opt benchmarks/*.opt.p benchmarks/*.profile
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
 distclean: clean
@@ -227,6 +263,6 @@ check-manifest:
 	exit $$rv
 
 .PHONY: depend dist check-manifest dpkg doc \
-	print-examples print-tests examples test
+	print-examples print-tests examples test benchmarks
 
 .SUFFIXES:      .cmo .cmi .cmx .ml .mli .mll

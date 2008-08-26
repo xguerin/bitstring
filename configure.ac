@@ -46,7 +46,7 @@ if test "x$OCAMLFIND" = "x"; then
 fi
 
 dnl Check for camlp4
-AC_CHECK_PROG(CAMLP4OF,camlp4of.opt,camlp4of.opt)
+AC_CHECK_PROG(CAMLP4OF,camlp4of.opt,camlp4of.opt,no)
 if test "x$CAMLP4OF" = "xno"; then
     AC_MSG_ERROR([You must have camlp4 installed])
 fi
@@ -58,6 +58,12 @@ AC_SUBST(pkg_extlib)
 dnl Check for CIL (optional)
 AC_CHECK_OCAML_PKG(cil)
 AC_SUBST(pkg_cil)
+
+dnl Check for /usr/bin/time and get full path.
+AC_PATH_PROG(TIME,time,no)
+
+dnl Check for gprof.
+AC_CHECK_PROG(GPROF,gprof,gprof,no)
 
 dnl Produce output files.
 AC_CONFIG_HEADERS([config.h])
