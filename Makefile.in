@@ -26,6 +26,7 @@ OCAMLDOC	= @OCAMLDOC@
 INSTALL		= @INSTALL@
 TIME		= @TIME@
 GPROF		= @GPROF@
+BISECT_REPORT	= @BISECT_REPORT@
 
 BYTESWAP_H	= @BYTESWAP_H@
 
@@ -35,10 +36,21 @@ top_srcdir	= @top_srcdir@
 pkg_cil		= @pkg_cil@
 pkg_extlib	= @pkg_extlib@
 
+enable_coverage = @enable_coverage@
+
 OCAMLCFLAGS	= -g
 OCAMLCPACKAGES	=
+OCAMLCLIBS	= -linkpkg
 OCAMLOPTFLAGS	=
 OCAMLOPTPACKAGES =
+OCAMLOPTLIBS	= -linkpkg
+
+ifneq ($(enable_coverage),no)
+OCAMLCFLAGS     += -I +bisect -pp 'camlp4o $(OCAMLLIB)/bisect/instrument.cma'
+OCAMLCLIBS	+= -I +bisect bisect.cma
+OCAMLOPTFLAGS   += -I +bisect -pp 'camlp4o $(OCAMLLIB)/bisect/instrument.cma'
+OCAMLOPTLIBS	+= -I +bisect bisect.cmxa
+endif
 
 OCAMLDOCFLAGS	= -html -sort
 
@@ -102,6 +114,7 @@ pa_bitstring.cmo: pa_bitstring.ml bitstring.cma bitstring_persistent.cma
 
 bitstring-objinfo: bitstring_objinfo.cmo bitstring.cma bitstring_persistent.cma
 	$(OCAMLFIND) ocamlc -I +camlp4 unix.cma camlp4lib.cma \
+	  $(OCAMLCLIBS) \
 	  bitstring.cma bitstring_persistent.cma \
 	  $< -o $@
 
@@ -114,18 +127,21 @@ byteswap.h: byteswap.in.h
 	} > $@-t
 	mv -f $@-t $@
 
-# Tests and examples.
+# Tests.
 
-PP	= -pp "camlp4o bitstring.cma bitstring_persistent.cma pa_bitstring.cmo"
+ifeq ($(enable_coverage),no)
+PP	= -pp 'camlp4o bitstring.cma bitstring_persistent.cma pa_bitstring.cmo'
+else
+PP	= -pp 'camlp4o $(OCAMLLIB)/bisect/bisect.cma bitstring.cma bitstring_persistent.cma pa_bitstring.cmo'
+endif
 
 test: pa_bitstring.cmo bitstring.cma bitstring_persistent.cma tests/test.bmpp
 	@for f in $(TESTS); do \
 	  echo Building $$f; \
-	  $(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(PP) \
-	    -package unix -linkpkg -I . bitstring.cma $$f.ml -o $$f; \
+	  $(OCAMLFIND) ocamlopt $(OCAMLOPTFLAGS) $(PP) -package unix $(OCAMLOPTLIBS) -I . bitstring.cmxa $$f.ml -o $$f.opt; \
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	  echo Running $$f; \
-	  $$f; \
+	  $$f.opt; \
 	  if [ $$? -ne 0 ]; then exit 1; fi; \
 	done
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
@@ -137,12 +153,27 @@ tests/test.bmpp: create_test_pattern
 create_test_pattern: create_test_pattern.cmo
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) -pp camlp4of \
 	  unix.cma -I +camlp4 camlp4lib.cma \
+	  $(OCAMLCLIBS) \
 	  -I . bitstring.cma bitstring_persistent.cma $< -o $@
 
 create_test_pattern.cmo: create_test_pattern.ml
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) -pp camlp4of \
 	  unix.cma -I +camlp4 \
 	  -I . -c $< -o $@
+
+# Coverage of tests.
+
+ifneq ($(BISECT_REPORT),no)
+coverage:
+	rm -f coverage-report/*
+	rm -f bisect*.out
+	$(MAKE) test
+	$(BISECT_REPORT) -html coverage-report bisect*.out
+	rm -f bisect*.out
+	@echo Coverage report is in `pwd`/coverage-report/index.html
+endif
+
+# Examples.
 
 examples: pa_bitstring.cmo bitstring.cma bitstring_persistent.cma
 	@for f in $(EXAMPLES); do \
@@ -204,7 +235,7 @@ endif
 
 clean:
 	rm -f core *~ *.cmi *.cmo *.cmx *.cma *.cmxa *.a *.o
-	rm -f tests/*~ tests/*.cmi tests/*.cmo $(TESTS)
+	rm -f tests/*~ tests/*.cmi tests/*.cmo tests/*.opt
 	rm -f examples/*~ examples/*.cmi examples/*.cmo $(EXAMPLES)
 	rm -f benchmarks/*~ benchmarks/*.cmi benchmarks/*.cmo
 	rm -f benchmarks/*.opt benchmarks/*.opt.p benchmarks/*.profile

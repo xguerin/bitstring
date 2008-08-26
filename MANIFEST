@@ -22,6 +22,12 @@ cil-tools/task_struct.ml
 configure.ac
 COPYING
 COPYING.LIB
+coverage-report/file0000.html
+coverage-report/file0001.html
+coverage-report/file0002.html
+coverage-report/file0003.html
+coverage-report/style.css
+coverage-report/index.html
 create_test_pattern.ml
 examples/elf.ml
 examples/ext3_sb

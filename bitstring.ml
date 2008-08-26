@@ -149,8 +149,8 @@ let takebits n (data, off, len) =
 
 module I = struct
   (* Bitwise operations on ints.  Note that we assume int <= 31 bits. *)
-  let (<<) = (lsl)
-  let (>>) = (lsr)
+  external (<<<) : int -> int -> int = "%lslint"
+  external (>>>) : int -> int -> int = "%lsrint"
   external to_int : int -> int = "%identity"
   let zero = 0
   let one = 1
@@ -160,7 +160,7 @@ module I = struct
   (* Create a mask 0-31 bits wide. *)
   let mask bits =
     if bits < 30 then
-      (one << bits) - 1
+      (one <<< bits) - 1
     else if bits = 30 then
       max_int
     else if bits = 31 then
@@ -173,21 +173,21 @@ module I = struct
     if bits <= 8 then v
     else if bits <= 16 then (
       let shift = bits-8 in
-      let v1 = v >> shift in
-      let v2 = (v land (mask shift)) << 8 in
+      let v1 = v >>> shift in
+      let v2 = ((v land (mask shift)) <<< 8) in
       v2 lor v1
     ) else if bits <= 24 then (
       let shift = bits - 16 in
-      let v1 = v >> (8+shift) in
-      let v2 = ((v >> shift) land ff) << 8 in
-      let v3 = (v land (mask shift)) << 16 in
+      let v1 = v >>> (8+shift) in
+      let v2 = ((v >>> shift) land ff) <<< 8 in
+      let v3 = (v land (mask shift)) <<< 16 in
       v3 lor v2 lor v1
     ) else (
       let shift = bits - 24 in
-      let v1 = v >> (16+shift) in
-      let v2 = ((v >> (8+shift)) land ff) << 8 in
-      let v3 = ((v >> shift) land ff) << 16 in
-      let v4 = (v land (mask shift)) << 24 in
+      let v1 = v >>> (16+shift) in
+      let v2 = ((v >>> (8+shift)) land ff) <<< 8 in
+      let v3 = ((v >>> shift) land ff) <<< 16 in
+      let v4 = (v land (mask shift)) <<< 24 in
       v4 lor v3 lor v2 lor v1
     )
 
@@ -201,7 +201,7 @@ module I = struct
    *)
   let rec map_bytes_be g f v bits =
     if bits >= 8 then (
-      map_bytes_be g f (v >> 8) (bits-8);
+      map_bytes_be g f (v >>> 8) (bits-8);
       let lsb = v land ff in
       f (to_int lsb)
     ) else if bits > 0 then (
@@ -216,7 +216,7 @@ module I = struct
     if bits >= 8 then (
       let lsb = v land ff in
       f (to_int lsb);
-      map_bytes_le g f (v >> 8) (bits-8)
+      map_bytes_le g f (v >>> 8) (bits-8)
     ) else if bits > 0 then (
       let lsb = v land (mask bits) in
       g (to_int lsb) bits
@@ -228,8 +228,8 @@ module I32 = struct
    * as possible to the I module above, to make it easier to track
    * down bugs.
    *)
-  let (<<) = Int32.shift_left
-  let (>>) = Int32.shift_right_logical
+  let (<<<) = Int32.shift_left
+  let (>>>) = Int32.shift_right_logical
   let (land) = Int32.logand
   let (lor) = Int32.logor
   let lnot = Int32.lognot
@@ -244,7 +244,7 @@ module I32 = struct
   (* Create a mask so many bits wide. *)
   let mask bits =
     if bits < 31 then
-      pred (one << bits)
+      pred (one <<< bits)
     else if bits = 31 then
       max_int
     else if bits = 32 then
@@ -257,21 +257,21 @@ module I32 = struct
     if bits <= 8 then v
     else if bits <= 16 then (
       let shift = bits-8 in
-      let v1 = v >> shift in
-      let v2 = (v land (mask shift)) << 8 in
+      let v1 = v >>> shift in
+      let v2 = (v land (mask shift)) <<< 8 in
       v2 lor v1
     ) else if bits <= 24 then (
       let shift = bits - 16 in
-      let v1 = v >> (8+shift) in
-      let v2 = ((v >> shift) land ff) << 8 in
-      let v3 = (v land (mask shift)) << 16 in
+      let v1 = v >>> (8+shift) in
+      let v2 = ((v >>> shift) land ff) <<< 8 in
+      let v3 = (v land (mask shift)) <<< 16 in
       v3 lor v2 lor v1
     ) else (
       let shift = bits - 24 in
-      let v1 = v >> (16+shift) in
-      let v2 = ((v >> (8+shift)) land ff) << 8 in
-      let v3 = ((v >> shift) land ff) << 16 in
-      let v4 = (v land (mask shift)) << 24 in
+      let v1 = v >>> (16+shift) in
+      let v2 = ((v >>> (8+shift)) land ff) <<< 8 in
+      let v3 = ((v >>> shift) land ff) <<< 16 in
+      let v4 = (v land (mask shift)) <<< 24 in
       v4 lor v3 lor v2 lor v1
     )
 
@@ -285,7 +285,7 @@ module I32 = struct
    *)
   let rec map_bytes_be g f v bits =
     if bits >= 8 then (
-      map_bytes_be g f (v >> 8) (bits-8);
+      map_bytes_be g f (v >>> 8) (bits-8);
       let lsb = v land ff in
       f (to_int lsb)
     ) else if bits > 0 then (
@@ -300,7 +300,7 @@ module I32 = struct
     if bits >= 8 then (
       let lsb = v land ff in
       f (to_int lsb);
-      map_bytes_le g f (v >> 8) (bits-8)
+      map_bytes_le g f (v >>> 8) (bits-8)
     ) else if bits > 0 then (
       let lsb = v land (mask bits) in
       g (to_int lsb) bits
@@ -312,8 +312,8 @@ module I64 = struct
    * as possible to the I/I32 modules above, to make it easier to track
    * down bugs.
    *)
-  let (<<) = Int64.shift_left
-  let (>>) = Int64.shift_right_logical
+  let (<<<) = Int64.shift_left
+  let (>>>) = Int64.shift_right_logical
   let (land) = Int64.logand
   let (lor) = Int64.logor
   let lnot = Int64.lognot
@@ -328,7 +328,7 @@ module I64 = struct
   (* Create a mask so many bits wide. *)
   let mask bits =
     if bits < 63 then
-      pred (one << bits)
+      pred (one <<< bits)
     else if bits = 63 then
       max_int
     else if bits = 64 then
@@ -349,7 +349,7 @@ module I64 = struct
    *)
   let rec map_bytes_be g f v bits =
     if bits >= 8 then (
-      map_bytes_be g f (v >> 8) (bits-8);
+      map_bytes_be g f (v >>> 8) (bits-8);
       let lsb = v land ff in
       f (to_int lsb)
     ) else if bits > 0 then (
@@ -364,7 +364,7 @@ module I64 = struct
     if bits >= 8 then (
       let lsb = v land ff in
       f (to_int lsb);
-      map_bytes_le g f (v >> 8) (bits-8)
+      map_bytes_le g f (v >>> 8) (bits-8)
     ) else if bits > 0 then (
       let lsb = v land (mask bits) in
       g (to_int lsb) bits

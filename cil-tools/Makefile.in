@@ -25,12 +25,19 @@ OCAMLMKLIB	= @OCAMLMKLIB@
 OCAMLDOC	= @OCAMLDOC@
 INSTALL		= @INSTALL@
 
+enable_coverage = @enable_coverage@
+
 OCAMLCFLAGS	= -g
 OCAMLCPACKAGES	= -package unix,str,extlib,cil -I +camlp4 -I ..
 OCAMLCLIBS	= $(OCAMLCPACKAGES) camlp4lib.cma -linkpkg ../bitstring.cma ../bitstring_persistent.cma
 OCAMLOPTFLAGS	=
 OCAMLOPTPACKAGES = $(OCAMLCPACKAGES)
 OCAMLOPTLIBS	= $(OCAMLOPTPACKAGES) camlp4lib.cmxa -linkpkg ../bitstring.cmxa ../bitstring_persistent.cmxa
+
+ifneq ($(enable_coverage),no)
+OCAMLCLIBS	:= -I +bisect bisect.cma $(OCAMLCLIBS)
+OCAMLOPTLIBS	:= -I +bisect bisect.cmxa $(OCAMLOPTLIBS)
+endif
 
 PP		= -pp "camlp4o -I .. bitstring.cma bitstring_persistent.cma pa_bitstring.cmo"
 

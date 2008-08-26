@@ -74,9 +74,25 @@ AC_SUBST(pkg_cil)
 
 dnl Check for /usr/bin/time and get full path.
 AC_PATH_PROG(TIME,time,no)
+if test "x$TIME" = "xno"; then
+    AC_MSG_ERROR(['time' command not found])
+fi
 
-dnl Check for gprof.
+dnl Check for gprof (optional).
 AC_CHECK_PROG(GPROF,gprof,gprof,no)
+
+dnl Check for ocaml-bisect (optional) and --enable-coverage.
+AC_CHECK_PROG(BISECT_REPORT,bisect-report,bisect-report,no)
+AC_ARG_ENABLE([coverage],
+    [AS_HELP_STRING([--enable-coverage],
+	[add code coverage information (slow) @<:@default=no@:>@])],
+    [],
+    [enable_coverage=no])
+
+if test "x$enable_coverage" != "xno" -a "x$BISECT_REPORT" = "xno"; then
+    AC_MSG_ERROR([You must install ocaml-bisect package to get code coverage])
+fi
+AC_SUBST(enable_coverage)
 
 dnl Produce output files.
 AC_CONFIG_HEADERS([config.h])
