@@ -30,12 +30,25 @@ test "x$U" != "x" && AC_MSG_ERROR(Compiler not ANSI compliant)
 AC_PROG_CC_C_O
 
 dnl Check for native endianness.
-AC_C_BIGENDIAN(
-  [NATIVEENDIAN=BigEndian],
-  [NATIVEENDIAN=LittleEndian],
+AC_C_BIGENDIAN(,,
   [AC_MSG_ERROR([Machine endianness could not be determined])]
 )
+if test "x$WORDS_BIGENDIAN" = "x"; then
+  NATIVEENDIAN=LittleEndian
+else
+  NATIVEENDIAN=BigEndian
+fi
 AC_SUBST(NATIVEENDIAN)
+
+dnl Create byteswap.h if the system doesn't have this file.
+dnl Written by Oskar Liljeblad.
+dnl From gnulib, license is LGPLv2+.
+AC_CHECK_HEADERS([byteswap.h], [
+  BYTESWAP_H=''
+], [
+  BYTESWAP_H='byteswap.h'
+])
+AC_SUBST(BYTESWAP_H)
 
 dnl Check for basic OCaml environment & findlib.
 AC_PROG_OCAML

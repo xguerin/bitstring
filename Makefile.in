@@ -27,7 +27,10 @@ INSTALL		= @INSTALL@
 TIME		= @TIME@
 GPROF		= @GPROF@
 
+BYTESWAP_H	= @BYTESWAP_H@
+
 OCAMLLIB	= @OCAMLLIB@
+top_srcdir	= @top_srcdir@
 
 pkg_cil		= @pkg_cil@
 pkg_extlib	= @pkg_extlib@
@@ -40,7 +43,7 @@ OCAMLOPTPACKAGES =
 OCAMLDOCFLAGS	= -html -sort
 
 CC		= @CC@
-CFLAGS		= @CFLAGS@ -Wall -Werror -fPIC -I$(OCAMLLIB)
+CFLAGS		= @CFLAGS@ -Wall -Werror -fPIC -I$(top_srcdir) -I$(OCAMLLIB)
 
 LIBRARY_PATH	= @abs_top_builddir@
 LD_LIBRARY_PATH	= @abs_top_builddir@
@@ -60,7 +63,8 @@ TESTS		= $(patsubst %.ml,%,$(wildcard tests/*.ml))
 
 BENCHMARKS	= $(patsubst %.ml,%,$(wildcard benchmarks/*.ml))
 
-all:	bitstring.cma bitstring_persistent.cma \
+all:	$(BYTESWAP_H) \
+	bitstring.cma bitstring_persistent.cma \
 	bitstring.cmxa bitstring_persistent.cmxa \
 	pa_bitstring.cmo \
 	bitstring-objinfo
@@ -100,6 +104,15 @@ bitstring-objinfo: bitstring_objinfo.cmo bitstring.cma bitstring_persistent.cma
 	$(OCAMLFIND) ocamlc -I +camlp4 unix.cma camlp4lib.cma \
 	  bitstring.cma bitstring_persistent.cma \
 	  $< -o $@
+
+# Create byteswap.h if the system doesn't have this file.
+# From gnulib, license is LGPLv2+.
+
+byteswap.h: byteswap.in.h
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
+	  cat $(srcdir)/byteswap.in.h; \
+	} > $@-t
+	mv -f $@-t $@
 
 # Tests and examples.
 

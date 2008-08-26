@@ -616,40 +616,84 @@ let output_bitmatch _loc bs cases =
 	  build_bitstring_call _loc ExtractFunc None endian signed in
 
 	let expr =
-	  match t, flen_is_const, field_offset_aligned with
-	  (* Very common cases: int field, constant 8/16/32/64 bit length,
-	   * aligned to the match at a known offset.  We still have to
-	   * check if the bitstring is aligned (can only be known at
-	   * runtime) but we may be able to directly access the
-	   * bytes in the string.
-	   *)
-	  | P.Int, Some ((8(*|16|32|64*)) as i), Some field_byte_offset ->
+	  match t, flen_is_const, field_offset_aligned, endian, signed with
+	    (* Very common cases: int field, constant 8/16/32/64 bit
+	     * length, aligned to the match at a known offset.  We
+	     * still have to check if the bitstring is aligned (can only
+	     * be known at runtime) but we may be able to directly access
+	     * the bytes in the string.
+	     *)
+	  | P.Int, Some 8, Some field_byte_offset, _, _ ->
+	      let extract_fn = int_extract_const 8 endian signed in
+
+              (* The fast-path code when everything is aligned. *)
+              let fastpath =
+		<:expr<
+                  let o =
+		    ($lid:original_off$ lsr 3) + $`int:field_byte_offset$ in
+                  Char.code (String.unsafe_get $lid:data$ o)              
+                >> in
+
+              <:expr<
+		if $lid:len$ >= 8 then (
+                  let v =
+                    if $lid:off_aligned$ then
+                      $fastpath$
+                    else
+                      $extract_fn$ $lid:data$ $lid:off$ $lid:len$ 8 in
+                  let $lid:off$ = $lid:off$ + 8
+                  and $lid:len$ = $lid:len$ - 8 in
+                  match v with $fpatt$ when true -> $expr$ | _ -> ()
+		)                                                               
+	      >>
+
+	  | P.Int, Some ((16|32|64) as i),
+	    Some field_byte_offset, (P.ConstantEndian _ as endian), signed ->
 	      let extract_fn = int_extract_const i endian signed in
-	      let o = gensym "off" and v = gensym "val" in
 
 	      (* The fast-path code when everything is aligned. *)
 	      let fastpath =
+		let fastpath_call =
+		  let endian = match endian with
+		    | P.ConstantEndian BigEndian -> "be"
+		    | P.ConstantEndian LittleEndian -> "le"
+		    | P.ConstantEndian NativeEndian -> "ne"
+		    | P.EndianExpr _ -> assert false in
+		  let signed = if signed then "signed" else "unsigned" in
+		  let name =
+		    sprintf "extract_fastpath_int%d_%s_%s" i endian signed in
+		  match i with
+		  | 16 ->
+		      <:expr< Bitstring.$lid:name$ $lid:data$ o >>
+		  | 32 ->
+		      <:expr< Bitstring.$lid:name$ $lid:data$ o 0l >>
+		  | 64 ->
+		      <:expr< Bitstring.$lid:name$ $lid:data$ o 0L >>
+		  | _ -> assert false in
 		<:expr<
-		  let $lid:o$ = ($lid:original_off$ lsr 3) +
-		    $`int:field_byte_offset$ in
-		  Char.code (String.unsafe_get $lid:data$ $lid:o$)
+		  (* Starting offset within the string. *)
+		  let o =
+		    ($lid:original_off$ lsr 3) + $`int:field_byte_offset$ in
+		  $fastpath_call$
 	        >> in
+
+	      let slowpath =
+		<:expr<
+		  $extract_fn$ $lid:data$ $lid:off$ $lid:len$ $`int:i$
+		>> in
 
 	      <:expr<
 		if $lid:len$ >= $`int:i$ then (
-		  let $lid:v$ =
-		    if $lid:off_aligned$ then
-		      $fastpath$
-		    else
-		      $extract_fn$ $lid:data$ $lid:off$ $lid:len$ $`int:i$ in
+		  let v =
+		    if $lid:off_aligned$ then $fastpath$ else $slowpath$ in
 		  let $lid:off$ = $lid:off$ + $`int:i$
 		  and $lid:len$ = $lid:len$ - $`int:i$ in
-		  match $lid:v$ with $fpatt$ when true -> $expr$ | _ -> ()
+		  match v with $fpatt$ when true -> $expr$ | _ -> ()
 		)
 	      >>
 
 	  (* Common case: int field, constant flen *)
-	  | P.Int, Some i, _ when i > 0 && i <= 64 ->
+	  | P.Int, Some i, _, _, _ when i > 0 && i <= 64 ->
 	      let extract_fn = int_extract_const i endian signed in
 	      let v = gensym "val" in
 	      <:expr<
@@ -662,14 +706,14 @@ let output_bitmatch _loc bs cases =
 		)
 	      >>
 
-	  | P.Int, Some _, _ ->
+	  | P.Int, Some _, _, _, _ ->
 	      fail "length of int field must be [1..64]"
 
 	  (* Int field, non-const flen.  We have to test the range of
 	   * the field at runtime.  If outside the range it's a no-match
 	   * (not an error).
 	   *)
-	  | P.Int, None, _ ->
+	  | P.Int, None, _, _, _ ->
 	      let extract_fn = int_extract endian signed in
 	      let v = gensym "val" in
 	      <:expr<
@@ -682,17 +726,52 @@ let output_bitmatch _loc bs cases =
 		)
 	      >>
 
-          (* String, constant flen > 0. *)
-	  | P.String, Some i, _ when i > 0 && i land 7 = 0 ->
-	      let bs = gensym "bs" in
+          (* String, constant flen > 0.
+	   * The field is at a known byte-aligned offset so we may
+	   * be able to optimize the substring extraction.
+	   *)
+	  | P.String, Some i, Some field_byte_offset, _, _
+	      when i > 0 && i land 7 = 0 ->
+	      let fastpath =
+		<:expr<
+		  (* Starting offset within the string. *)
+		  let o =
+		    ($lid:original_off$ lsr 3) + $`int:field_byte_offset$ in
+		  String.sub $lid:data$ o $`int:(i lsr 3)$
+		>> in
+
+	      let slowpath =
+		<:expr<
+		  Bitstring.string_of_bitstring
+		    ($lid:data$, $lid:off$, $`int:i$)
+		>> in
+
+	      let cond =
+		<:expr<
+		  if $lid:off_aligned$ then $fastpath$ else $slowpath$
+		>> in
+
 	      <:expr<
 		if $lid:len$ >= $`int:i$ then (
-		  let $lid:bs$ =
-		    Bitstring.extract_bitstring $lid:data$ $lid:off$ $lid:len$
-		      $`int:i$ in
+		  let str = $cond$ in
 		  let $lid:off$ = $lid:off$ + $`int:i$
 		  and $lid:len$ = $lid:len$ - $`int:i$ in
-		  match Bitstring.string_of_bitstring $lid:bs$ with
+		  match str with
+		  | $fpatt$ when true -> $expr$
+		  | _ -> ()
+		)
+	      >>
+
+          (* String, constant flen > 0. *)
+	  | P.String, Some i, None, _, _ when i > 0 && i land 7 = 0 ->
+	      <:expr<
+		if $lid:len$ >= $`int:i$ then (
+		  let str =
+		    Bitstring.string_of_bitstring
+		      ($lid:data$, $lid:off$, $`int:i$) in
+		  let $lid:off$ = $lid:off$ + $`int:i$
+		  and $lid:len$ = $lid:len$ - $`int:i$ in
+		  match str with
 		  | $fpatt$ when true -> $expr$
 		  | _ -> ()
 		)
@@ -700,33 +779,36 @@ let output_bitmatch _loc bs cases =
 
           (* String, constant flen = -1, means consume all the
 	   * rest of the input.
+	   * XXX It should be possible to optimize this for known byte
+	   * offset, but the optimization is tricky because the end/length
+	   * of the string may not be byte-aligned.
 	   *)
-	  | P.String, Some i, _ when i = -1 ->
-	      let bs = gensym "bs" in
+	  | P.String, Some i, _, _, _ when i = -1 ->
+	      let str = gensym "str" in
+
 	      <:expr<
-		let $lid:bs$ =
-		  Bitstring.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
+		let $lid:str$ =
+		  Bitstring.string_of_bitstring
+		    ($lid:data$, $lid:off$, $lid:len$) in
 		let $lid:off$ = $lid:off$ + $lid:len$ in
 		let $lid:len$ = 0 in
-		match Bitstring.string_of_bitstring $lid:bs$ with
+		match $lid:str$ with
 		| $fpatt$ when true -> $expr$
 		| _ -> ()
 	      >>
 
-	  | P.String, Some _, _ ->
+	  | P.String, Some _, _, _, _ ->
 	      fail "length of string must be > 0 and a multiple of 8, or the special value -1"
 
 	  (* String field, non-const flen.  We check the flen is > 0
 	   * and a multiple of 8 (-1 is not allowed here), at runtime.
 	   *)
-	  | P.String, None, _ ->
+	  | P.String, None, _, _, _ ->
 	      let bs = gensym "bs" in
 	      <:expr<
 		if $flen$ >= 0 && $flen$ <= $lid:len$
 		  && $flen$ land 7 = 0 then (
-		    let $lid:bs$ =
-		      Bitstring.extract_bitstring
-			$lid:data$ $lid:off$ $lid:len$ $flen$ in
+		    let $lid:bs$ = ($lid:data$, $lid:off$, $flen$) in
 		    let $lid:off$ = $lid:off$ + $flen$
 		    and $lid:len$ = $lid:len$ - $flen$ in
 		    match Bitstring.string_of_bitstring $lid:bs$ with
@@ -739,7 +821,7 @@ let output_bitmatch _loc bs cases =
 	   * At the moment all we can do is assign the bitstring to an
 	   * identifier.
 	   *)
-	  | P.Bitstring, Some i, _ when i >= 0 ->
+	  | P.Bitstring, Some i, _, _, _ when i >= 0 ->
 	      let ident =
 		match fpatt with
 		| <:patt< $lid:ident$ >> -> ident
@@ -748,9 +830,7 @@ let output_bitmatch _loc bs cases =
 		    fail "cannot compare a bitstring to a constant" in
 	      <:expr<
 		if $lid:len$ >= $`int:i$ then (
-		  let $lid:ident$ =
-		    Bitstring.extract_bitstring $lid:data$ $lid:off$ $lid:len$
-		      $`int:i$ in
+		  let $lid:ident$ = ($lid:data$, $lid:off$, $`int:i$) in
 		  let $lid:off$ = $lid:off$ + $`int:i$
 		  and $lid:len$ = $lid:len$ - $`int:i$ in
 		  $expr$
@@ -760,7 +840,7 @@ let output_bitmatch _loc bs cases =
           (* Bitstring, constant flen = -1, means consume all the
 	   * rest of the input.
 	   *)
-	  | P.Bitstring, Some i, _ when i = -1 ->
+	  | P.Bitstring, Some i, _, _, _ when i = -1 ->
 	      let ident =
 		match fpatt with
 		| <:patt< $lid:ident$ >> -> ident
@@ -768,20 +848,19 @@ let output_bitmatch _loc bs cases =
 		| _ ->
 		    fail "cannot compare a bitstring to a constant" in
 	      <:expr<
-		let $lid:ident$ =
-		  Bitstring.extract_remainder $lid:data$ $lid:off$ $lid:len$ in
+		let $lid:ident$ = ($lid:data$, $lid:off$, $lid:len$) in
 		let $lid:off$ = $lid:off$ + $lid:len$ in
 		let $lid:len$ = 0 in
 		  $expr$
 	      >>
 
-	  | P.Bitstring, Some _, _ ->
+	  | P.Bitstring, Some _, _, _, _ ->
 	      fail "length of bitstring must be >= 0 or the special value -1"
 
 	  (* Bitstring field, non-const flen.  We check the flen is >= 0
 	   * (-1 is not allowed here) at runtime.
 	   *)
-	  | P.Bitstring, None, _ ->
+	  | P.Bitstring, None, _, _, _ ->
 	      let ident =
 		match fpatt with
 		| <:patt< $lid:ident$ >> -> ident
@@ -790,9 +869,7 @@ let output_bitmatch _loc bs cases =
 		    fail "cannot compare a bitstring to a constant" in
 	      <:expr<
 		if $flen$ >= 0 && $flen$ <= $lid:len$ then (
-		  let $lid:ident$ =
-		    Bitstring.extract_bitstring $lid:data$ $lid:off$ $lid:len$
-		      $flen$ in
+		  let $lid:ident$ = ($lid:data$, $lid:off$, $flen$) in
 		  let $lid:off$ = $lid:off$ + $flen$
 		  and $lid:len$ = $lid:len$ - $flen$ in
 		  $expr$
