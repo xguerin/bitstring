@@ -1,4 +1,5 @@
 aclocal.m4
+benchmarks/parse_ext3_superblock.ml
 bitmatch.ml
 bitstring.ml
 bitstring.mli
