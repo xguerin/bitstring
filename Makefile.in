@@ -234,11 +234,15 @@ endif
 # Clean.
 
 clean:
-	rm -f core *~ *.cmi *.cmo *.cmx *.cma *.cmxa *.a *.o
-	rm -f tests/*~ tests/*.cmi tests/*.cmo tests/*.opt
-	rm -f examples/*~ examples/*.cmi examples/*.cmo $(EXAMPLES)
+	rm -f core *~ *.cmi *.cmo *.cmx *.cma *.cmxa *.cmp *.a *.o *.so
+	rm -f tests/*~ tests/*.cmi tests/*.cmo tests/*.cmx tests/*.opt
+	rm -f tests/*.o
+	rm -f examples/*~ examples/*.cmi examples/*.cmo examples/*.cmx
+	rm -f examples/*.o $(EXAMPLES)
 	rm -f benchmarks/*~ benchmarks/*.cmi benchmarks/*.cmo
+	rm -f benchmarks/*.cmx benchmarks/*.o
 	rm -f benchmarks/*.opt benchmarks/*.opt.p benchmarks/*.profile
+	rm -f create_test_pattern bitstring-objinfo
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
 distclean: clean

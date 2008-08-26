@@ -96,6 +96,7 @@ task_struct.bmpp: task_struct.c bitstring-import-c
 clean:
 	rm -f core *~ *.cmi *.cmo *.cmx *.cma *.cmxa *.a *.o *.bmpp
 	rm -f bitstring-import-c bitstring-import-c.opt
+	rm -f ext3 task_struct
 
 distclean: clean
 
