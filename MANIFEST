@@ -9,6 +9,7 @@ bitstring_objinfo.ml
 bitstring_persistent.ml
 bitstring_persistent.mli
 bitstring_types.ml
+byteswap.in.h
 .depend
 cil-tools/bitstring_import_c.ml
 cil-tools/bitstring-import-prefix.h
