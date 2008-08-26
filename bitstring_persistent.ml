@@ -104,44 +104,40 @@ let patt_printer = function
   | <:patt< _ >> -> "_"
   | _ -> "[pattern]"
 
-let expr_printer = function
+let rec expr_printer = function
   | <:expr< $lid:id$ >> -> id
   | <:expr< $int:i$ >> -> i
-  | _ -> "[expression]"
+  | <:expr< $lid:op$ $a$ $b$ >> ->
+    sprintf "%s %s %s" op (expr_printer a) (expr_printer b)
+  | _ -> "[expr]"
 
 let _string_of_field { flen = flen;
 		       endian = endian; signed = signed; t = t;
 		       _loc = _loc;
 		       offset = offset; check = check; bind = bind;
 		       save_offset_to = save_offset_to } =
-  let flen =
-    match expr_is_constant flen with
-    | Some i -> string_of_int i
-    | None -> "[non-const-len]" in
+  let flen = expr_printer flen in
   let endian =
     match endian with
     | ConstantEndian endian -> Bitstring.string_of_endian endian
-    | EndianExpr _ -> "endian([expr])" in
+    | EndianExpr expr -> sprintf "endian(%s)" (expr_printer expr) in
   let signed = if signed then "signed" else "unsigned" in
   let t = string_of_field_type t in
 
   let offset =
     match offset with
     | None -> ""
-    | Some expr ->
-	match expr_is_constant expr with
-	| Some i -> sprintf ", offset(%d)" i
-	| None -> sprintf ", offset([expr])" in
+    | Some expr -> sprintf ", offset(%s)" (expr_printer expr) in
 
   let check =
     match check with
     | None -> ""
-    | Some expr -> sprintf ", check([expr])" in
+    | Some expr -> sprintf ", check(%s)" (expr_printer expr) in
 
   let bind =
     match bind with
     | None -> ""
-    | Some expr -> sprintf ", bind([expr])" in
+    | Some expr -> sprintf ", bind(%s)" (expr_printer expr) in
 
   let save_offset_to =
     match save_offset_to with
