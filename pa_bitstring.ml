@@ -55,9 +55,16 @@ let rec expr_is_constant = function
     (match expr_is_constant a, expr_is_constant b with
      | Some a, Some b ->	       (* Integer binary operations. *)
          let ops = ["+", (+); "-", (-); "*", ( * ); "/", (/);
-                    "land", (land); "lor", (lor); "lxor", (lxor);
-                    "lsl", (lsl); "lsr", (lsr); "asr", (asr);
-		    "mod", (mod)] in
+		    (* NB: explicit fun .. -> is necessary here to work
+		     * around a camlp4 bug in OCaml 3.10.0.
+		     *)
+                    "land", (fun a b -> a land b);
+		    "lor", (fun a b -> a lor b);
+		    "lxor", (fun a b -> a lxor b);
+                    "lsl", (fun a b -> a lsl b);
+		    "lsr", (fun a b -> a lsr b);
+		    "asr", (fun a b -> a asr b);
+		    "mod", (fun a b -> a mod b)] in
          (try Some ((List.assoc op ops) a b) with Not_found -> None)
      | _ -> None)
   | _ -> None
