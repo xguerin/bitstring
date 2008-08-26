@@ -3,6 +3,7 @@ benchmarks/parse_ext3_superblock.ml
 bitmatch.ml
 bitstring.ml
 bitstring.mli
+bitstring_c.c
 bitstring_config.ml.in
 bitstring_objinfo.ml
 bitstring_persistent.ml

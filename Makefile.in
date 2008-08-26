@@ -27,6 +27,8 @@ INSTALL		= @INSTALL@
 TIME		= @TIME@
 GPROF		= @GPROF@
 
+OCAMLLIB	= @OCAMLLIB@
+
 pkg_cil		= @pkg_cil@
 pkg_extlib	= @pkg_extlib@
 
@@ -36,6 +38,14 @@ OCAMLOPTFLAGS	=
 OCAMLOPTPACKAGES =
 
 OCAMLDOCFLAGS	= -html -sort
+
+CC		= @CC@
+CFLAGS		= @CFLAGS@ -Wall -Werror -fPIC -I$(OCAMLLIB)
+
+LIBRARY_PATH	= @abs_top_builddir@
+LD_LIBRARY_PATH	= @abs_top_builddir@
+export LIBRARY_PATH
+export LD_LIBRARY_PATH
 
 SUBDIRS		=
 ifneq ($(pkg_cil),no)
@@ -56,9 +66,9 @@ all:	bitstring.cma bitstring_persistent.cma \
 	bitstring-objinfo
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
-bitstring.cma: bitstring_types.cmo bitstring_config.cmo bitstring.cmo \
-	  bitmatch.cmo
-	$(OCAMLFIND) ocamlc -a -o $@ $^
+bitstring.cma: bitstring_types.cmo bitstring_config.cmo \
+	  bitstring_c.o bitstring.cmo bitmatch.cmo
+	$(OCAMLMKLIB) -o bitstring $^
 
 bitstring_persistent.cma: bitstring_persistent.cmo
 	$(OCAMLFIND) ocamlc -a -o $@ $^
@@ -67,9 +77,9 @@ bitstring_persistent.cmo: bitstring_persistent.ml
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) \
 	  -I +camlp4 -pp camlp4of -c $<
 
-bitstring.cmxa: bitstring_types.cmx bitstring_config.cmx bitstring.cmx \
-	  bitmatch.cmx
-	$(OCAMLFIND) ocamlopt -a -o $@ $^
+bitstring.cmxa: bitstring_types.cmx bitstring_config.cmx \
+	  bitstring_c.o bitstring.cmx bitmatch.cmx
+	$(OCAMLMKLIB) -o bitstring $^
 
 bitstring_persistent.cmxa: bitstring_persistent.cmx
 	$(OCAMLFIND) ocamlopt -a -o $@ $^
@@ -207,7 +217,7 @@ endif
 # Install.
 
 install:
-	ocamlfind install bitstring META *.mli *.cmx *.cma *.cmxa *.a \
+	ocamlfind install bitstring META *.mli *.cmx *.cma *.cmxa *.a *.so \
 		bitstring.cmi \
 		bitstring_persistent.cmi \
 		pa_bitstring.cmo

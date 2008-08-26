@@ -157,16 +157,8 @@ module I = struct
   let minus_one = -1
   let ff = 0xff
 
-  (* Create a mask so many bits wide. *)
-  let mask bits =
-    if bits < 30 then
-      pred (one << bits)
-    else if bits = 30 then
-      max_int
-    else if bits = 31 then
-      minus_one
-    else
-      invalid_arg "Bitstring.I.mask"
+  (* Create a mask 0-31 bits wide. *)
+  external mask : int -> int = "ocaml_bitstring_I_mask" "noalloc"
 
   (* Byte swap an int of a given size. *)
   let byteswap v bits =
