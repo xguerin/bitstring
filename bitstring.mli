@@ -870,38 +870,41 @@ val debug : bool ref
  * these directly - they are not safe.
  *)
 
-val extract_bitstring : string -> int -> int -> int -> bitstring * int * int
+(* 'extract' functions are used in bitmatch statements. *)
 
-val extract_remainder : string -> int -> int -> bitstring * int * int
+val extract_bitstring : string -> int -> int -> int -> bitstring
 
-val extract_bit : string -> int -> int -> int -> bool * int * int
+val extract_remainder : string -> int -> int -> bitstring
 
-val extract_char_unsigned : string -> int -> int -> int -> int * int * int
+val extract_bit : string -> int -> int -> int -> bool
 
-val extract_int_be_unsigned : string -> int -> int -> int -> int * int * int
+val extract_char_unsigned : string -> int -> int -> int -> int
 
-val extract_int_le_unsigned : string -> int -> int -> int -> int * int * int
+val extract_int_be_unsigned : string -> int -> int -> int -> int
 
-val extract_int_ne_unsigned : string -> int -> int -> int -> int * int * int
+val extract_int_le_unsigned : string -> int -> int -> int -> int
 
-val extract_int_ee_unsigned : endian -> string -> int -> int -> int -> int * int * int
+val extract_int_ne_unsigned : string -> int -> int -> int -> int
 
-val extract_int32_be_unsigned : string -> int -> int -> int -> int32 * int * int
+val extract_int_ee_unsigned : endian -> string -> int -> int -> int -> int
 
-val extract_int32_le_unsigned : string -> int -> int -> int -> int32 * int * int
+val extract_int32_be_unsigned : string -> int -> int -> int -> int32
 
-val extract_int32_ne_unsigned : string -> int -> int -> int -> int32 * int * int
+val extract_int32_le_unsigned : string -> int -> int -> int -> int32
 
-val extract_int32_ee_unsigned : endian -> string -> int -> int -> int -> int32 * int * int
+val extract_int32_ne_unsigned : string -> int -> int -> int -> int32
 
-val extract_int64_be_unsigned : string -> int -> int -> int -> int64 * int * int
+val extract_int32_ee_unsigned : endian -> string -> int -> int -> int -> int32
 
-val extract_int64_le_unsigned : string -> int -> int -> int -> int64 * int * int
+val extract_int64_be_unsigned : string -> int -> int -> int -> int64
 
-val extract_int64_ne_unsigned : string -> int -> int -> int -> int64 * int * int
+val extract_int64_le_unsigned : string -> int -> int -> int -> int64
 
-val extract_int64_ee_unsigned : endian -> string -> int -> int -> int -> int64 * int * int
+val extract_int64_ne_unsigned : string -> int -> int -> int -> int64
 
+val extract_int64_ee_unsigned : endian -> string -> int -> int -> int -> int64
+
+(* 'construct' functions are used in BITSTRING constructors. *)
 val construct_bit : Buffer.t -> bool -> int -> exn -> unit
 
 val construct_char_unsigned : Buffer.t -> int -> int -> exn -> unit

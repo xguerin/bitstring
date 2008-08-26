@@ -372,10 +372,10 @@ end
 
 (* Bitstrings. *)
 let extract_bitstring data off len flen =
-  (data, off, flen), off+flen, len-flen
+  (data, off, flen) (*, off+flen, len-flen*)
 
 let extract_remainder data off len =
-  (data, off, len), off+len, 0
+  (data, off, len) (*, off+len, 0*)
 
 (* Extract and convert to numeric.  A single bit is returned as
  * a boolean.  There are no endianness or signedness considerations.
@@ -384,7 +384,7 @@ let extract_bit data off len _ =	(* final param is always 1 *)
   let byteoff = off lsr 3 in
   let bitmask = 1 lsl (7 - (off land 7)) in
   let b = Char.code data.[byteoff] land bitmask <> 0 in
-  b, off+1, len-1
+  b (*, off+1, len-1*)
 
 (* Returns 8 bit unsigned aligned bytes from the string.
  * If the string ends then this returns 0's.
@@ -405,7 +405,7 @@ let extract_char_unsigned data off len flen =
   (* Optimize the common (byte-aligned) case. *)
   if off land 7 = 0 then (
     let byte = Char.code data.[byteoff] in
-    byte lsr (8 - flen), off+flen, len-flen
+    byte lsr (8 - flen) (*, off+flen, len-flen*)
   ) else (
     (* Extract the 16 bits at byteoff and byteoff+1 (note that the
      * second byte might not exist in the original string).
@@ -423,7 +423,7 @@ let extract_char_unsigned data off len flen =
     let shift = 16 - ((off land 7) + flen) in
     let word = word lsr shift in
 
-    word, off+flen, len-flen
+    word (*, off+flen, len-flen*)
   )
 
 (* Extract [9..31] bits.  We have to consider endianness and signedness. *)
@@ -457,19 +457,22 @@ let extract_int_be_unsigned data off len flen =
     ) else (
       (* Extract the next 31 bits, slow method. *)
       let word =
-	let c0, off, len = extract_char_unsigned data off len 8 in
-	let c1, off, len = extract_char_unsigned data off len 8 in
-	let c2, off, len = extract_char_unsigned data off len 8 in
-	let c3, off, len = extract_char_unsigned data off len 7 in
+	let c0 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c1 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c2 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c3 = extract_char_unsigned data off len 7 in
 	(c0 lsl 23) + (c1 lsl 15) + (c2 lsl 7) + c3 in
       word lsr (31 - flen)
     ) in
-  word, off+flen, len-flen
+  word (*, off+flen, len-flen*)
 
 let extract_int_le_unsigned data off len flen =
-  let v, off, len = extract_int_be_unsigned data off len flen in
+  let v = extract_int_be_unsigned data off len flen in
   let v = I.byteswap v flen in
-  v, off, len
+  v
 
 let extract_int_ne_unsigned =
   if nativeendian = BigEndian
@@ -518,10 +521,13 @@ let extract_int32_be_unsigned data off len flen =
     ) else (
       (* Extract the next 32 bits, slow method. *)
       let word =
-	let c0, off, len = extract_char_unsigned data off len 8 in
-	let c1, off, len = extract_char_unsigned data off len 8 in
-	let c2, off, len = extract_char_unsigned data off len 8 in
-	let c3, _, _ = extract_char_unsigned data off len 8 in
+	let c0 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c1 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c2 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c3 = extract_char_unsigned data off len 8 in
 	let c0 = Int32.of_int c0 in
 	let c1 = Int32.of_int c1 in
 	let c2 = Int32.of_int c2 in
@@ -529,12 +535,12 @@ let extract_int32_be_unsigned data off len flen =
 	_make_int32_be c0 c1 c2 c3 in
       Int32.shift_right_logical word (32 - flen)
     ) in
-  word, off+flen, len-flen
+  word (*, off+flen, len-flen*)
 
 let extract_int32_le_unsigned data off len flen =
-  let v, off, len = extract_int32_be_unsigned data off len flen in
+  let v = extract_int32_be_unsigned data off len flen in
   let v = I32.byteswap v flen in
-  v, off, len
+  v
 
 let extract_int32_ne_unsigned =
   if nativeendian = BigEndian
@@ -589,14 +595,21 @@ let extract_int64_be_unsigned data off len flen =
     ) else (
       (* Extract the next 64 bits, slow method. *)
       let word =
-	let c0, off, len = extract_char_unsigned data off len 8 in
-	let c1, off, len = extract_char_unsigned data off len 8 in
-	let c2, off, len = extract_char_unsigned data off len 8 in
-	let c3, off, len = extract_char_unsigned data off len 8 in
-	let c4, off, len = extract_char_unsigned data off len 8 in
-	let c5, off, len = extract_char_unsigned data off len 8 in
-	let c6, off, len = extract_char_unsigned data off len 8 in
-	let c7, _, _ = extract_char_unsigned data off len 8 in
+	let c0 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c1 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c2 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c3 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c4 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c5 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c6 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c7 = extract_char_unsigned data off len 8 in
 	let c0 = Int64.of_int c0 in
 	let c1 = Int64.of_int c1 in
 	let c2 = Int64.of_int c2 in
@@ -608,7 +621,7 @@ let extract_int64_be_unsigned data off len flen =
 	_make_int64_be c0 c1 c2 c3 c4 c5 c6 c7 in
       Int64.shift_right_logical word (64 - flen)
     ) in
-  word, off+flen, len-flen
+  word (*, off+flen, len-flen*)
 
 let extract_int64_le_unsigned data off len flen =
   let byteoff = off lsr 3 in
@@ -632,14 +645,21 @@ let extract_int64_le_unsigned data off len flen =
     ) else (
       (* Extract the next 64 bits, slow method. *)
       let word =
-	let c0, off, len = extract_char_unsigned data off len 8 in
-	let c1, off, len = extract_char_unsigned data off len 8 in
-	let c2, off, len = extract_char_unsigned data off len 8 in
-	let c3, off, len = extract_char_unsigned data off len 8 in
-	let c4, off, len = extract_char_unsigned data off len 8 in
-	let c5, off, len = extract_char_unsigned data off len 8 in
-	let c6, off, len = extract_char_unsigned data off len 8 in
-	let c7, _, _ = extract_char_unsigned data off len 8 in
+	let c0 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c1 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c2 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c3 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c4 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c5 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c6 = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
+	let c7 = extract_char_unsigned data off len 8 in
 	let c0 = Int64.of_int c0 in
 	let c1 = Int64.of_int c1 in
 	let c2 = Int64.of_int c2 in
@@ -651,7 +671,7 @@ let extract_int64_le_unsigned data off len flen =
 	_make_int64_le c0 c1 c2 c3 c4 c5 c6 c7 in
       Int64.logand word (I64.mask flen)
     ) in
-  word, off+flen, len-flen
+  word (*, off+flen, len-flen*)
 
 let extract_int64_ne_unsigned =
   if nativeendian = BigEndian
@@ -882,7 +902,8 @@ let construct_bitstring buf (data, off, len) =
   let rec loop off len blen =
     if blen = 0 then (off, len)
     else (
-      let b, off, len = extract_bit data off len 1 in
+      let b = extract_bit data off len 1
+      and off = off + 1 and len = len + 1 in
       Buffer.add_bit buf b;
       loop off len (blen-1)
     )
@@ -912,11 +933,12 @@ let string_of_bitstring (data, off, len) =
     let str = String.make strlen '\000' in
     let rec loop data off len i =
       if len >= 8 then (
-	let c, off, len = extract_char_unsigned data off len 8 in
+	let c = extract_char_unsigned data off len 8
+	and off = off + 8 and len = len - 8 in
 	str.[i] <- Char.chr c;
 	loop data off len (i+1)
       ) else if len > 0 then (
-	let c, _, _ = extract_char_unsigned data off len len in
+	let c = extract_char_unsigned data off len len in
 	str.[i] <- Char.chr (c lsl (8-len))
       )
     in
@@ -966,8 +988,8 @@ let hexdump_bitstring chan (data, off, len) =
 
   while !len > 0 do
     let bits = min !len 8 in
-    let byte, off', len' = extract_char_unsigned data !off !len bits in
-    off := off'; len := len';
+    let byte = extract_char_unsigned data !off !len bits in
+    off := !off + bits; len := !len - bits;
 
     let byte = byte lsl (8-bits) in
     fprintf chan "%02x " byte;
