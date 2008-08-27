@@ -135,7 +135,10 @@ else
 PP	= -pp 'camlp4o $(OCAMLLIB)/bisect/bisect.cma bitstring.cma bitstring_persistent.cma pa_bitstring.cmo'
 endif
 
-test: pa_bitstring.cmo bitstring.cma bitstring_persistent.cma tests/test.bmpp
+test: pa_bitstring.cmo \
+	bitstring.cma bitstring_persistent.cma \
+	bitstring.cmxa bitstring_persistent.cmxa \
+	tests/test.bmpp
 	@for f in $(TESTS); do \
 	  echo Building $$f; \
 	  $(OCAMLFIND) ocamlopt $(OCAMLOPTFLAGS) $(PP) -package unix $(OCAMLOPTLIBS) -I . bitstring.cmxa $$f.ml -o $$f.opt; \
