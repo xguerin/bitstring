@@ -9,13 +9,13 @@
     <h4>Statistics:</h4>
     <table class="simple">
       <tr><th>kind</th><th width="16px">&nbsp;</th><th>coverage</th></tr>
-      <tr><td>binding</td><td width="16px">&nbsp;</td><td>149 / 245 (60 %)</td></tr>
-      <tr><td>sequence</td><td width="16px">&nbsp;</td><td>60 / 95 (63 %)</td></tr>
-      <tr><td>for</td><td width="16px">&nbsp;</td><td>3 / 5 (60 %)</td></tr>
-      <tr><td>if/then</td><td width="16px">&nbsp;</td><td>100 / 193 (51 %)</td></tr>
+      <tr><td>binding</td><td width="16px">&nbsp;</td><td>226 / 245 (92 %)</td></tr>
+      <tr><td>sequence</td><td width="16px">&nbsp;</td><td>83 / 95 (87 %)</td></tr>
+      <tr><td>for</td><td width="16px">&nbsp;</td><td>5 / 5 (100 %)</td></tr>
+      <tr><td>if/then</td><td width="16px">&nbsp;</td><td>141 / 194 (72 %)</td></tr>
       <tr><td>try</td><td width="16px">&nbsp;</td><td>1 / 2 (50 %)</td></tr>
-      <tr><td>while</td><td width="16px">&nbsp;</td><td>2 / 3 (66 %)</td></tr>
-      <tr><td>match/function</td><td width="16px">&nbsp;</td><td>53 / 88 (60 %)</td></tr>
+      <tr><td>while</td><td width="16px">&nbsp;</td><td>3 / 3 (100 %)</td></tr>
+      <tr><td>match/function</td><td width="16px">&nbsp;</td><td>64 / 87 (73 %)</td></tr>
       <tr><td>class expression</td><td width="16px">&nbsp;</td><td>0 / 0 (- %)</td></tr>
       <tr><td>class initializer</td><td width="16px">&nbsp;</td><td>0 / 0 (- %)</td></tr>
       <tr><td>class method</td><td width="16px">&nbsp;</td><td>0 / 0 (- %)</td></tr>
@@ -43,7 +43,7 @@
       <div class="lineNone">000016| &nbsp;*&nbsp;License&nbsp;along&nbsp;with&nbsp;this&nbsp;library;&nbsp;if&nbsp;not,&nbsp;write&nbsp;to&nbsp;the&nbsp;Free&nbsp;Software</div>
       <div class="lineNone">000017| &nbsp;*&nbsp;Foundation,&nbsp;Inc.,&nbsp;51&nbsp;Franklin&nbsp;Street,&nbsp;Fifth&nbsp;Floor,&nbsp;Boston,&nbsp;MA&nbsp;02110-1301&nbsp;USA</div>
       <div class="lineNone">000018| &nbsp;*</div>
-      <div class="lineNone">000019| &nbsp;*&nbsp;$Id:&nbsp;bitstring.ml&nbsp;156&nbsp;2008-08-26&nbsp;09:42:05Z&nbsp;richard.wm.jones&nbsp;$</div>
+      <div class="lineNone">000019| &nbsp;*&nbsp;$Id:&nbsp;bitstring.ml&nbsp;159&nbsp;2008-08-27&nbsp;11:26:45Z&nbsp;richard.wm.jones&nbsp;$</div>
       <div class="lineNone">000020| &nbsp;*)</div>
       <div class="lineNone">000021| &nbsp;</div>
       <div class="lineNone">000022| open&nbsp;Printf</div>
@@ -54,7 +54,7 @@
       <div class="lineNone">000027| (*&nbsp;Enable&nbsp;runtime&nbsp;debug&nbsp;messages.&nbsp;&nbsp;Must&nbsp;also&nbsp;have&nbsp;been&nbsp;enabled</div>
       <div class="lineNone">000028| &nbsp;*&nbsp;in&nbsp;pa_bitstring.ml.</div>
       <div class="lineNone">000029| &nbsp;*)</div>
-      <div class="lineAllVisited">000030| let&nbsp;debug&nbsp;=&nbsp;(*[34]*)ref&nbsp;false</div>
+      <div class="lineAllVisited">000030| let&nbsp;debug&nbsp;=&nbsp;(*[43]*)ref&nbsp;false</div>
       <div class="lineNone">000031| &nbsp;</div>
       <div class="lineNone">000032| (*&nbsp;Exceptions.&nbsp;*)</div>
       <div class="lineNone">000033| exception&nbsp;Construct_failure&nbsp;of&nbsp;string&nbsp;*&nbsp;string&nbsp;*&nbsp;int&nbsp;*&nbsp;int</div>
@@ -68,32 +68,32 @@
       <div class="lineNone">000041| type&nbsp;t&nbsp;=&nbsp;bitstring</div>
       <div class="lineNone">000042| &nbsp;</div>
       <div class="lineNone">000043| (*&nbsp;Functions&nbsp;to&nbsp;create&nbsp;and&nbsp;load&nbsp;bitstrings.&nbsp;*)</div>
-      <div class="lineAllVisited">000044| let&nbsp;empty_bitstring&nbsp;=&nbsp;(*[34]*)&quot;&quot;,&nbsp;0,&nbsp;0</div>
+      <div class="lineAllVisited">000044| let&nbsp;empty_bitstring&nbsp;=&nbsp;(*[43]*)&quot;&quot;,&nbsp;0,&nbsp;0</div>
       <div class="lineNone">000045| &nbsp;</div>
       <div class="lineNone">000046| let&nbsp;make_bitstring&nbsp;len&nbsp;c&nbsp;=</div>
-      <div class="lineAllVisited">000047| &nbsp;&nbsp;(*[1325857]*)if&nbsp;len&nbsp;&gt;=&nbsp;0&nbsp;then&nbsp;(*[1325857]*)String.make&nbsp;((len+7)&nbsp;lsr&nbsp;3)&nbsp;c,&nbsp;0,&nbsp;len</div>
+      <div class="lineAllVisited">000047| &nbsp;&nbsp;(*[1325989]*)if&nbsp;len&nbsp;&gt;=&nbsp;0&nbsp;then&nbsp;(*[1325989]*)String.make&nbsp;((len+7)&nbsp;lsr&nbsp;3)&nbsp;c,&nbsp;0,&nbsp;len</div>
       <div class="lineNone">000048| &nbsp;&nbsp;else</div>
       <div class="lineAllUnvisited">000049| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)invalid_arg&nbsp;(</div>
       <div class="lineNone">000050| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sprintf&nbsp;&quot;make_bitstring/create_bitstring:&nbsp;len&nbsp;%d&nbsp;&lt;&nbsp;0&quot;&nbsp;len</div>
       <div class="lineNone">000051| &nbsp;&nbsp;&nbsp;&nbsp;)</div>
       <div class="lineNone">000052| &nbsp;</div>
-      <div class="lineAllVisited">000053| let&nbsp;create_bitstring&nbsp;len&nbsp;=&nbsp;(*[42773]*)make_bitstring&nbsp;len&nbsp;'\000'</div>
+      <div class="lineAllVisited">000053| let&nbsp;create_bitstring&nbsp;len&nbsp;=&nbsp;(*[42903]*)make_bitstring&nbsp;len&nbsp;'\000'</div>
       <div class="lineNone">000054| &nbsp;</div>
-      <div class="lineAllVisited">000055| let&nbsp;zeroes_bitstring&nbsp;=&nbsp;(*[34]*)create_bitstring</div>
+      <div class="lineAllVisited">000055| let&nbsp;zeroes_bitstring&nbsp;=&nbsp;(*[43]*)create_bitstring</div>
       <div class="lineNone">000056| &nbsp;</div>
       <div class="lineAllVisited">000057| let&nbsp;ones_bitstring&nbsp;len&nbsp;=&nbsp;(*[1278457]*)make_bitstring&nbsp;len&nbsp;'\xff'</div>
       <div class="lineNone">000058| &nbsp;</div>
       <div class="lineAllVisited">000059| let&nbsp;bitstring_of_string&nbsp;str&nbsp;=&nbsp;(*[2]*)str,&nbsp;0,&nbsp;String.length&nbsp;str&nbsp;lsl&nbsp;3</div>
       <div class="lineNone">000060| &nbsp;</div>
       <div class="lineNone">000061| let&nbsp;bitstring_of_chan&nbsp;chan&nbsp;=</div>
-      <div class="lineAllVisited">000062| &nbsp;&nbsp;(*[2]*)let&nbsp;tmpsize&nbsp;=&nbsp;16384&nbsp;in</div>
-      <div class="lineAllVisited">000063| &nbsp;&nbsp;(*[2]*)let&nbsp;buf&nbsp;=&nbsp;Buffer.create&nbsp;tmpsize&nbsp;in</div>
-      <div class="lineAllVisited">000064| &nbsp;&nbsp;(*[2]*)let&nbsp;tmp&nbsp;=&nbsp;String.create&nbsp;tmpsize&nbsp;in</div>
-      <div class="lineAllVisited">000065| &nbsp;&nbsp;(*[2]*)let&nbsp;n&nbsp;=&nbsp;ref&nbsp;0&nbsp;in</div>
-      <div class="lineAllVisited">000066| &nbsp;&nbsp;(*[2]*)while&nbsp;(*[4]*)n&nbsp;:=&nbsp;input&nbsp;chan&nbsp;tmp&nbsp;0&nbsp;tmpsize;&nbsp;!(*[4]*)n&nbsp;&gt;&nbsp;0&nbsp;do</div>
-      <div class="lineAllVisited">000067| &nbsp;&nbsp;&nbsp;&nbsp;(*[2]*)Buffer.add_substring&nbsp;buf&nbsp;tmp&nbsp;0&nbsp;!n;</div>
+      <div class="lineAllVisited">000062| &nbsp;&nbsp;(*[36]*)let&nbsp;tmpsize&nbsp;=&nbsp;16384&nbsp;in</div>
+      <div class="lineAllVisited">000063| &nbsp;&nbsp;(*[36]*)let&nbsp;buf&nbsp;=&nbsp;Buffer.create&nbsp;tmpsize&nbsp;in</div>
+      <div class="lineAllVisited">000064| &nbsp;&nbsp;(*[36]*)let&nbsp;tmp&nbsp;=&nbsp;String.create&nbsp;tmpsize&nbsp;in</div>
+      <div class="lineAllVisited">000065| &nbsp;&nbsp;(*[36]*)let&nbsp;n&nbsp;=&nbsp;ref&nbsp;0&nbsp;in</div>
+      <div class="lineAllVisited">000066| &nbsp;&nbsp;(*[36]*)while&nbsp;(*[72]*)n&nbsp;:=&nbsp;input&nbsp;chan&nbsp;tmp&nbsp;0&nbsp;tmpsize;&nbsp;!(*[72]*)n&nbsp;&gt;&nbsp;0&nbsp;do</div>
+      <div class="lineAllVisited">000067| &nbsp;&nbsp;&nbsp;&nbsp;(*[36]*)Buffer.add_substring&nbsp;buf&nbsp;tmp&nbsp;0&nbsp;!n;</div>
       <div class="lineNone">000068| &nbsp;&nbsp;done;</div>
-      <div class="lineAllVisited">000069| &nbsp;&nbsp;(*[2]*)Buffer.contents&nbsp;buf,&nbsp;0,&nbsp;Buffer.length&nbsp;buf&nbsp;lsl&nbsp;3</div>
+      <div class="lineAllVisited">000069| &nbsp;&nbsp;(*[36]*)Buffer.contents&nbsp;buf,&nbsp;0,&nbsp;Buffer.length&nbsp;buf&nbsp;lsl&nbsp;3</div>
       <div class="lineNone">000070| &nbsp;</div>
       <div class="lineNone">000071| let&nbsp;bitstring_of_chan_max&nbsp;chan&nbsp;max&nbsp;=</div>
       <div class="lineAllVisited">000072| &nbsp;&nbsp;(*[2]*)let&nbsp;tmpsize&nbsp;=&nbsp;16384&nbsp;in</div>
@@ -144,21 +144,21 @@
       <div class="lineAllVisited">000117| &nbsp;&nbsp;(*[2]*)Buffer.contents&nbsp;buf,&nbsp;0,&nbsp;!len&nbsp;lsl&nbsp;3</div>
       <div class="lineNone">000118| &nbsp;</div>
       <div class="lineNone">000119| let&nbsp;bitstring_of_file&nbsp;fname&nbsp;=</div>
-      <div class="lineAllVisited">000120| &nbsp;&nbsp;(*[1]*)let&nbsp;chan&nbsp;=&nbsp;open_in_bin&nbsp;fname&nbsp;in</div>
-      <div class="lineAllVisited">000121| &nbsp;&nbsp;(*[1]*)try</div>
-      <div class="lineAllVisited">000122| &nbsp;&nbsp;&nbsp;&nbsp;(*[1]*)let&nbsp;bs&nbsp;=&nbsp;bitstring_of_chan&nbsp;chan&nbsp;in</div>
-      <div class="lineAllVisited">000123| &nbsp;&nbsp;&nbsp;&nbsp;(*[1]*)close_in&nbsp;(*[1]*)chan;</div>
-      <div class="lineAllVisited">000124| &nbsp;&nbsp;&nbsp;&nbsp;(*[1]*)bs</div>
+      <div class="lineAllVisited">000120| &nbsp;&nbsp;(*[35]*)let&nbsp;chan&nbsp;=&nbsp;open_in_bin&nbsp;fname&nbsp;in</div>
+      <div class="lineAllVisited">000121| &nbsp;&nbsp;(*[35]*)try</div>
+      <div class="lineAllVisited">000122| &nbsp;&nbsp;&nbsp;&nbsp;(*[35]*)let&nbsp;bs&nbsp;=&nbsp;bitstring_of_chan&nbsp;chan&nbsp;in</div>
+      <div class="lineAllVisited">000123| &nbsp;&nbsp;&nbsp;&nbsp;(*[35]*)close_in&nbsp;(*[35]*)chan;</div>
+      <div class="lineAllVisited">000124| &nbsp;&nbsp;&nbsp;&nbsp;(*[35]*)bs</div>
       <div class="lineNone">000125| &nbsp;&nbsp;with&nbsp;exn&nbsp;-&gt;</div>
       <div class="lineAllUnvisited">000126| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)close_in&nbsp;(*[0]*)chan;</div>
       <div class="lineAllUnvisited">000127| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)raise&nbsp;exn</div>
       <div class="lineNone">000128| &nbsp;</div>
-      <div class="lineAllVisited">000129| let&nbsp;bitstring_length&nbsp;(_,&nbsp;_,&nbsp;len)&nbsp;=&nbsp;(*[1565296]*)len</div>
+      <div class="lineAllVisited">000129| let&nbsp;bitstring_length&nbsp;(_,&nbsp;_,&nbsp;len)&nbsp;=&nbsp;(*[1565492]*)len</div>
       <div class="lineNone">000130| &nbsp;</div>
       <div class="lineNone">000131| let&nbsp;subbitstring&nbsp;(data,&nbsp;off,&nbsp;len)&nbsp;off'&nbsp;len'&nbsp;=</div>
-      <div class="lineAllUnvisited">000132| &nbsp;&nbsp;(*[0]*)let&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;off'&nbsp;in</div>
-      <div class="lineAllUnvisited">000133| &nbsp;&nbsp;(*[0]*)if&nbsp;len&nbsp;&lt;&nbsp;off'&nbsp;+&nbsp;len'&nbsp;then&nbsp;(*[0]*)invalid_arg&nbsp;&quot;subbitstring&quot;;</div>
-      <div class="lineAllUnvisited">000134| &nbsp;&nbsp;((*[0]*)data,&nbsp;off,&nbsp;len')</div>
+      <div class="lineAllVisited">000132| &nbsp;&nbsp;(*[1]*)let&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;off'&nbsp;in</div>
+      <div class="lineMixed">000133| &nbsp;&nbsp;(*[1]*)if&nbsp;len&nbsp;&lt;&nbsp;off'&nbsp;+&nbsp;len'&nbsp;then&nbsp;(*[0]*)invalid_arg&nbsp;&quot;subbitstring&quot;;</div>
+      <div class="lineAllVisited">000134| &nbsp;&nbsp;((*[1]*)data,&nbsp;off,&nbsp;len')</div>
       <div class="lineNone">000135| &nbsp;</div>
       <div class="lineNone">000136| let&nbsp;dropbits&nbsp;n&nbsp;(data,&nbsp;off,&nbsp;len)&nbsp;=</div>
       <div class="lineAllVisited">000137| &nbsp;&nbsp;(*[336643]*)let&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;n&nbsp;in</div>
@@ -167,8 +167,8 @@
       <div class="lineAllVisited">000140| &nbsp;&nbsp;((*[336643]*)data,&nbsp;off,&nbsp;len)</div>
       <div class="lineNone">000141| &nbsp;</div>
       <div class="lineNone">000142| let&nbsp;takebits&nbsp;n&nbsp;(data,&nbsp;off,&nbsp;len)&nbsp;=</div>
-      <div class="lineAllUnvisited">000143| &nbsp;&nbsp;(*[0]*)if&nbsp;len&nbsp;&lt;&nbsp;n&nbsp;then&nbsp;(*[0]*)invalid_arg&nbsp;&quot;takebits&quot;;</div>
-      <div class="lineAllUnvisited">000144| &nbsp;&nbsp;((*[0]*)data,&nbsp;off,&nbsp;n)</div>
+      <div class="lineMixed">000143| &nbsp;&nbsp;(*[100]*)if&nbsp;len&nbsp;&lt;&nbsp;n&nbsp;then&nbsp;(*[0]*)invalid_arg&nbsp;&quot;takebits&quot;;</div>
+      <div class="lineAllVisited">000144| &nbsp;&nbsp;((*[100]*)data,&nbsp;off,&nbsp;n)</div>
       <div class="lineNone">000145| &nbsp;</div>
       <div class="lineNone">000146| (*----------------------------------------------------------------------*)</div>
       <div class="lineNone">000147| (*&nbsp;Bitwise&nbsp;functions.</div>
@@ -181,74 +181,74 @@
       <div class="lineNone">000154| &nbsp;&nbsp;external&nbsp;(&lt;&lt;&lt;)&nbsp;:&nbsp;int&nbsp;-&gt;&nbsp;int&nbsp;-&gt;&nbsp;int&nbsp;=&nbsp;&quot;%lslint&quot;</div>
       <div class="lineNone">000155| &nbsp;&nbsp;external&nbsp;(&gt;&gt;&gt;)&nbsp;:&nbsp;int&nbsp;-&gt;&nbsp;int&nbsp;-&gt;&nbsp;int&nbsp;=&nbsp;&quot;%lsrint&quot;</div>
       <div class="lineNone">000156| &nbsp;&nbsp;external&nbsp;to_int&nbsp;:&nbsp;int&nbsp;-&gt;&nbsp;int&nbsp;=&nbsp;&quot;%identity&quot;</div>
-      <div class="lineAllVisited">000157| &nbsp;&nbsp;let&nbsp;zero&nbsp;=&nbsp;(*[34]*)0</div>
-      <div class="lineAllVisited">000158| &nbsp;&nbsp;let&nbsp;one&nbsp;=&nbsp;(*[34]*)1</div>
-      <div class="lineAllVisited">000159| &nbsp;&nbsp;let&nbsp;minus_one&nbsp;=&nbsp;(*[34]*)-1</div>
-      <div class="lineAllVisited">000160| &nbsp;&nbsp;let&nbsp;ff&nbsp;=&nbsp;(*[34]*)0xff</div>
+      <div class="lineAllVisited">000157| &nbsp;&nbsp;let&nbsp;zero&nbsp;=&nbsp;(*[43]*)0</div>
+      <div class="lineAllVisited">000158| &nbsp;&nbsp;let&nbsp;one&nbsp;=&nbsp;(*[43]*)1</div>
+      <div class="lineAllVisited">000159| &nbsp;&nbsp;let&nbsp;minus_one&nbsp;=&nbsp;(*[43]*)-1</div>
+      <div class="lineAllVisited">000160| &nbsp;&nbsp;let&nbsp;ff&nbsp;=&nbsp;(*[43]*)0xff</div>
       <div class="lineNone">000161| &nbsp;</div>
       <div class="lineNone">000162| &nbsp;&nbsp;(*&nbsp;Create&nbsp;a&nbsp;mask&nbsp;0-31&nbsp;bits&nbsp;wide.&nbsp;*)</div>
       <div class="lineNone">000163| &nbsp;&nbsp;let&nbsp;mask&nbsp;bits&nbsp;=</div>
-      <div class="lineAllVisited">000164| &nbsp;&nbsp;&nbsp;&nbsp;(*[2]*)if&nbsp;bits&nbsp;&lt;&nbsp;30&nbsp;then</div>
-      <div class="lineAllVisited">000165| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((*[2]*)one&nbsp;&lt;&lt;&lt;&nbsp;bits)&nbsp;-&nbsp;1</div>
-      <div class="lineAllUnvisited">000166| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[0]*)if&nbsp;bits&nbsp;=&nbsp;30&nbsp;then</div>
+      <div class="lineAllVisited">000164| &nbsp;&nbsp;&nbsp;&nbsp;(*[2342]*)if&nbsp;bits&nbsp;&lt;&nbsp;30&nbsp;then</div>
+      <div class="lineAllVisited">000165| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((*[1952]*)one&nbsp;&lt;&lt;&lt;&nbsp;bits)&nbsp;-&nbsp;1</div>
+      <div class="lineAllVisited">000166| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[390]*)if&nbsp;bits&nbsp;=&nbsp;30&nbsp;then</div>
       <div class="lineAllUnvisited">000167| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)max_int</div>
-      <div class="lineAllUnvisited">000168| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[0]*)if&nbsp;bits&nbsp;=&nbsp;31&nbsp;then</div>
-      <div class="lineAllUnvisited">000169| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)minus_one</div>
+      <div class="lineAllVisited">000168| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[390]*)if&nbsp;bits&nbsp;=&nbsp;31&nbsp;then</div>
+      <div class="lineAllVisited">000169| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[390]*)minus_one</div>
       <div class="lineNone">000170| &nbsp;&nbsp;&nbsp;&nbsp;else</div>
       <div class="lineAllUnvisited">000171| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)invalid_arg&nbsp;&quot;Bitstring.I.mask&quot;</div>
       <div class="lineNone">000172| &nbsp;</div>
       <div class="lineNone">000173| &nbsp;&nbsp;(*&nbsp;Byte&nbsp;swap&nbsp;an&nbsp;int&nbsp;of&nbsp;a&nbsp;given&nbsp;size.&nbsp;*)</div>
       <div class="lineNone">000174| &nbsp;&nbsp;let&nbsp;byteswap&nbsp;v&nbsp;bits&nbsp;=</div>
-      <div class="lineAllUnvisited">000175| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)if&nbsp;bits&nbsp;&lt;=&nbsp;8&nbsp;then&nbsp;(*[0]*)v</div>
-      <div class="lineAllUnvisited">000176| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[0]*)if&nbsp;bits&nbsp;&lt;=&nbsp;16&nbsp;then&nbsp;(</div>
-      <div class="lineAllUnvisited">000177| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;shift&nbsp;=&nbsp;bits-8&nbsp;in</div>
-      <div class="lineAllUnvisited">000178| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;v1&nbsp;=&nbsp;v&nbsp;&gt;&gt;&gt;&nbsp;shift&nbsp;in</div>
-      <div class="lineAllUnvisited">000179| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;v2&nbsp;=&nbsp;((v&nbsp;land&nbsp;(mask&nbsp;shift))&nbsp;&lt;&lt;&lt;&nbsp;8)&nbsp;in</div>
-      <div class="lineAllUnvisited">000180| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v2&nbsp;(*[0]*)lor&nbsp;v1</div>
-      <div class="lineAllUnvisited">000181| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[0]*)if&nbsp;bits&nbsp;&lt;=&nbsp;24&nbsp;then&nbsp;(</div>
-      <div class="lineAllUnvisited">000182| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;shift&nbsp;=&nbsp;bits&nbsp;-&nbsp;16&nbsp;in</div>
-      <div class="lineAllUnvisited">000183| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;v1&nbsp;=&nbsp;v&nbsp;&gt;&gt;&gt;&nbsp;(8+shift)&nbsp;in</div>
-      <div class="lineAllUnvisited">000184| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;v2&nbsp;=&nbsp;((v&nbsp;&gt;&gt;&gt;&nbsp;shift)&nbsp;land&nbsp;ff)&nbsp;&lt;&lt;&lt;&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000185| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;v3&nbsp;=&nbsp;(v&nbsp;land&nbsp;(mask&nbsp;shift))&nbsp;&lt;&lt;&lt;&nbsp;16&nbsp;in</div>
-      <div class="lineAllUnvisited">000186| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v3&nbsp;lor&nbsp;v2&nbsp;(*[0]*)lor&nbsp;v1</div>
+      <div class="lineMixed">000175| &nbsp;&nbsp;&nbsp;&nbsp;(*[780]*)if&nbsp;bits&nbsp;&lt;=&nbsp;8&nbsp;then&nbsp;(*[0]*)v</div>
+      <div class="lineAllVisited">000176| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[780]*)if&nbsp;bits&nbsp;&lt;=&nbsp;16&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000177| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[260]*)let&nbsp;shift&nbsp;=&nbsp;bits-8&nbsp;in</div>
+      <div class="lineAllVisited">000178| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[260]*)let&nbsp;v1&nbsp;=&nbsp;v&nbsp;&gt;&gt;&gt;&nbsp;shift&nbsp;in</div>
+      <div class="lineAllVisited">000179| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[260]*)let&nbsp;v2&nbsp;=&nbsp;((v&nbsp;land&nbsp;(mask&nbsp;shift))&nbsp;&lt;&lt;&lt;&nbsp;8)&nbsp;in</div>
+      <div class="lineAllVisited">000180| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v2&nbsp;(*[260]*)lor&nbsp;v1</div>
+      <div class="lineAllVisited">000181| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[520]*)if&nbsp;bits&nbsp;&lt;=&nbsp;24&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000182| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[260]*)let&nbsp;shift&nbsp;=&nbsp;bits&nbsp;-&nbsp;16&nbsp;in</div>
+      <div class="lineAllVisited">000183| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[260]*)let&nbsp;v1&nbsp;=&nbsp;v&nbsp;&gt;&gt;&gt;&nbsp;(8+shift)&nbsp;in</div>
+      <div class="lineAllVisited">000184| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[260]*)let&nbsp;v2&nbsp;=&nbsp;((v&nbsp;&gt;&gt;&gt;&nbsp;shift)&nbsp;land&nbsp;ff)&nbsp;&lt;&lt;&lt;&nbsp;8&nbsp;in</div>
+      <div class="lineAllVisited">000185| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[260]*)let&nbsp;v3&nbsp;=&nbsp;(v&nbsp;land&nbsp;(mask&nbsp;shift))&nbsp;&lt;&lt;&lt;&nbsp;16&nbsp;in</div>
+      <div class="lineAllVisited">000186| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v3&nbsp;lor&nbsp;v2&nbsp;(*[260]*)lor&nbsp;v1</div>
       <div class="lineNone">000187| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(</div>
-      <div class="lineAllUnvisited">000188| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;shift&nbsp;=&nbsp;bits&nbsp;-&nbsp;24&nbsp;in</div>
-      <div class="lineAllUnvisited">000189| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;v1&nbsp;=&nbsp;v&nbsp;&gt;&gt;&gt;&nbsp;(16+shift)&nbsp;in</div>
-      <div class="lineAllUnvisited">000190| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;v2&nbsp;=&nbsp;((v&nbsp;&gt;&gt;&gt;&nbsp;(8+shift))&nbsp;land&nbsp;ff)&nbsp;&lt;&lt;&lt;&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000191| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;v3&nbsp;=&nbsp;((v&nbsp;&gt;&gt;&gt;&nbsp;shift)&nbsp;land&nbsp;ff)&nbsp;&lt;&lt;&lt;&nbsp;16&nbsp;in</div>
-      <div class="lineAllUnvisited">000192| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;v4&nbsp;=&nbsp;(v&nbsp;land&nbsp;(mask&nbsp;shift))&nbsp;&lt;&lt;&lt;&nbsp;24&nbsp;in</div>
-      <div class="lineAllUnvisited">000193| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v4&nbsp;lor&nbsp;v3&nbsp;lor&nbsp;v2&nbsp;(*[0]*)lor&nbsp;v1</div>
+      <div class="lineAllVisited">000188| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[260]*)let&nbsp;shift&nbsp;=&nbsp;bits&nbsp;-&nbsp;24&nbsp;in</div>
+      <div class="lineAllVisited">000189| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[260]*)let&nbsp;v1&nbsp;=&nbsp;v&nbsp;&gt;&gt;&gt;&nbsp;(16+shift)&nbsp;in</div>
+      <div class="lineAllVisited">000190| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[260]*)let&nbsp;v2&nbsp;=&nbsp;((v&nbsp;&gt;&gt;&gt;&nbsp;(8+shift))&nbsp;land&nbsp;ff)&nbsp;&lt;&lt;&lt;&nbsp;8&nbsp;in</div>
+      <div class="lineAllVisited">000191| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[260]*)let&nbsp;v3&nbsp;=&nbsp;((v&nbsp;&gt;&gt;&gt;&nbsp;shift)&nbsp;land&nbsp;ff)&nbsp;&lt;&lt;&lt;&nbsp;16&nbsp;in</div>
+      <div class="lineAllVisited">000192| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[260]*)let&nbsp;v4&nbsp;=&nbsp;(v&nbsp;land&nbsp;(mask&nbsp;shift))&nbsp;&lt;&lt;&lt;&nbsp;24&nbsp;in</div>
+      <div class="lineAllVisited">000193| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v4&nbsp;lor&nbsp;v3&nbsp;lor&nbsp;v2&nbsp;(*[260]*)lor&nbsp;v1</div>
       <div class="lineNone">000194| &nbsp;&nbsp;&nbsp;&nbsp;)</div>
       <div class="lineNone">000195| &nbsp;</div>
       <div class="lineNone">000196| &nbsp;&nbsp;(*&nbsp;Check&nbsp;a&nbsp;value&nbsp;is&nbsp;in&nbsp;range&nbsp;0&nbsp;..&nbsp;2^bits-1.&nbsp;*)</div>
       <div class="lineNone">000197| &nbsp;&nbsp;let&nbsp;range_unsigned&nbsp;v&nbsp;bits&nbsp;=</div>
-      <div class="lineAllVisited">000198| &nbsp;&nbsp;&nbsp;&nbsp;(*[2]*)let&nbsp;mask&nbsp;=&nbsp;lnot&nbsp;(mask&nbsp;bits)&nbsp;in</div>
-      <div class="lineAllVisited">000199| &nbsp;&nbsp;&nbsp;&nbsp;(v&nbsp;(*[2]*)land&nbsp;mask)&nbsp;=&nbsp;zero</div>
+      <div class="lineAllVisited">000198| &nbsp;&nbsp;&nbsp;&nbsp;(*[1172]*)let&nbsp;mask&nbsp;=&nbsp;lnot&nbsp;(mask&nbsp;bits)&nbsp;in</div>
+      <div class="lineAllVisited">000199| &nbsp;&nbsp;&nbsp;&nbsp;(v&nbsp;(*[1172]*)land&nbsp;mask)&nbsp;=&nbsp;zero</div>
       <div class="lineNone">000200| &nbsp;</div>
       <div class="lineNone">000201| &nbsp;&nbsp;(*&nbsp;Call&nbsp;function&nbsp;g&nbsp;on&nbsp;the&nbsp;top&nbsp;bits,&nbsp;then&nbsp;f&nbsp;on&nbsp;each&nbsp;full&nbsp;byte</div>
       <div class="lineNone">000202| &nbsp;&nbsp;&nbsp;*&nbsp;(big&nbsp;endian&nbsp;-&nbsp;so&nbsp;start&nbsp;at&nbsp;top).</div>
       <div class="lineNone">000203| &nbsp;&nbsp;&nbsp;*)</div>
       <div class="lineNone">000204| &nbsp;&nbsp;let&nbsp;rec&nbsp;map_bytes_be&nbsp;g&nbsp;f&nbsp;v&nbsp;bits&nbsp;=</div>
-      <div class="lineAllVisited">000205| &nbsp;&nbsp;&nbsp;&nbsp;(*[6]*)if&nbsp;bits&nbsp;&gt;=&nbsp;8&nbsp;then&nbsp;(</div>
-      <div class="lineAllVisited">000206| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[4]*)map_bytes_be&nbsp;g&nbsp;f&nbsp;(v&nbsp;&gt;&gt;&gt;&nbsp;8)&nbsp;(*[4]*)(bits-8);</div>
-      <div class="lineAllVisited">000207| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[4]*)let&nbsp;lsb&nbsp;=&nbsp;v&nbsp;land&nbsp;ff&nbsp;in</div>
-      <div class="lineAllVisited">000208| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[4]*)f&nbsp;(to_int&nbsp;lsb)</div>
-      <div class="lineAllVisited">000209| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[2]*)if&nbsp;bits&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(</div>
-      <div class="lineAllUnvisited">000210| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;lsb&nbsp;=&nbsp;v&nbsp;land&nbsp;(mask&nbsp;bits)&nbsp;in</div>
-      <div class="lineAllUnvisited">000211| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)g&nbsp;(to_int&nbsp;lsb)&nbsp;bits</div>
+      <div class="lineAllVisited">000205| &nbsp;&nbsp;&nbsp;&nbsp;(*[1436]*)if&nbsp;bits&nbsp;&gt;=&nbsp;8&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000206| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1044]*)map_bytes_be&nbsp;g&nbsp;f&nbsp;(v&nbsp;&gt;&gt;&gt;&nbsp;8)&nbsp;(*[1044]*)(bits-8);</div>
+      <div class="lineAllVisited">000207| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1044]*)let&nbsp;lsb&nbsp;=&nbsp;v&nbsp;land&nbsp;ff&nbsp;in</div>
+      <div class="lineAllVisited">000208| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1044]*)f&nbsp;(to_int&nbsp;lsb)</div>
+      <div class="lineAllVisited">000209| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[262]*)if&nbsp;bits&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000210| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[130]*)let&nbsp;lsb&nbsp;=&nbsp;v&nbsp;land&nbsp;(mask&nbsp;bits)&nbsp;in</div>
+      <div class="lineAllVisited">000211| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[130]*)g&nbsp;(to_int&nbsp;lsb)&nbsp;bits</div>
       <div class="lineNone">000212| &nbsp;&nbsp;&nbsp;&nbsp;)</div>
       <div class="lineNone">000213| &nbsp;</div>
       <div class="lineNone">000214| &nbsp;&nbsp;(*&nbsp;Call&nbsp;function&nbsp;g&nbsp;on&nbsp;the&nbsp;top&nbsp;bits,&nbsp;then&nbsp;f&nbsp;on&nbsp;each&nbsp;full&nbsp;byte</div>
       <div class="lineNone">000215| &nbsp;&nbsp;&nbsp;*&nbsp;(little&nbsp;endian&nbsp;-&nbsp;so&nbsp;start&nbsp;at&nbsp;root).</div>
       <div class="lineNone">000216| &nbsp;&nbsp;&nbsp;*)</div>
       <div class="lineNone">000217| &nbsp;&nbsp;let&nbsp;rec&nbsp;map_bytes_le&nbsp;g&nbsp;f&nbsp;v&nbsp;bits&nbsp;=</div>
-      <div class="lineAllUnvisited">000218| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)if&nbsp;bits&nbsp;&gt;=&nbsp;8&nbsp;then&nbsp;(</div>
-      <div class="lineAllUnvisited">000219| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;lsb&nbsp;=&nbsp;v&nbsp;land&nbsp;ff&nbsp;in</div>
-      <div class="lineAllUnvisited">000220| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)f&nbsp;(*[0]*)(to_int&nbsp;lsb);</div>
-      <div class="lineAllUnvisited">000221| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)map_bytes_le&nbsp;g&nbsp;f&nbsp;(v&nbsp;&gt;&gt;&gt;&nbsp;8)&nbsp;(bits-8)</div>
-      <div class="lineAllUnvisited">000222| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[0]*)if&nbsp;bits&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(</div>
-      <div class="lineAllUnvisited">000223| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;lsb&nbsp;=&nbsp;v&nbsp;land&nbsp;(mask&nbsp;bits)&nbsp;in</div>
-      <div class="lineAllUnvisited">000224| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)g&nbsp;(to_int&nbsp;lsb)&nbsp;bits</div>
+      <div class="lineAllVisited">000218| &nbsp;&nbsp;&nbsp;&nbsp;(*[2860]*)if&nbsp;bits&nbsp;&gt;=&nbsp;8&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000219| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[2080]*)let&nbsp;lsb&nbsp;=&nbsp;v&nbsp;land&nbsp;ff&nbsp;in</div>
+      <div class="lineAllVisited">000220| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[2080]*)f&nbsp;(*[2080]*)(to_int&nbsp;lsb);</div>
+      <div class="lineAllVisited">000221| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[2080]*)map_bytes_le&nbsp;g&nbsp;f&nbsp;(v&nbsp;&gt;&gt;&gt;&nbsp;8)&nbsp;(bits-8)</div>
+      <div class="lineAllVisited">000222| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[520]*)if&nbsp;bits&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000223| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[260]*)let&nbsp;lsb&nbsp;=&nbsp;v&nbsp;land&nbsp;(mask&nbsp;bits)&nbsp;in</div>
+      <div class="lineAllVisited">000224| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[260]*)g&nbsp;(to_int&nbsp;lsb)&nbsp;bits</div>
       <div class="lineNone">000225| &nbsp;&nbsp;&nbsp;&nbsp;)</div>
       <div class="lineNone">000226| end</div>
       <div class="lineNone">000227| &nbsp;</div>
@@ -257,23 +257,23 @@
       <div class="lineNone">000230| &nbsp;&nbsp;&nbsp;*&nbsp;as&nbsp;possible&nbsp;to&nbsp;the&nbsp;I&nbsp;module&nbsp;above,&nbsp;to&nbsp;make&nbsp;it&nbsp;easier&nbsp;to&nbsp;track</div>
       <div class="lineNone">000231| &nbsp;&nbsp;&nbsp;*&nbsp;down&nbsp;bugs.</div>
       <div class="lineNone">000232| &nbsp;&nbsp;&nbsp;*)</div>
-      <div class="lineAllVisited">000233| &nbsp;&nbsp;let&nbsp;(&lt;&lt;&lt;)&nbsp;=&nbsp;(*[34]*)Int32.shift_left</div>
-      <div class="lineAllVisited">000234| &nbsp;&nbsp;let&nbsp;(&gt;&gt;&gt;)&nbsp;=&nbsp;(*[34]*)Int32.shift_right_logical</div>
-      <div class="lineAllVisited">000235| &nbsp;&nbsp;let&nbsp;(land)&nbsp;=&nbsp;(*[34]*)Int32.logand</div>
-      <div class="lineAllVisited">000236| &nbsp;&nbsp;let&nbsp;(lor)&nbsp;=&nbsp;(*[34]*)Int32.logor</div>
-      <div class="lineAllVisited">000237| &nbsp;&nbsp;let&nbsp;lnot&nbsp;=&nbsp;(*[34]*)Int32.lognot</div>
-      <div class="lineAllVisited">000238| &nbsp;&nbsp;let&nbsp;pred&nbsp;=&nbsp;(*[34]*)Int32.pred</div>
-      <div class="lineAllVisited">000239| &nbsp;&nbsp;let&nbsp;max_int&nbsp;=&nbsp;(*[34]*)Int32.max_int</div>
-      <div class="lineAllVisited">000240| &nbsp;&nbsp;let&nbsp;to_int&nbsp;=&nbsp;(*[34]*)Int32.to_int</div>
-      <div class="lineAllVisited">000241| &nbsp;&nbsp;let&nbsp;zero&nbsp;=&nbsp;(*[34]*)Int32.zero</div>
-      <div class="lineAllVisited">000242| &nbsp;&nbsp;let&nbsp;one&nbsp;=&nbsp;(*[34]*)Int32.one</div>
-      <div class="lineAllVisited">000243| &nbsp;&nbsp;let&nbsp;minus_one&nbsp;=&nbsp;(*[34]*)Int32.minus_one</div>
-      <div class="lineAllVisited">000244| &nbsp;&nbsp;let&nbsp;ff&nbsp;=&nbsp;(*[34]*)0xff_l</div>
+      <div class="lineAllVisited">000233| &nbsp;&nbsp;let&nbsp;(&lt;&lt;&lt;)&nbsp;=&nbsp;(*[43]*)Int32.shift_left</div>
+      <div class="lineAllVisited">000234| &nbsp;&nbsp;let&nbsp;(&gt;&gt;&gt;)&nbsp;=&nbsp;(*[43]*)Int32.shift_right_logical</div>
+      <div class="lineAllVisited">000235| &nbsp;&nbsp;let&nbsp;(land)&nbsp;=&nbsp;(*[43]*)Int32.logand</div>
+      <div class="lineAllVisited">000236| &nbsp;&nbsp;let&nbsp;(lor)&nbsp;=&nbsp;(*[43]*)Int32.logor</div>
+      <div class="lineAllVisited">000237| &nbsp;&nbsp;let&nbsp;lnot&nbsp;=&nbsp;(*[43]*)Int32.lognot</div>
+      <div class="lineAllVisited">000238| &nbsp;&nbsp;let&nbsp;pred&nbsp;=&nbsp;(*[43]*)Int32.pred</div>
+      <div class="lineAllVisited">000239| &nbsp;&nbsp;let&nbsp;max_int&nbsp;=&nbsp;(*[43]*)Int32.max_int</div>
+      <div class="lineAllVisited">000240| &nbsp;&nbsp;let&nbsp;to_int&nbsp;=&nbsp;(*[43]*)Int32.to_int</div>
+      <div class="lineAllVisited">000241| &nbsp;&nbsp;let&nbsp;zero&nbsp;=&nbsp;(*[43]*)Int32.zero</div>
+      <div class="lineAllVisited">000242| &nbsp;&nbsp;let&nbsp;one&nbsp;=&nbsp;(*[43]*)Int32.one</div>
+      <div class="lineAllVisited">000243| &nbsp;&nbsp;let&nbsp;minus_one&nbsp;=&nbsp;(*[43]*)Int32.minus_one</div>
+      <div class="lineAllVisited">000244| &nbsp;&nbsp;let&nbsp;ff&nbsp;=&nbsp;(*[43]*)0xff_l</div>
       <div class="lineNone">000245| &nbsp;</div>
       <div class="lineNone">000246| &nbsp;&nbsp;(*&nbsp;Create&nbsp;a&nbsp;mask&nbsp;so&nbsp;many&nbsp;bits&nbsp;wide.&nbsp;*)</div>
       <div class="lineNone">000247| &nbsp;&nbsp;let&nbsp;mask&nbsp;bits&nbsp;=</div>
-      <div class="lineAllVisited">000248| &nbsp;&nbsp;&nbsp;&nbsp;(*[12]*)if&nbsp;bits&nbsp;&lt;&nbsp;31&nbsp;then</div>
-      <div class="lineAllVisited">000249| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[12]*)pred&nbsp;(one&nbsp;&lt;&lt;&lt;&nbsp;bits)</div>
+      <div class="lineAllVisited">000248| &nbsp;&nbsp;&nbsp;&nbsp;(*[272]*)if&nbsp;bits&nbsp;&lt;&nbsp;31&nbsp;then</div>
+      <div class="lineAllVisited">000249| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[272]*)pred&nbsp;(one&nbsp;&lt;&lt;&lt;&nbsp;bits)</div>
       <div class="lineAllUnvisited">000250| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[0]*)if&nbsp;bits&nbsp;=&nbsp;31&nbsp;then</div>
       <div class="lineAllUnvisited">000251| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)max_int</div>
       <div class="lineAllUnvisited">000252| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[0]*)if&nbsp;bits&nbsp;=&nbsp;32&nbsp;then</div>
@@ -283,25 +283,25 @@
       <div class="lineNone">000256| &nbsp;</div>
       <div class="lineNone">000257| &nbsp;&nbsp;(*&nbsp;Byte&nbsp;swap&nbsp;an&nbsp;int&nbsp;of&nbsp;a&nbsp;given&nbsp;size.&nbsp;*)</div>
       <div class="lineNone">000258| &nbsp;&nbsp;let&nbsp;byteswap&nbsp;v&nbsp;bits&nbsp;=</div>
-      <div class="lineMixed">000259| &nbsp;&nbsp;&nbsp;&nbsp;(*[12]*)if&nbsp;bits&nbsp;&lt;=&nbsp;8&nbsp;then&nbsp;(*[0]*)v</div>
-      <div class="lineAllVisited">000260| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[12]*)if&nbsp;bits&nbsp;&lt;=&nbsp;16&nbsp;then&nbsp;(</div>
+      <div class="lineMixed">000259| &nbsp;&nbsp;&nbsp;&nbsp;(*[272]*)if&nbsp;bits&nbsp;&lt;=&nbsp;8&nbsp;then&nbsp;(*[0]*)v</div>
+      <div class="lineAllVisited">000260| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[272]*)if&nbsp;bits&nbsp;&lt;=&nbsp;16&nbsp;then&nbsp;(</div>
       <div class="lineAllUnvisited">000261| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;shift&nbsp;=&nbsp;bits-8&nbsp;in</div>
       <div class="lineAllUnvisited">000262| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;v1&nbsp;=&nbsp;v&nbsp;&gt;&gt;&gt;&nbsp;shift&nbsp;in</div>
       <div class="lineAllUnvisited">000263| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;v2&nbsp;=&nbsp;(v&nbsp;land&nbsp;(mask&nbsp;shift))&nbsp;&lt;&lt;&lt;&nbsp;8&nbsp;in</div>
       <div class="lineAllUnvisited">000264| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v2&nbsp;(*[0]*)lor&nbsp;v1</div>
-      <div class="lineAllVisited">000265| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[12]*)if&nbsp;bits&nbsp;&lt;=&nbsp;24&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000265| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[272]*)if&nbsp;bits&nbsp;&lt;=&nbsp;24&nbsp;then&nbsp;(</div>
       <div class="lineAllUnvisited">000266| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;shift&nbsp;=&nbsp;bits&nbsp;-&nbsp;16&nbsp;in</div>
       <div class="lineAllUnvisited">000267| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;v1&nbsp;=&nbsp;v&nbsp;&gt;&gt;&gt;&nbsp;(8+shift)&nbsp;in</div>
       <div class="lineAllUnvisited">000268| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;v2&nbsp;=&nbsp;((v&nbsp;&gt;&gt;&gt;&nbsp;shift)&nbsp;land&nbsp;ff)&nbsp;&lt;&lt;&lt;&nbsp;8&nbsp;in</div>
       <div class="lineAllUnvisited">000269| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;v3&nbsp;=&nbsp;(v&nbsp;land&nbsp;(mask&nbsp;shift))&nbsp;&lt;&lt;&lt;&nbsp;16&nbsp;in</div>
       <div class="lineAllUnvisited">000270| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v3&nbsp;lor&nbsp;v2&nbsp;(*[0]*)lor&nbsp;v1</div>
       <div class="lineNone">000271| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(</div>
-      <div class="lineAllVisited">000272| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[12]*)let&nbsp;shift&nbsp;=&nbsp;bits&nbsp;-&nbsp;24&nbsp;in</div>
-      <div class="lineAllVisited">000273| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[12]*)let&nbsp;v1&nbsp;=&nbsp;v&nbsp;&gt;&gt;&gt;&nbsp;(16+shift)&nbsp;in</div>
-      <div class="lineAllVisited">000274| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[12]*)let&nbsp;v2&nbsp;=&nbsp;((v&nbsp;&gt;&gt;&gt;&nbsp;(8+shift))&nbsp;land&nbsp;ff)&nbsp;&lt;&lt;&lt;&nbsp;8&nbsp;in</div>
-      <div class="lineAllVisited">000275| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[12]*)let&nbsp;v3&nbsp;=&nbsp;((v&nbsp;&gt;&gt;&gt;&nbsp;shift)&nbsp;land&nbsp;ff)&nbsp;&lt;&lt;&lt;&nbsp;16&nbsp;in</div>
-      <div class="lineAllVisited">000276| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[12]*)let&nbsp;v4&nbsp;=&nbsp;(v&nbsp;land&nbsp;(mask&nbsp;shift))&nbsp;&lt;&lt;&lt;&nbsp;24&nbsp;in</div>
-      <div class="lineAllVisited">000277| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v4&nbsp;lor&nbsp;v3&nbsp;lor&nbsp;v2&nbsp;(*[12]*)lor&nbsp;v1</div>
+      <div class="lineAllVisited">000272| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[272]*)let&nbsp;shift&nbsp;=&nbsp;bits&nbsp;-&nbsp;24&nbsp;in</div>
+      <div class="lineAllVisited">000273| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[272]*)let&nbsp;v1&nbsp;=&nbsp;v&nbsp;&gt;&gt;&gt;&nbsp;(16+shift)&nbsp;in</div>
+      <div class="lineAllVisited">000274| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[272]*)let&nbsp;v2&nbsp;=&nbsp;((v&nbsp;&gt;&gt;&gt;&nbsp;(8+shift))&nbsp;land&nbsp;ff)&nbsp;&lt;&lt;&lt;&nbsp;8&nbsp;in</div>
+      <div class="lineAllVisited">000275| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[272]*)let&nbsp;v3&nbsp;=&nbsp;((v&nbsp;&gt;&gt;&gt;&nbsp;shift)&nbsp;land&nbsp;ff)&nbsp;&lt;&lt;&lt;&nbsp;16&nbsp;in</div>
+      <div class="lineAllVisited">000276| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[272]*)let&nbsp;v4&nbsp;=&nbsp;(v&nbsp;land&nbsp;(mask&nbsp;shift))&nbsp;&lt;&lt;&lt;&nbsp;24&nbsp;in</div>
+      <div class="lineAllVisited">000277| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v4&nbsp;lor&nbsp;v3&nbsp;lor&nbsp;v2&nbsp;(*[272]*)lor&nbsp;v1</div>
       <div class="lineNone">000278| &nbsp;&nbsp;&nbsp;&nbsp;)</div>
       <div class="lineNone">000279| &nbsp;</div>
       <div class="lineNone">000280| &nbsp;&nbsp;(*&nbsp;Check&nbsp;a&nbsp;value&nbsp;is&nbsp;in&nbsp;range&nbsp;0&nbsp;..&nbsp;2^bits-1.&nbsp;*)</div>
@@ -341,27 +341,27 @@
       <div class="lineNone">000314| &nbsp;&nbsp;&nbsp;*&nbsp;as&nbsp;possible&nbsp;to&nbsp;the&nbsp;I/I32&nbsp;modules&nbsp;above,&nbsp;to&nbsp;make&nbsp;it&nbsp;easier&nbsp;to&nbsp;track</div>
       <div class="lineNone">000315| &nbsp;&nbsp;&nbsp;*&nbsp;down&nbsp;bugs.</div>
       <div class="lineNone">000316| &nbsp;&nbsp;&nbsp;*)</div>
-      <div class="lineAllVisited">000317| &nbsp;&nbsp;let&nbsp;(&lt;&lt;&lt;)&nbsp;=&nbsp;(*[34]*)Int64.shift_left</div>
-      <div class="lineAllVisited">000318| &nbsp;&nbsp;let&nbsp;(&gt;&gt;&gt;)&nbsp;=&nbsp;(*[34]*)Int64.shift_right_logical</div>
-      <div class="lineAllVisited">000319| &nbsp;&nbsp;let&nbsp;(land)&nbsp;=&nbsp;(*[34]*)Int64.logand</div>
-      <div class="lineAllVisited">000320| &nbsp;&nbsp;let&nbsp;(lor)&nbsp;=&nbsp;(*[34]*)Int64.logor</div>
-      <div class="lineAllVisited">000321| &nbsp;&nbsp;let&nbsp;lnot&nbsp;=&nbsp;(*[34]*)Int64.lognot</div>
-      <div class="lineAllVisited">000322| &nbsp;&nbsp;let&nbsp;pred&nbsp;=&nbsp;(*[34]*)Int64.pred</div>
-      <div class="lineAllVisited">000323| &nbsp;&nbsp;let&nbsp;max_int&nbsp;=&nbsp;(*[34]*)Int64.max_int</div>
-      <div class="lineAllVisited">000324| &nbsp;&nbsp;let&nbsp;to_int&nbsp;=&nbsp;(*[34]*)Int64.to_int</div>
-      <div class="lineAllVisited">000325| &nbsp;&nbsp;let&nbsp;zero&nbsp;=&nbsp;(*[34]*)Int64.zero</div>
-      <div class="lineAllVisited">000326| &nbsp;&nbsp;let&nbsp;one&nbsp;=&nbsp;(*[34]*)Int64.one</div>
-      <div class="lineAllVisited">000327| &nbsp;&nbsp;let&nbsp;minus_one&nbsp;=&nbsp;(*[34]*)Int64.minus_one</div>
-      <div class="lineAllVisited">000328| &nbsp;&nbsp;let&nbsp;ff&nbsp;=&nbsp;(*[34]*)0xff_L</div>
+      <div class="lineAllVisited">000317| &nbsp;&nbsp;let&nbsp;(&lt;&lt;&lt;)&nbsp;=&nbsp;(*[43]*)Int64.shift_left</div>
+      <div class="lineAllVisited">000318| &nbsp;&nbsp;let&nbsp;(&gt;&gt;&gt;)&nbsp;=&nbsp;(*[43]*)Int64.shift_right_logical</div>
+      <div class="lineAllVisited">000319| &nbsp;&nbsp;let&nbsp;(land)&nbsp;=&nbsp;(*[43]*)Int64.logand</div>
+      <div class="lineAllVisited">000320| &nbsp;&nbsp;let&nbsp;(lor)&nbsp;=&nbsp;(*[43]*)Int64.logor</div>
+      <div class="lineAllVisited">000321| &nbsp;&nbsp;let&nbsp;lnot&nbsp;=&nbsp;(*[43]*)Int64.lognot</div>
+      <div class="lineAllVisited">000322| &nbsp;&nbsp;let&nbsp;pred&nbsp;=&nbsp;(*[43]*)Int64.pred</div>
+      <div class="lineAllVisited">000323| &nbsp;&nbsp;let&nbsp;max_int&nbsp;=&nbsp;(*[43]*)Int64.max_int</div>
+      <div class="lineAllVisited">000324| &nbsp;&nbsp;let&nbsp;to_int&nbsp;=&nbsp;(*[43]*)Int64.to_int</div>
+      <div class="lineAllVisited">000325| &nbsp;&nbsp;let&nbsp;zero&nbsp;=&nbsp;(*[43]*)Int64.zero</div>
+      <div class="lineAllVisited">000326| &nbsp;&nbsp;let&nbsp;one&nbsp;=&nbsp;(*[43]*)Int64.one</div>
+      <div class="lineAllVisited">000327| &nbsp;&nbsp;let&nbsp;minus_one&nbsp;=&nbsp;(*[43]*)Int64.minus_one</div>
+      <div class="lineAllVisited">000328| &nbsp;&nbsp;let&nbsp;ff&nbsp;=&nbsp;(*[43]*)0xff_L</div>
       <div class="lineNone">000329| &nbsp;</div>
       <div class="lineNone">000330| &nbsp;&nbsp;(*&nbsp;Create&nbsp;a&nbsp;mask&nbsp;so&nbsp;many&nbsp;bits&nbsp;wide.&nbsp;*)</div>
       <div class="lineNone">000331| &nbsp;&nbsp;let&nbsp;mask&nbsp;bits&nbsp;=</div>
-      <div class="lineAllVisited">000332| &nbsp;&nbsp;&nbsp;&nbsp;(*[669050]*)if&nbsp;bits&nbsp;&lt;&nbsp;63&nbsp;then</div>
-      <div class="lineAllVisited">000333| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[664100]*)pred&nbsp;(one&nbsp;&lt;&lt;&lt;&nbsp;bits)</div>
-      <div class="lineAllVisited">000334| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[4950]*)if&nbsp;bits&nbsp;=&nbsp;63&nbsp;then</div>
+      <div class="lineAllVisited">000332| &nbsp;&nbsp;&nbsp;&nbsp;(*[670350]*)if&nbsp;bits&nbsp;&lt;&nbsp;63&nbsp;then</div>
+      <div class="lineAllVisited">000333| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[664750]*)pred&nbsp;(one&nbsp;&lt;&lt;&lt;&nbsp;bits)</div>
+      <div class="lineAllVisited">000334| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[5600]*)if&nbsp;bits&nbsp;=&nbsp;63&nbsp;then</div>
       <div class="lineAllVisited">000335| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[4950]*)max_int</div>
-      <div class="lineAllUnvisited">000336| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[0]*)if&nbsp;bits&nbsp;=&nbsp;64&nbsp;then</div>
-      <div class="lineAllUnvisited">000337| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)minus_one</div>
+      <div class="lineAllVisited">000336| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[650]*)if&nbsp;bits&nbsp;=&nbsp;64&nbsp;then</div>
+      <div class="lineAllVisited">000337| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[650]*)minus_one</div>
       <div class="lineNone">000338| &nbsp;&nbsp;&nbsp;&nbsp;else</div>
       <div class="lineAllUnvisited">000339| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)invalid_arg&nbsp;&quot;Bitstring.I64.mask&quot;</div>
       <div class="lineNone">000340| &nbsp;</div>
@@ -370,18 +370,18 @@
       <div class="lineNone">000343| &nbsp;</div>
       <div class="lineNone">000344| &nbsp;&nbsp;(*&nbsp;Check&nbsp;a&nbsp;value&nbsp;is&nbsp;in&nbsp;range&nbsp;0&nbsp;..&nbsp;2^bits-1.&nbsp;*)</div>
       <div class="lineNone">000345| &nbsp;&nbsp;let&nbsp;range_unsigned&nbsp;v&nbsp;bits&nbsp;=</div>
-      <div class="lineAllVisited">000346| &nbsp;&nbsp;&nbsp;&nbsp;(*[351850]*)let&nbsp;mask&nbsp;=&nbsp;lnot&nbsp;(mask&nbsp;bits)&nbsp;in</div>
-      <div class="lineAllVisited">000347| &nbsp;&nbsp;&nbsp;&nbsp;(v&nbsp;(*[351850]*)land&nbsp;mask)&nbsp;=&nbsp;zero</div>
+      <div class="lineAllVisited">000346| &nbsp;&nbsp;&nbsp;&nbsp;(*[352630]*)let&nbsp;mask&nbsp;=&nbsp;lnot&nbsp;(mask&nbsp;bits)&nbsp;in</div>
+      <div class="lineAllVisited">000347| &nbsp;&nbsp;&nbsp;&nbsp;(v&nbsp;(*[352630]*)land&nbsp;mask)&nbsp;=&nbsp;zero</div>
       <div class="lineNone">000348| &nbsp;</div>
       <div class="lineNone">000349| &nbsp;&nbsp;(*&nbsp;Call&nbsp;function&nbsp;g&nbsp;on&nbsp;the&nbsp;top&nbsp;bits,&nbsp;then&nbsp;f&nbsp;on&nbsp;each&nbsp;full&nbsp;byte</div>
       <div class="lineNone">000350| &nbsp;&nbsp;&nbsp;*&nbsp;(big&nbsp;endian&nbsp;-&nbsp;so&nbsp;start&nbsp;at&nbsp;top).</div>
       <div class="lineNone">000351| &nbsp;&nbsp;&nbsp;*)</div>
       <div class="lineNone">000352| &nbsp;&nbsp;let&nbsp;rec&nbsp;map_bytes_be&nbsp;g&nbsp;f&nbsp;v&nbsp;bits&nbsp;=</div>
-      <div class="lineAllVisited">000353| &nbsp;&nbsp;&nbsp;&nbsp;(*[1460650]*)if&nbsp;bits&nbsp;&gt;=&nbsp;8&nbsp;then&nbsp;(</div>
-      <div class="lineAllVisited">000354| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1108800]*)map_bytes_be&nbsp;g&nbsp;f&nbsp;(v&nbsp;&gt;&gt;&gt;&nbsp;8)&nbsp;(*[1108800]*)(bits-8);</div>
-      <div class="lineAllVisited">000355| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1108800]*)let&nbsp;lsb&nbsp;=&nbsp;v&nbsp;land&nbsp;ff&nbsp;in</div>
-      <div class="lineAllVisited">000356| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1108800]*)f&nbsp;(to_int&nbsp;lsb)</div>
-      <div class="lineAllVisited">000357| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[34650]*)if&nbsp;bits&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000353| &nbsp;&nbsp;&nbsp;&nbsp;(*[1462730]*)if&nbsp;bits&nbsp;&gt;=&nbsp;8&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000354| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1110620]*)map_bytes_be&nbsp;g&nbsp;f&nbsp;(v&nbsp;&gt;&gt;&gt;&nbsp;8)&nbsp;(*[1110620]*)(bits-8);</div>
+      <div class="lineAllVisited">000355| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1110620]*)let&nbsp;lsb&nbsp;=&nbsp;v&nbsp;land&nbsp;ff&nbsp;in</div>
+      <div class="lineAllVisited">000356| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1110620]*)f&nbsp;(to_int&nbsp;lsb)</div>
+      <div class="lineAllVisited">000357| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[34910]*)if&nbsp;bits&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(</div>
       <div class="lineAllVisited">000358| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[317200]*)let&nbsp;lsb&nbsp;=&nbsp;v&nbsp;land&nbsp;(mask&nbsp;bits)&nbsp;in</div>
       <div class="lineAllVisited">000359| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[317200]*)g&nbsp;(to_int&nbsp;lsb)&nbsp;bits</div>
       <div class="lineNone">000360| &nbsp;&nbsp;&nbsp;&nbsp;)</div>
@@ -390,11 +390,11 @@
       <div class="lineNone">000363| &nbsp;&nbsp;&nbsp;*&nbsp;(little&nbsp;endian&nbsp;-&nbsp;so&nbsp;start&nbsp;at&nbsp;root).</div>
       <div class="lineNone">000364| &nbsp;&nbsp;&nbsp;*)</div>
       <div class="lineNone">000365| &nbsp;&nbsp;let&nbsp;rec&nbsp;map_bytes_le&nbsp;g&nbsp;f&nbsp;v&nbsp;bits&nbsp;=</div>
-      <div class="lineAllUnvisited">000366| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)if&nbsp;bits&nbsp;&gt;=&nbsp;8&nbsp;then&nbsp;(</div>
-      <div class="lineAllUnvisited">000367| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;lsb&nbsp;=&nbsp;v&nbsp;land&nbsp;ff&nbsp;in</div>
-      <div class="lineAllUnvisited">000368| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)f&nbsp;(*[0]*)(to_int&nbsp;lsb);</div>
-      <div class="lineAllUnvisited">000369| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)map_bytes_le&nbsp;g&nbsp;f&nbsp;(v&nbsp;&gt;&gt;&gt;&nbsp;8)&nbsp;(bits-8)</div>
-      <div class="lineAllUnvisited">000370| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[0]*)if&nbsp;bits&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000366| &nbsp;&nbsp;&nbsp;&nbsp;(*[4160]*)if&nbsp;bits&nbsp;&gt;=&nbsp;8&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000367| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[3640]*)let&nbsp;lsb&nbsp;=&nbsp;v&nbsp;land&nbsp;ff&nbsp;in</div>
+      <div class="lineAllVisited">000368| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[3640]*)f&nbsp;(*[3640]*)(to_int&nbsp;lsb);</div>
+      <div class="lineAllVisited">000369| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[3640]*)map_bytes_le&nbsp;g&nbsp;f&nbsp;(v&nbsp;&gt;&gt;&gt;&nbsp;8)&nbsp;(bits-8)</div>
+      <div class="lineAllVisited">000370| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[520]*)if&nbsp;bits&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(</div>
       <div class="lineAllUnvisited">000371| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;lsb&nbsp;=&nbsp;v&nbsp;land&nbsp;(mask&nbsp;bits)&nbsp;in</div>
       <div class="lineAllUnvisited">000372| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)g&nbsp;(to_int&nbsp;lsb)&nbsp;bits</div>
       <div class="lineNone">000373| &nbsp;&nbsp;&nbsp;&nbsp;)</div>
@@ -411,103 +411,103 @@
       <div class="lineNone">000384| &nbsp;*&nbsp;a&nbsp;boolean.&nbsp;&nbsp;There&nbsp;are&nbsp;no&nbsp;endianness&nbsp;or&nbsp;signedness&nbsp;considerations.</div>
       <div class="lineNone">000385| &nbsp;*)</div>
       <div class="lineNone">000386| let&nbsp;extract_bit&nbsp;data&nbsp;off&nbsp;len&nbsp;_&nbsp;=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;final&nbsp;param&nbsp;is&nbsp;always&nbsp;1&nbsp;*)</div>
-      <div class="lineAllVisited">000387| &nbsp;&nbsp;(*[2515152]*)let&nbsp;byteoff&nbsp;=&nbsp;off&nbsp;lsr&nbsp;3&nbsp;in</div>
-      <div class="lineAllVisited">000388| &nbsp;&nbsp;(*[2515152]*)let&nbsp;bitmask&nbsp;=&nbsp;1&nbsp;lsl&nbsp;(7&nbsp;-&nbsp;(off&nbsp;land&nbsp;7))&nbsp;in</div>
-      <div class="lineAllVisited">000389| &nbsp;&nbsp;(*[2515152]*)let&nbsp;b&nbsp;=&nbsp;Char.code&nbsp;data.[byteoff]&nbsp;land&nbsp;bitmask&nbsp;&lt;&gt;&nbsp;0&nbsp;in</div>
-      <div class="lineAllVisited">000390| &nbsp;&nbsp;(*[2515152]*)b&nbsp;(*,&nbsp;off+1,&nbsp;len-1*)</div>
+      <div class="lineAllVisited">000387| &nbsp;&nbsp;(*[2515282]*)let&nbsp;byteoff&nbsp;=&nbsp;off&nbsp;lsr&nbsp;3&nbsp;in</div>
+      <div class="lineAllVisited">000388| &nbsp;&nbsp;(*[2515282]*)let&nbsp;bitmask&nbsp;=&nbsp;1&nbsp;lsl&nbsp;(7&nbsp;-&nbsp;(off&nbsp;land&nbsp;7))&nbsp;in</div>
+      <div class="lineAllVisited">000389| &nbsp;&nbsp;(*[2515282]*)let&nbsp;b&nbsp;=&nbsp;Char.code&nbsp;data.[byteoff]&nbsp;land&nbsp;bitmask&nbsp;&lt;&gt;&nbsp;0&nbsp;in</div>
+      <div class="lineAllVisited">000390| &nbsp;&nbsp;(*[2515282]*)b&nbsp;(*,&nbsp;off+1,&nbsp;len-1*)</div>
       <div class="lineNone">000391| &nbsp;</div>
       <div class="lineNone">000392| (*&nbsp;Returns&nbsp;8&nbsp;bit&nbsp;unsigned&nbsp;aligned&nbsp;bytes&nbsp;from&nbsp;the&nbsp;string.</div>
       <div class="lineNone">000393| &nbsp;*&nbsp;If&nbsp;the&nbsp;string&nbsp;ends&nbsp;then&nbsp;this&nbsp;returns&nbsp;0's.</div>
       <div class="lineNone">000394| &nbsp;*)</div>
       <div class="lineNone">000395| let&nbsp;_get_byte&nbsp;data&nbsp;byteoff&nbsp;strlen&nbsp;=</div>
-      <div class="lineAllVisited">000396| &nbsp;&nbsp;(*[9818264]*)if&nbsp;strlen&nbsp;&gt;&nbsp;byteoff&nbsp;then&nbsp;(*[9252298]*)Char.code&nbsp;data.[byteoff]&nbsp;else&nbsp;(*[565966]*)0</div>
+      <div class="lineAllVisited">000396| &nbsp;&nbsp;(*[9840892]*)if&nbsp;strlen&nbsp;&gt;&nbsp;byteoff&nbsp;then&nbsp;(*[9274362]*)Char.code&nbsp;data.[byteoff]&nbsp;else&nbsp;(*[566530]*)0</div>
       <div class="lineNone">000397| let&nbsp;_get_byte32&nbsp;data&nbsp;byteoff&nbsp;strlen&nbsp;=</div>
-      <div class="lineMixed">000398| &nbsp;&nbsp;(*[72]*)if&nbsp;strlen&nbsp;&gt;&nbsp;byteoff&nbsp;then&nbsp;(*[72]*)Int32.of_int&nbsp;(Char.code&nbsp;data.[byteoff])&nbsp;else&nbsp;(*[0]*)0l</div>
+      <div class="lineMixed">000398| &nbsp;&nbsp;(*[264]*)if&nbsp;strlen&nbsp;&gt;&nbsp;byteoff&nbsp;then&nbsp;(*[264]*)Int32.of_int&nbsp;(Char.code&nbsp;data.[byteoff])&nbsp;else&nbsp;(*[0]*)0l</div>
       <div class="lineNone">000399| let&nbsp;_get_byte64&nbsp;data&nbsp;byteoff&nbsp;strlen&nbsp;=</div>
-      <div class="lineAllVisited">000400| &nbsp;&nbsp;(*[1626456]*)if&nbsp;strlen&nbsp;&gt;&nbsp;byteoff&nbsp;then&nbsp;(*[1517847]*)Int64.of_int&nbsp;(Char.code&nbsp;data.[byteoff])&nbsp;else&nbsp;(*[108609]*)0L</div>
+      <div class="lineAllVisited">000400| &nbsp;&nbsp;(*[1626792]*)if&nbsp;strlen&nbsp;&gt;&nbsp;byteoff&nbsp;then&nbsp;(*[1518549]*)Int64.of_int&nbsp;(Char.code&nbsp;data.[byteoff])&nbsp;else&nbsp;(*[108243]*)0L</div>
       <div class="lineNone">000401| &nbsp;</div>
       <div class="lineNone">000402| (*&nbsp;Extract&nbsp;[2..8]&nbsp;bits.&nbsp;&nbsp;Because&nbsp;the&nbsp;result&nbsp;fits&nbsp;into&nbsp;a&nbsp;single</div>
       <div class="lineNone">000403| &nbsp;*&nbsp;byte&nbsp;we&nbsp;don't&nbsp;have&nbsp;to&nbsp;worry&nbsp;about&nbsp;endianness,&nbsp;only&nbsp;signedness.</div>
       <div class="lineNone">000404| &nbsp;*)</div>
       <div class="lineNone">000405| let&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;flen&nbsp;=</div>
-      <div class="lineAllVisited">000406| &nbsp;&nbsp;(*[5030404]*)let&nbsp;byteoff&nbsp;=&nbsp;off&nbsp;lsr&nbsp;3&nbsp;in</div>
+      <div class="lineAllVisited">000406| &nbsp;&nbsp;(*[5040562]*)let&nbsp;byteoff&nbsp;=&nbsp;off&nbsp;lsr&nbsp;3&nbsp;in</div>
       <div class="lineNone">000407| &nbsp;</div>
       <div class="lineNone">000408| &nbsp;&nbsp;(*&nbsp;Optimize&nbsp;the&nbsp;common&nbsp;(byte-aligned)&nbsp;case.&nbsp;*)</div>
-      <div class="lineAllVisited">000409| &nbsp;&nbsp;(*[5030404]*)if&nbsp;off&nbsp;land&nbsp;7&nbsp;=&nbsp;0&nbsp;then&nbsp;(</div>
-      <div class="lineAllVisited">000410| &nbsp;&nbsp;&nbsp;&nbsp;(*[121272]*)let&nbsp;byte&nbsp;=&nbsp;Char.code&nbsp;data.[byteoff]&nbsp;in</div>
-      <div class="lineAllVisited">000411| &nbsp;&nbsp;&nbsp;&nbsp;byte&nbsp;(*[121272]*)lsr&nbsp;(8&nbsp;-&nbsp;flen)&nbsp;(*,&nbsp;off+flen,&nbsp;len-flen*)</div>
+      <div class="lineAllVisited">000409| &nbsp;&nbsp;(*[5040562]*)if&nbsp;off&nbsp;land&nbsp;7&nbsp;=&nbsp;0&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000410| &nbsp;&nbsp;&nbsp;&nbsp;(*[121776]*)let&nbsp;byte&nbsp;=&nbsp;Char.code&nbsp;data.[byteoff]&nbsp;in</div>
+      <div class="lineAllVisited">000411| &nbsp;&nbsp;&nbsp;&nbsp;byte&nbsp;(*[121776]*)lsr&nbsp;(8&nbsp;-&nbsp;flen)&nbsp;(*,&nbsp;off+flen,&nbsp;len-flen*)</div>
       <div class="lineNone">000412| &nbsp;&nbsp;)&nbsp;else&nbsp;(</div>
       <div class="lineNone">000413| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Extract&nbsp;the&nbsp;16&nbsp;bits&nbsp;at&nbsp;byteoff&nbsp;and&nbsp;byteoff+1&nbsp;(note&nbsp;that&nbsp;the</div>
       <div class="lineNone">000414| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;second&nbsp;byte&nbsp;might&nbsp;not&nbsp;exist&nbsp;in&nbsp;the&nbsp;original&nbsp;string).</div>
       <div class="lineNone">000415| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*)</div>
-      <div class="lineAllVisited">000416| &nbsp;&nbsp;&nbsp;&nbsp;(*[4909132]*)let&nbsp;strlen&nbsp;=&nbsp;String.length&nbsp;data&nbsp;in</div>
+      <div class="lineAllVisited">000416| &nbsp;&nbsp;&nbsp;&nbsp;(*[4918786]*)let&nbsp;strlen&nbsp;=&nbsp;String.length&nbsp;data&nbsp;in</div>
       <div class="lineNone">000417| &nbsp;</div>
-      <div class="lineAllVisited">000418| &nbsp;&nbsp;&nbsp;&nbsp;(*[4909132]*)let&nbsp;word&nbsp;=</div>
+      <div class="lineAllVisited">000418| &nbsp;&nbsp;&nbsp;&nbsp;(*[4918786]*)let&nbsp;word&nbsp;=</div>
       <div class="lineNone">000419| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(_get_byte&nbsp;data&nbsp;byteoff&nbsp;strlen&nbsp;lsl&nbsp;8)&nbsp;+</div>
       <div class="lineNone">000420| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_get_byte&nbsp;data&nbsp;(byteoff+1)&nbsp;strlen&nbsp;in</div>
       <div class="lineNone">000421| &nbsp;</div>
       <div class="lineNone">000422| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Mask&nbsp;off&nbsp;the&nbsp;top&nbsp;bits.&nbsp;*)</div>
-      <div class="lineAllVisited">000423| &nbsp;&nbsp;&nbsp;&nbsp;(*[4909132]*)let&nbsp;bitmask&nbsp;=&nbsp;(1&nbsp;lsl&nbsp;(16&nbsp;-&nbsp;(off&nbsp;land&nbsp;7)))&nbsp;-&nbsp;1&nbsp;in</div>
-      <div class="lineAllVisited">000424| &nbsp;&nbsp;&nbsp;&nbsp;(*[4909132]*)let&nbsp;word&nbsp;=&nbsp;word&nbsp;land&nbsp;bitmask&nbsp;in</div>
+      <div class="lineAllVisited">000423| &nbsp;&nbsp;&nbsp;&nbsp;(*[4918786]*)let&nbsp;bitmask&nbsp;=&nbsp;(1&nbsp;lsl&nbsp;(16&nbsp;-&nbsp;(off&nbsp;land&nbsp;7)))&nbsp;-&nbsp;1&nbsp;in</div>
+      <div class="lineAllVisited">000424| &nbsp;&nbsp;&nbsp;&nbsp;(*[4918786]*)let&nbsp;word&nbsp;=&nbsp;word&nbsp;land&nbsp;bitmask&nbsp;in</div>
       <div class="lineNone">000425| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Shift&nbsp;right&nbsp;to&nbsp;get&nbsp;rid&nbsp;of&nbsp;the&nbsp;bottom&nbsp;bits.&nbsp;*)</div>
-      <div class="lineAllVisited">000426| &nbsp;&nbsp;&nbsp;&nbsp;(*[4909132]*)let&nbsp;shift&nbsp;=&nbsp;16&nbsp;-&nbsp;((off&nbsp;land&nbsp;7)&nbsp;+&nbsp;flen)&nbsp;in</div>
-      <div class="lineAllVisited">000427| &nbsp;&nbsp;&nbsp;&nbsp;(*[4909132]*)let&nbsp;word&nbsp;=&nbsp;word&nbsp;lsr&nbsp;shift&nbsp;in</div>
+      <div class="lineAllVisited">000426| &nbsp;&nbsp;&nbsp;&nbsp;(*[4918786]*)let&nbsp;shift&nbsp;=&nbsp;16&nbsp;-&nbsp;((off&nbsp;land&nbsp;7)&nbsp;+&nbsp;flen)&nbsp;in</div>
+      <div class="lineAllVisited">000427| &nbsp;&nbsp;&nbsp;&nbsp;(*[4918786]*)let&nbsp;word&nbsp;=&nbsp;word&nbsp;lsr&nbsp;shift&nbsp;in</div>
       <div class="lineNone">000428| &nbsp;</div>
-      <div class="lineAllVisited">000429| &nbsp;&nbsp;&nbsp;&nbsp;(*[4909132]*)word&nbsp;(*,&nbsp;off+flen,&nbsp;len-flen*)</div>
+      <div class="lineAllVisited">000429| &nbsp;&nbsp;&nbsp;&nbsp;(*[4918786]*)word&nbsp;(*,&nbsp;off+flen,&nbsp;len-flen*)</div>
       <div class="lineNone">000430| &nbsp;&nbsp;)</div>
       <div class="lineNone">000431| &nbsp;</div>
       <div class="lineNone">000432| (*&nbsp;Extract&nbsp;[9..31]&nbsp;bits.&nbsp;&nbsp;We&nbsp;have&nbsp;to&nbsp;consider&nbsp;endianness&nbsp;and&nbsp;signedness.&nbsp;*)</div>
       <div class="lineNone">000433| let&nbsp;extract_int_be_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;flen&nbsp;=</div>
-      <div class="lineAllUnvisited">000434| &nbsp;&nbsp;(*[0]*)let&nbsp;byteoff&nbsp;=&nbsp;off&nbsp;lsr&nbsp;3&nbsp;in</div>
+      <div class="lineAllVisited">000434| &nbsp;&nbsp;(*[1170]*)let&nbsp;byteoff&nbsp;=&nbsp;off&nbsp;lsr&nbsp;3&nbsp;in</div>
       <div class="lineNone">000435| &nbsp;</div>
-      <div class="lineAllUnvisited">000436| &nbsp;&nbsp;(*[0]*)let&nbsp;strlen&nbsp;=&nbsp;String.length&nbsp;data&nbsp;in</div>
+      <div class="lineAllVisited">000436| &nbsp;&nbsp;(*[1170]*)let&nbsp;strlen&nbsp;=&nbsp;String.length&nbsp;data&nbsp;in</div>
       <div class="lineNone">000437| &nbsp;</div>
-      <div class="lineAllUnvisited">000438| &nbsp;&nbsp;(*[0]*)let&nbsp;word&nbsp;=</div>
+      <div class="lineAllVisited">000438| &nbsp;&nbsp;(*[1170]*)let&nbsp;word&nbsp;=</div>
       <div class="lineNone">000439| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Optimize&nbsp;the&nbsp;common&nbsp;(byte-aligned)&nbsp;case.&nbsp;*)</div>
       <div class="lineNone">000440| &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;off&nbsp;land&nbsp;7&nbsp;=&nbsp;0&nbsp;then&nbsp;(</div>
-      <div class="lineAllUnvisited">000441| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;word&nbsp;=</div>
+      <div class="lineAllVisited">000441| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[152]*)let&nbsp;word&nbsp;=</div>
       <div class="lineNone">000442| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(_get_byte&nbsp;data&nbsp;byteoff&nbsp;strlen&nbsp;lsl&nbsp;23)&nbsp;+</div>
       <div class="lineNone">000443| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(_get_byte&nbsp;data&nbsp;(byteoff+1)&nbsp;strlen&nbsp;lsl&nbsp;15)&nbsp;+</div>
       <div class="lineNone">000444| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(_get_byte&nbsp;data&nbsp;(byteoff+2)&nbsp;strlen&nbsp;lsl&nbsp;7)&nbsp;+</div>
       <div class="lineNone">000445| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(_get_byte&nbsp;data&nbsp;(byteoff+3)&nbsp;strlen&nbsp;lsr&nbsp;1)&nbsp;in</div>
-      <div class="lineAllUnvisited">000446| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;word&nbsp;(*[0]*)lsr&nbsp;(31&nbsp;-&nbsp;flen)</div>
-      <div class="lineAllUnvisited">000447| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[0]*)if&nbsp;flen&nbsp;&lt;=&nbsp;24&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000446| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;word&nbsp;(*[152]*)lsr&nbsp;(31&nbsp;-&nbsp;flen)</div>
+      <div class="lineAllVisited">000447| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[1018]*)if&nbsp;flen&nbsp;&lt;=&nbsp;24&nbsp;then&nbsp;(</div>
       <div class="lineNone">000448| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Extract&nbsp;the&nbsp;31&nbsp;bits&nbsp;at&nbsp;byteoff&nbsp;..&nbsp;byteoff+3.&nbsp;*)</div>
-      <div class="lineAllUnvisited">000449| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;word&nbsp;=</div>
+      <div class="lineAllVisited">000449| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[678]*)let&nbsp;word&nbsp;=</div>
       <div class="lineNone">000450| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(_get_byte&nbsp;data&nbsp;byteoff&nbsp;strlen&nbsp;lsl&nbsp;23)&nbsp;+</div>
       <div class="lineNone">000451| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(_get_byte&nbsp;data&nbsp;(byteoff+1)&nbsp;strlen&nbsp;lsl&nbsp;15)&nbsp;+</div>
       <div class="lineNone">000452| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(_get_byte&nbsp;data&nbsp;(byteoff+2)&nbsp;strlen&nbsp;lsl&nbsp;7)&nbsp;+</div>
       <div class="lineNone">000453| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(_get_byte&nbsp;data&nbsp;(byteoff+3)&nbsp;strlen&nbsp;lsr&nbsp;1)&nbsp;in</div>
       <div class="lineNone">000454| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Mask&nbsp;off&nbsp;the&nbsp;top&nbsp;bits.&nbsp;*)</div>
-      <div class="lineAllUnvisited">000455| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;bitmask&nbsp;=&nbsp;(1&nbsp;lsl&nbsp;(31&nbsp;-&nbsp;(off&nbsp;land&nbsp;7)))&nbsp;-&nbsp;1&nbsp;in</div>
-      <div class="lineAllUnvisited">000456| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;word&nbsp;=&nbsp;word&nbsp;land&nbsp;bitmask&nbsp;in</div>
+      <div class="lineAllVisited">000455| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[678]*)let&nbsp;bitmask&nbsp;=&nbsp;(1&nbsp;lsl&nbsp;(31&nbsp;-&nbsp;(off&nbsp;land&nbsp;7)))&nbsp;-&nbsp;1&nbsp;in</div>
+      <div class="lineAllVisited">000456| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[678]*)let&nbsp;word&nbsp;=&nbsp;word&nbsp;land&nbsp;bitmask&nbsp;in</div>
       <div class="lineNone">000457| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Shift&nbsp;right&nbsp;to&nbsp;get&nbsp;rid&nbsp;of&nbsp;the&nbsp;bottom&nbsp;bits.&nbsp;*)</div>
-      <div class="lineAllUnvisited">000458| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;shift&nbsp;=&nbsp;31&nbsp;-&nbsp;((off&nbsp;land&nbsp;7)&nbsp;+&nbsp;flen)&nbsp;in</div>
-      <div class="lineAllUnvisited">000459| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;word&nbsp;(*[0]*)lsr&nbsp;shift</div>
+      <div class="lineAllVisited">000458| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[678]*)let&nbsp;shift&nbsp;=&nbsp;31&nbsp;-&nbsp;((off&nbsp;land&nbsp;7)&nbsp;+&nbsp;flen)&nbsp;in</div>
+      <div class="lineAllVisited">000459| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;word&nbsp;(*[678]*)lsr&nbsp;shift</div>
       <div class="lineNone">000460| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(</div>
       <div class="lineNone">000461| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Extract&nbsp;the&nbsp;next&nbsp;31&nbsp;bits,&nbsp;slow&nbsp;method.&nbsp;*)</div>
-      <div class="lineAllUnvisited">000462| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;word&nbsp;=</div>
+      <div class="lineAllVisited">000462| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[340]*)let&nbsp;word&nbsp;=</div>
       <div class="lineNone">000463| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;c0&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000464| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000465| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c1&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000465| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[340]*)let&nbsp;c1&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000466| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000467| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c2&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000467| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[340]*)let&nbsp;c2&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000468| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000469| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c3&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;7&nbsp;in</div>
-      <div class="lineAllUnvisited">000470| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(c0&nbsp;(*[0]*)lsl&nbsp;23)&nbsp;+&nbsp;(c1&nbsp;lsl&nbsp;15)&nbsp;+&nbsp;(c2&nbsp;lsl&nbsp;7)&nbsp;+&nbsp;c3&nbsp;in</div>
-      <div class="lineAllUnvisited">000471| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;word&nbsp;(*[0]*)lsr&nbsp;(31&nbsp;-&nbsp;flen)</div>
+      <div class="lineAllVisited">000469| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[340]*)let&nbsp;c3&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;7&nbsp;in</div>
+      <div class="lineAllVisited">000470| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(c0&nbsp;(*[340]*)lsl&nbsp;23)&nbsp;+&nbsp;(c1&nbsp;lsl&nbsp;15)&nbsp;+&nbsp;(c2&nbsp;lsl&nbsp;7)&nbsp;+&nbsp;c3&nbsp;in</div>
+      <div class="lineAllVisited">000471| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;word&nbsp;(*[340]*)lsr&nbsp;(31&nbsp;-&nbsp;flen)</div>
       <div class="lineNone">000472| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;in</div>
-      <div class="lineAllUnvisited">000473| &nbsp;&nbsp;(*[0]*)word&nbsp;(*,&nbsp;off+flen,&nbsp;len-flen*)</div>
+      <div class="lineAllVisited">000473| &nbsp;&nbsp;(*[1170]*)word&nbsp;(*,&nbsp;off+flen,&nbsp;len-flen*)</div>
       <div class="lineNone">000474| &nbsp;</div>
       <div class="lineNone">000475| let&nbsp;extract_int_le_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;flen&nbsp;=</div>
-      <div class="lineAllUnvisited">000476| &nbsp;&nbsp;(*[0]*)let&nbsp;v&nbsp;=&nbsp;extract_int_be_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;flen&nbsp;in</div>
-      <div class="lineAllUnvisited">000477| &nbsp;&nbsp;(*[0]*)let&nbsp;v&nbsp;=&nbsp;I.byteswap&nbsp;v&nbsp;flen&nbsp;in</div>
-      <div class="lineAllUnvisited">000478| &nbsp;&nbsp;(*[0]*)v</div>
+      <div class="lineAllVisited">000476| &nbsp;&nbsp;(*[780]*)let&nbsp;v&nbsp;=&nbsp;extract_int_be_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;flen&nbsp;in</div>
+      <div class="lineAllVisited">000477| &nbsp;&nbsp;(*[780]*)let&nbsp;v&nbsp;=&nbsp;I.byteswap&nbsp;v&nbsp;flen&nbsp;in</div>
+      <div class="lineAllVisited">000478| &nbsp;&nbsp;(*[780]*)v</div>
       <div class="lineNone">000479| &nbsp;</div>
       <div class="lineNone">000480| let&nbsp;extract_int_ne_unsigned&nbsp;=</div>
-      <div class="lineAllVisited">000481| &nbsp;&nbsp;(*[34]*)if&nbsp;nativeendian&nbsp;=&nbsp;BigEndian</div>
+      <div class="lineAllVisited">000481| &nbsp;&nbsp;(*[43]*)if&nbsp;nativeendian&nbsp;=&nbsp;BigEndian</div>
       <div class="lineAllUnvisited">000482| &nbsp;&nbsp;then&nbsp;(*[0]*)extract_int_be_unsigned</div>
-      <div class="lineAllVisited">000483| &nbsp;&nbsp;else&nbsp;(*[34]*)extract_int_le_unsigned</div>
+      <div class="lineAllVisited">000483| &nbsp;&nbsp;else&nbsp;(*[43]*)extract_int_le_unsigned</div>
       <div class="lineNone">000484| &nbsp;</div>
       <div class="lineNone">000485| let&nbsp;extract_int_ee_unsigned&nbsp;=&nbsp;function</div>
       <div class="lineAllUnvisited">000486| &nbsp;&nbsp;|&nbsp;BigEndian&nbsp;-&gt;&nbsp;(*[0]*)extract_int_be_unsigned</div>
@@ -515,7 +515,7 @@
       <div class="lineAllUnvisited">000488| &nbsp;&nbsp;|&nbsp;NativeEndian&nbsp;-&gt;&nbsp;(*[0]*)extract_int_ne_unsigned</div>
       <div class="lineNone">000489| &nbsp;</div>
       <div class="lineNone">000490| let&nbsp;_make_int32_be&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;=</div>
-      <div class="lineAllVisited">000491| &nbsp;&nbsp;(*[18]*)Int32.logor</div>
+      <div class="lineAllVisited">000491| &nbsp;&nbsp;(*[408]*)Int32.logor</div>
       <div class="lineNone">000492| &nbsp;&nbsp;&nbsp;&nbsp;(Int32.logor</div>
       <div class="lineNone">000493| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Int32.logor</div>
       <div class="lineNone">000494| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Int32.shift_left&nbsp;c0&nbsp;24)</div>
@@ -534,48 +534,48 @@
       <div class="lineNone">000507| &nbsp;</div>
       <div class="lineNone">000508| (*&nbsp;Extract&nbsp;exactly&nbsp;32&nbsp;bits.&nbsp;&nbsp;We&nbsp;have&nbsp;to&nbsp;consider&nbsp;endianness&nbsp;and&nbsp;signedness.&nbsp;*)</div>
       <div class="lineNone">000509| let&nbsp;extract_int32_be_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;flen&nbsp;=</div>
-      <div class="lineAllVisited">000510| &nbsp;&nbsp;(*[18]*)let&nbsp;byteoff&nbsp;=&nbsp;off&nbsp;lsr&nbsp;3&nbsp;in</div>
+      <div class="lineAllVisited">000510| &nbsp;&nbsp;(*[408]*)let&nbsp;byteoff&nbsp;=&nbsp;off&nbsp;lsr&nbsp;3&nbsp;in</div>
       <div class="lineNone">000511| &nbsp;</div>
-      <div class="lineAllVisited">000512| &nbsp;&nbsp;(*[18]*)let&nbsp;strlen&nbsp;=&nbsp;String.length&nbsp;data&nbsp;in</div>
+      <div class="lineAllVisited">000512| &nbsp;&nbsp;(*[408]*)let&nbsp;strlen&nbsp;=&nbsp;String.length&nbsp;data&nbsp;in</div>
       <div class="lineNone">000513| &nbsp;</div>
-      <div class="lineAllVisited">000514| &nbsp;&nbsp;(*[18]*)let&nbsp;word&nbsp;=</div>
+      <div class="lineAllVisited">000514| &nbsp;&nbsp;(*[408]*)let&nbsp;word&nbsp;=</div>
       <div class="lineNone">000515| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Optimize&nbsp;the&nbsp;common&nbsp;(byte-aligned)&nbsp;case.&nbsp;*)</div>
       <div class="lineNone">000516| &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;off&nbsp;land&nbsp;7&nbsp;=&nbsp;0&nbsp;then&nbsp;(</div>
-      <div class="lineAllVisited">000517| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[18]*)let&nbsp;word&nbsp;=</div>
+      <div class="lineAllVisited">000517| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[66]*)let&nbsp;word&nbsp;=</div>
       <div class="lineNone">000518| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;c0&nbsp;=&nbsp;_get_byte32&nbsp;data&nbsp;byteoff&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllVisited">000519| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[18]*)let&nbsp;c1&nbsp;=&nbsp;_get_byte32&nbsp;data&nbsp;(byteoff+1)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllVisited">000520| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[18]*)let&nbsp;c2&nbsp;=&nbsp;_get_byte32&nbsp;data&nbsp;(byteoff+2)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllVisited">000521| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[18]*)let&nbsp;c3&nbsp;=&nbsp;_get_byte32&nbsp;data&nbsp;(byteoff+3)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllVisited">000522| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[18]*)_make_int32_be&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;in</div>
-      <div class="lineAllVisited">000523| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[18]*)Int32.shift_right_logical&nbsp;word&nbsp;(32&nbsp;-&nbsp;flen)</div>
+      <div class="lineAllVisited">000519| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[66]*)let&nbsp;c1&nbsp;=&nbsp;_get_byte32&nbsp;data&nbsp;(byteoff+1)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000520| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[66]*)let&nbsp;c2&nbsp;=&nbsp;_get_byte32&nbsp;data&nbsp;(byteoff+2)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000521| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[66]*)let&nbsp;c3&nbsp;=&nbsp;_get_byte32&nbsp;data&nbsp;(byteoff+3)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000522| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[66]*)_make_int32_be&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;in</div>
+      <div class="lineAllVisited">000523| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[66]*)Int32.shift_right_logical&nbsp;word&nbsp;(32&nbsp;-&nbsp;flen)</div>
       <div class="lineNone">000524| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(</div>
       <div class="lineNone">000525| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Extract&nbsp;the&nbsp;next&nbsp;32&nbsp;bits,&nbsp;slow&nbsp;method.&nbsp;*)</div>
-      <div class="lineAllUnvisited">000526| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;word&nbsp;=</div>
+      <div class="lineAllVisited">000526| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[342]*)let&nbsp;word&nbsp;=</div>
       <div class="lineNone">000527| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;c0&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000528| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000529| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c1&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000529| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[342]*)let&nbsp;c1&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000530| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000531| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c2&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000531| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[342]*)let&nbsp;c2&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000532| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000533| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c3&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000534| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c0&nbsp;=&nbsp;Int32.of_int&nbsp;c0&nbsp;in</div>
-      <div class="lineAllUnvisited">000535| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c1&nbsp;=&nbsp;Int32.of_int&nbsp;c1&nbsp;in</div>
-      <div class="lineAllUnvisited">000536| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c2&nbsp;=&nbsp;Int32.of_int&nbsp;c2&nbsp;in</div>
-      <div class="lineAllUnvisited">000537| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c3&nbsp;=&nbsp;Int32.of_int&nbsp;c3&nbsp;in</div>
-      <div class="lineAllUnvisited">000538| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)_make_int32_be&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;in</div>
-      <div class="lineAllUnvisited">000539| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)Int32.shift_right_logical&nbsp;word&nbsp;(32&nbsp;-&nbsp;flen)</div>
+      <div class="lineAllVisited">000533| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[342]*)let&nbsp;c3&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8&nbsp;in</div>
+      <div class="lineAllVisited">000534| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[342]*)let&nbsp;c0&nbsp;=&nbsp;Int32.of_int&nbsp;c0&nbsp;in</div>
+      <div class="lineAllVisited">000535| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[342]*)let&nbsp;c1&nbsp;=&nbsp;Int32.of_int&nbsp;c1&nbsp;in</div>
+      <div class="lineAllVisited">000536| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[342]*)let&nbsp;c2&nbsp;=&nbsp;Int32.of_int&nbsp;c2&nbsp;in</div>
+      <div class="lineAllVisited">000537| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[342]*)let&nbsp;c3&nbsp;=&nbsp;Int32.of_int&nbsp;c3&nbsp;in</div>
+      <div class="lineAllVisited">000538| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[342]*)_make_int32_be&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;in</div>
+      <div class="lineAllVisited">000539| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[342]*)Int32.shift_right_logical&nbsp;word&nbsp;(32&nbsp;-&nbsp;flen)</div>
       <div class="lineNone">000540| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;in</div>
-      <div class="lineAllVisited">000541| &nbsp;&nbsp;(*[18]*)word&nbsp;(*,&nbsp;off+flen,&nbsp;len-flen*)</div>
+      <div class="lineAllVisited">000541| &nbsp;&nbsp;(*[408]*)word&nbsp;(*,&nbsp;off+flen,&nbsp;len-flen*)</div>
       <div class="lineNone">000542| &nbsp;</div>
       <div class="lineNone">000543| let&nbsp;extract_int32_le_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;flen&nbsp;=</div>
-      <div class="lineAllVisited">000544| &nbsp;&nbsp;(*[12]*)let&nbsp;v&nbsp;=&nbsp;extract_int32_be_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;flen&nbsp;in</div>
-      <div class="lineAllVisited">000545| &nbsp;&nbsp;(*[12]*)let&nbsp;v&nbsp;=&nbsp;I32.byteswap&nbsp;v&nbsp;flen&nbsp;in</div>
-      <div class="lineAllVisited">000546| &nbsp;&nbsp;(*[12]*)v</div>
+      <div class="lineAllVisited">000544| &nbsp;&nbsp;(*[272]*)let&nbsp;v&nbsp;=&nbsp;extract_int32_be_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;flen&nbsp;in</div>
+      <div class="lineAllVisited">000545| &nbsp;&nbsp;(*[272]*)let&nbsp;v&nbsp;=&nbsp;I32.byteswap&nbsp;v&nbsp;flen&nbsp;in</div>
+      <div class="lineAllVisited">000546| &nbsp;&nbsp;(*[272]*)v</div>
       <div class="lineNone">000547| &nbsp;</div>
       <div class="lineNone">000548| let&nbsp;extract_int32_ne_unsigned&nbsp;=</div>
-      <div class="lineAllVisited">000549| &nbsp;&nbsp;(*[34]*)if&nbsp;nativeendian&nbsp;=&nbsp;BigEndian</div>
+      <div class="lineAllVisited">000549| &nbsp;&nbsp;(*[43]*)if&nbsp;nativeendian&nbsp;=&nbsp;BigEndian</div>
       <div class="lineAllUnvisited">000550| &nbsp;&nbsp;then&nbsp;(*[0]*)extract_int32_be_unsigned</div>
-      <div class="lineAllVisited">000551| &nbsp;&nbsp;else&nbsp;(*[34]*)extract_int32_le_unsigned</div>
+      <div class="lineAllVisited">000551| &nbsp;&nbsp;else&nbsp;(*[43]*)extract_int32_le_unsigned</div>
       <div class="lineNone">000552| &nbsp;</div>
       <div class="lineNone">000553| let&nbsp;extract_int32_ee_unsigned&nbsp;=&nbsp;function</div>
       <div class="lineAllVisited">000554| &nbsp;&nbsp;|&nbsp;BigEndian&nbsp;-&gt;&nbsp;(*[6]*)extract_int32_be_unsigned</div>
@@ -583,7 +583,7 @@
       <div class="lineAllVisited">000556| &nbsp;&nbsp;|&nbsp;NativeEndian&nbsp;-&gt;&nbsp;(*[6]*)extract_int32_ne_unsigned</div>
       <div class="lineNone">000557| &nbsp;</div>
       <div class="lineNone">000558| let&nbsp;_make_int64_be&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;c4&nbsp;c5&nbsp;c6&nbsp;c7&nbsp;=</div>
-      <div class="lineAllVisited">000559| &nbsp;&nbsp;(*[657463]*)Int64.logor</div>
+      <div class="lineAllVisited">000559| &nbsp;&nbsp;(*[658243]*)Int64.logor</div>
       <div class="lineNone">000560| &nbsp;&nbsp;&nbsp;&nbsp;(Int64.logor</div>
       <div class="lineNone">000561| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Int64.logor</div>
       <div class="lineNone">000562| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Int64.logor</div>
@@ -600,113 +600,113 @@
       <div class="lineNone">000573| &nbsp;&nbsp;&nbsp;&nbsp;c7</div>
       <div class="lineNone">000574| &nbsp;</div>
       <div class="lineNone">000575| let&nbsp;_make_int64_le&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;c4&nbsp;c5&nbsp;c6&nbsp;c7&nbsp;=</div>
-      <div class="lineAllUnvisited">000576| &nbsp;&nbsp;(*[0]*)_make_int64_be&nbsp;c7&nbsp;c6&nbsp;c5&nbsp;c4&nbsp;c3&nbsp;c2&nbsp;c1&nbsp;c0</div>
+      <div class="lineAllVisited">000576| &nbsp;&nbsp;(*[520]*)_make_int64_be&nbsp;c7&nbsp;c6&nbsp;c5&nbsp;c4&nbsp;c3&nbsp;c2&nbsp;c1&nbsp;c0</div>
       <div class="lineNone">000577| &nbsp;</div>
       <div class="lineNone">000578| (*&nbsp;Extract&nbsp;[1..64]&nbsp;bits.&nbsp;&nbsp;We&nbsp;have&nbsp;to&nbsp;consider&nbsp;endianness&nbsp;and&nbsp;signedness.&nbsp;*)</div>
       <div class="lineNone">000579| let&nbsp;extract_int64_be_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;flen&nbsp;=</div>
-      <div class="lineAllVisited">000580| &nbsp;&nbsp;(*[657463]*)let&nbsp;byteoff&nbsp;=&nbsp;off&nbsp;lsr&nbsp;3&nbsp;in</div>
+      <div class="lineAllVisited">000580| &nbsp;&nbsp;(*[657723]*)let&nbsp;byteoff&nbsp;=&nbsp;off&nbsp;lsr&nbsp;3&nbsp;in</div>
       <div class="lineNone">000581| &nbsp;</div>
-      <div class="lineAllVisited">000582| &nbsp;&nbsp;(*[657463]*)let&nbsp;strlen&nbsp;=&nbsp;String.length&nbsp;data&nbsp;in</div>
+      <div class="lineAllVisited">000582| &nbsp;&nbsp;(*[657723]*)let&nbsp;strlen&nbsp;=&nbsp;String.length&nbsp;data&nbsp;in</div>
       <div class="lineNone">000583| &nbsp;</div>
-      <div class="lineAllVisited">000584| &nbsp;&nbsp;(*[657463]*)let&nbsp;word&nbsp;=</div>
+      <div class="lineAllVisited">000584| &nbsp;&nbsp;(*[657723]*)let&nbsp;word&nbsp;=</div>
       <div class="lineNone">000585| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Optimize&nbsp;the&nbsp;common&nbsp;(byte-aligned)&nbsp;case.&nbsp;*)</div>
       <div class="lineNone">000586| &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;off&nbsp;land&nbsp;7&nbsp;=&nbsp;0&nbsp;then&nbsp;(</div>
-      <div class="lineAllVisited">000587| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203307]*)let&nbsp;word&nbsp;=</div>
+      <div class="lineAllVisited">000587| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203285]*)let&nbsp;word&nbsp;=</div>
       <div class="lineNone">000588| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;c0&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;byteoff&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllVisited">000589| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203307]*)let&nbsp;c1&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+1)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllVisited">000590| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203307]*)let&nbsp;c2&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+2)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllVisited">000591| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203307]*)let&nbsp;c3&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+3)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllVisited">000592| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203307]*)let&nbsp;c4&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+4)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllVisited">000593| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203307]*)let&nbsp;c5&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+5)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllVisited">000594| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203307]*)let&nbsp;c6&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+6)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllVisited">000595| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203307]*)let&nbsp;c7&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+7)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllVisited">000596| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203307]*)_make_int64_be&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;c4&nbsp;c5&nbsp;c6&nbsp;c7&nbsp;in</div>
-      <div class="lineAllVisited">000597| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203307]*)Int64.shift_right_logical&nbsp;word&nbsp;(64&nbsp;-&nbsp;flen)</div>
+      <div class="lineAllVisited">000589| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203285]*)let&nbsp;c1&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+1)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000590| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203285]*)let&nbsp;c2&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+2)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000591| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203285]*)let&nbsp;c3&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+3)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000592| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203285]*)let&nbsp;c4&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+4)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000593| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203285]*)let&nbsp;c5&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+5)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000594| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203285]*)let&nbsp;c6&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+6)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000595| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203285]*)let&nbsp;c7&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+7)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000596| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203285]*)_make_int64_be&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;c4&nbsp;c5&nbsp;c6&nbsp;c7&nbsp;in</div>
+      <div class="lineAllVisited">000597| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[203285]*)Int64.shift_right_logical&nbsp;word&nbsp;(64&nbsp;-&nbsp;flen)</div>
       <div class="lineNone">000598| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(</div>
       <div class="lineNone">000599| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Extract&nbsp;the&nbsp;next&nbsp;64&nbsp;bits,&nbsp;slow&nbsp;method.&nbsp;*)</div>
-      <div class="lineAllVisited">000600| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;word&nbsp;=</div>
+      <div class="lineAllVisited">000600| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;word&nbsp;=</div>
       <div class="lineNone">000601| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;c0&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000602| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllVisited">000603| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c1&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000603| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c1&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000604| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllVisited">000605| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c2&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000605| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c2&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000606| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllVisited">000607| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c3&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000607| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c3&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000608| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllVisited">000609| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c4&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000609| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c4&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000610| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllVisited">000611| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c5&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000611| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c5&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000612| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllVisited">000613| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c6&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000613| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c6&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000614| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllVisited">000615| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c7&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8&nbsp;in</div>
-      <div class="lineAllVisited">000616| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c0&nbsp;=&nbsp;Int64.of_int&nbsp;c0&nbsp;in</div>
-      <div class="lineAllVisited">000617| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c1&nbsp;=&nbsp;Int64.of_int&nbsp;c1&nbsp;in</div>
-      <div class="lineAllVisited">000618| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c2&nbsp;=&nbsp;Int64.of_int&nbsp;c2&nbsp;in</div>
-      <div class="lineAllVisited">000619| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c3&nbsp;=&nbsp;Int64.of_int&nbsp;c3&nbsp;in</div>
-      <div class="lineAllVisited">000620| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c4&nbsp;=&nbsp;Int64.of_int&nbsp;c4&nbsp;in</div>
-      <div class="lineAllVisited">000621| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c5&nbsp;=&nbsp;Int64.of_int&nbsp;c5&nbsp;in</div>
-      <div class="lineAllVisited">000622| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c6&nbsp;=&nbsp;Int64.of_int&nbsp;c6&nbsp;in</div>
-      <div class="lineAllVisited">000623| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)let&nbsp;c7&nbsp;=&nbsp;Int64.of_int&nbsp;c7&nbsp;in</div>
-      <div class="lineAllVisited">000624| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)_make_int64_be&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;c4&nbsp;c5&nbsp;c6&nbsp;c7&nbsp;in</div>
-      <div class="lineAllVisited">000625| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454156]*)Int64.shift_right_logical&nbsp;word&nbsp;(64&nbsp;-&nbsp;flen)</div>
+      <div class="lineAllVisited">000615| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c7&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8&nbsp;in</div>
+      <div class="lineAllVisited">000616| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c0&nbsp;=&nbsp;Int64.of_int&nbsp;c0&nbsp;in</div>
+      <div class="lineAllVisited">000617| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c1&nbsp;=&nbsp;Int64.of_int&nbsp;c1&nbsp;in</div>
+      <div class="lineAllVisited">000618| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c2&nbsp;=&nbsp;Int64.of_int&nbsp;c2&nbsp;in</div>
+      <div class="lineAllVisited">000619| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c3&nbsp;=&nbsp;Int64.of_int&nbsp;c3&nbsp;in</div>
+      <div class="lineAllVisited">000620| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c4&nbsp;=&nbsp;Int64.of_int&nbsp;c4&nbsp;in</div>
+      <div class="lineAllVisited">000621| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c5&nbsp;=&nbsp;Int64.of_int&nbsp;c5&nbsp;in</div>
+      <div class="lineAllVisited">000622| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c6&nbsp;=&nbsp;Int64.of_int&nbsp;c6&nbsp;in</div>
+      <div class="lineAllVisited">000623| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)let&nbsp;c7&nbsp;=&nbsp;Int64.of_int&nbsp;c7&nbsp;in</div>
+      <div class="lineAllVisited">000624| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)_make_int64_be&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;c4&nbsp;c5&nbsp;c6&nbsp;c7&nbsp;in</div>
+      <div class="lineAllVisited">000625| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[454438]*)Int64.shift_right_logical&nbsp;word&nbsp;(64&nbsp;-&nbsp;flen)</div>
       <div class="lineNone">000626| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;in</div>
-      <div class="lineAllVisited">000627| &nbsp;&nbsp;(*[657463]*)word&nbsp;(*,&nbsp;off+flen,&nbsp;len-flen*)</div>
+      <div class="lineAllVisited">000627| &nbsp;&nbsp;(*[657723]*)word&nbsp;(*,&nbsp;off+flen,&nbsp;len-flen*)</div>
       <div class="lineNone">000628| &nbsp;</div>
       <div class="lineNone">000629| let&nbsp;extract_int64_le_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;flen&nbsp;=</div>
-      <div class="lineAllUnvisited">000630| &nbsp;&nbsp;(*[0]*)let&nbsp;byteoff&nbsp;=&nbsp;off&nbsp;lsr&nbsp;3&nbsp;in</div>
+      <div class="lineAllVisited">000630| &nbsp;&nbsp;(*[520]*)let&nbsp;byteoff&nbsp;=&nbsp;off&nbsp;lsr&nbsp;3&nbsp;in</div>
       <div class="lineNone">000631| &nbsp;</div>
-      <div class="lineAllUnvisited">000632| &nbsp;&nbsp;(*[0]*)let&nbsp;strlen&nbsp;=&nbsp;String.length&nbsp;data&nbsp;in</div>
+      <div class="lineAllVisited">000632| &nbsp;&nbsp;(*[520]*)let&nbsp;strlen&nbsp;=&nbsp;String.length&nbsp;data&nbsp;in</div>
       <div class="lineNone">000633| &nbsp;</div>
-      <div class="lineAllUnvisited">000634| &nbsp;&nbsp;(*[0]*)let&nbsp;word&nbsp;=</div>
+      <div class="lineAllVisited">000634| &nbsp;&nbsp;(*[520]*)let&nbsp;word&nbsp;=</div>
       <div class="lineNone">000635| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Optimize&nbsp;the&nbsp;common&nbsp;(byte-aligned)&nbsp;case.&nbsp;*)</div>
       <div class="lineNone">000636| &nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;off&nbsp;land&nbsp;7&nbsp;=&nbsp;0&nbsp;then&nbsp;(</div>
-      <div class="lineAllUnvisited">000637| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;word&nbsp;=</div>
+      <div class="lineAllVisited">000637| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[64]*)let&nbsp;word&nbsp;=</div>
       <div class="lineNone">000638| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;c0&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;byteoff&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllUnvisited">000639| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c1&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+1)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllUnvisited">000640| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c2&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+2)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllUnvisited">000641| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c3&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+3)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllUnvisited">000642| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c4&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+4)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllUnvisited">000643| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c5&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+5)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllUnvisited">000644| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c6&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+6)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllUnvisited">000645| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c7&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+7)&nbsp;strlen&nbsp;in</div>
-      <div class="lineAllUnvisited">000646| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)_make_int64_le&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;c4&nbsp;c5&nbsp;c6&nbsp;c7&nbsp;in</div>
-      <div class="lineAllUnvisited">000647| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)Int64.logand&nbsp;word&nbsp;(I64.mask&nbsp;flen)</div>
+      <div class="lineAllVisited">000639| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[64]*)let&nbsp;c1&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+1)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000640| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[64]*)let&nbsp;c2&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+2)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000641| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[64]*)let&nbsp;c3&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+3)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000642| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[64]*)let&nbsp;c4&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+4)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000643| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[64]*)let&nbsp;c5&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+5)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000644| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[64]*)let&nbsp;c6&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+6)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000645| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[64]*)let&nbsp;c7&nbsp;=&nbsp;_get_byte64&nbsp;data&nbsp;(byteoff+7)&nbsp;strlen&nbsp;in</div>
+      <div class="lineAllVisited">000646| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[64]*)_make_int64_le&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;c4&nbsp;c5&nbsp;c6&nbsp;c7&nbsp;in</div>
+      <div class="lineAllVisited">000647| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[64]*)Int64.logand&nbsp;word&nbsp;(I64.mask&nbsp;flen)</div>
       <div class="lineNone">000648| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(</div>
       <div class="lineNone">000649| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Extract&nbsp;the&nbsp;next&nbsp;64&nbsp;bits,&nbsp;slow&nbsp;method.&nbsp;*)</div>
-      <div class="lineAllUnvisited">000650| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;word&nbsp;=</div>
+      <div class="lineAllVisited">000650| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;word&nbsp;=</div>
       <div class="lineNone">000651| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;c0&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000652| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000653| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c1&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000653| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c1&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000654| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000655| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c2&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000655| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c2&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000656| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000657| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c3&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000657| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c3&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000658| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000659| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c4&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000659| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c4&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000660| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000661| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c5&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000661| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c5&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000662| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000663| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c6&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineAllVisited">000663| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c6&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
       <div class="lineNone">000664| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000665| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c7&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">000666| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c0&nbsp;=&nbsp;Int64.of_int&nbsp;c0&nbsp;in</div>
-      <div class="lineAllUnvisited">000667| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c1&nbsp;=&nbsp;Int64.of_int&nbsp;c1&nbsp;in</div>
-      <div class="lineAllUnvisited">000668| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c2&nbsp;=&nbsp;Int64.of_int&nbsp;c2&nbsp;in</div>
-      <div class="lineAllUnvisited">000669| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c3&nbsp;=&nbsp;Int64.of_int&nbsp;c3&nbsp;in</div>
-      <div class="lineAllUnvisited">000670| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c4&nbsp;=&nbsp;Int64.of_int&nbsp;c4&nbsp;in</div>
-      <div class="lineAllUnvisited">000671| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c5&nbsp;=&nbsp;Int64.of_int&nbsp;c5&nbsp;in</div>
-      <div class="lineAllUnvisited">000672| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c6&nbsp;=&nbsp;Int64.of_int&nbsp;c6&nbsp;in</div>
-      <div class="lineAllUnvisited">000673| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c7&nbsp;=&nbsp;Int64.of_int&nbsp;c7&nbsp;in</div>
-      <div class="lineAllUnvisited">000674| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)_make_int64_le&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;c4&nbsp;c5&nbsp;c6&nbsp;c7&nbsp;in</div>
-      <div class="lineAllUnvisited">000675| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)Int64.logand&nbsp;word&nbsp;(I64.mask&nbsp;flen)</div>
+      <div class="lineAllVisited">000665| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c7&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8&nbsp;in</div>
+      <div class="lineAllVisited">000666| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c0&nbsp;=&nbsp;Int64.of_int&nbsp;c0&nbsp;in</div>
+      <div class="lineAllVisited">000667| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c1&nbsp;=&nbsp;Int64.of_int&nbsp;c1&nbsp;in</div>
+      <div class="lineAllVisited">000668| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c2&nbsp;=&nbsp;Int64.of_int&nbsp;c2&nbsp;in</div>
+      <div class="lineAllVisited">000669| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c3&nbsp;=&nbsp;Int64.of_int&nbsp;c3&nbsp;in</div>
+      <div class="lineAllVisited">000670| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c4&nbsp;=&nbsp;Int64.of_int&nbsp;c4&nbsp;in</div>
+      <div class="lineAllVisited">000671| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c5&nbsp;=&nbsp;Int64.of_int&nbsp;c5&nbsp;in</div>
+      <div class="lineAllVisited">000672| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c6&nbsp;=&nbsp;Int64.of_int&nbsp;c6&nbsp;in</div>
+      <div class="lineAllVisited">000673| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)let&nbsp;c7&nbsp;=&nbsp;Int64.of_int&nbsp;c7&nbsp;in</div>
+      <div class="lineAllVisited">000674| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)_make_int64_le&nbsp;c0&nbsp;c1&nbsp;c2&nbsp;c3&nbsp;c4&nbsp;c5&nbsp;c6&nbsp;c7&nbsp;in</div>
+      <div class="lineAllVisited">000675| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[456]*)Int64.logand&nbsp;word&nbsp;(I64.mask&nbsp;flen)</div>
       <div class="lineNone">000676| &nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;in</div>
-      <div class="lineAllUnvisited">000677| &nbsp;&nbsp;(*[0]*)word&nbsp;(*,&nbsp;off+flen,&nbsp;len-flen*)</div>
+      <div class="lineAllVisited">000677| &nbsp;&nbsp;(*[520]*)word&nbsp;(*,&nbsp;off+flen,&nbsp;len-flen*)</div>
       <div class="lineNone">000678| &nbsp;</div>
       <div class="lineNone">000679| let&nbsp;extract_int64_ne_unsigned&nbsp;=</div>
-      <div class="lineAllVisited">000680| &nbsp;&nbsp;(*[34]*)if&nbsp;nativeendian&nbsp;=&nbsp;BigEndian</div>
+      <div class="lineAllVisited">000680| &nbsp;&nbsp;(*[43]*)if&nbsp;nativeendian&nbsp;=&nbsp;BigEndian</div>
       <div class="lineAllUnvisited">000681| &nbsp;&nbsp;then&nbsp;(*[0]*)extract_int64_be_unsigned</div>
-      <div class="lineAllVisited">000682| &nbsp;&nbsp;else&nbsp;(*[34]*)extract_int64_le_unsigned</div>
+      <div class="lineAllVisited">000682| &nbsp;&nbsp;else&nbsp;(*[43]*)extract_int64_le_unsigned</div>
       <div class="lineNone">000683| &nbsp;</div>
       <div class="lineNone">000684| let&nbsp;extract_int64_ee_unsigned&nbsp;=&nbsp;function</div>
       <div class="lineAllUnvisited">000685| &nbsp;&nbsp;|&nbsp;BigEndian&nbsp;-&gt;&nbsp;(*[0]*)extract_int64_be_unsigned</div>
@@ -818,73 +818,73 @@
       <div class="lineNone">000791| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;XXX&nbsp;We&nbsp;have&nbsp;almost&nbsp;enough&nbsp;information&nbsp;in&nbsp;the&nbsp;generator&nbsp;to</div>
       <div class="lineNone">000792| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;choose&nbsp;a&nbsp;good&nbsp;initial&nbsp;size.</div>
       <div class="lineNone">000793| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*)</div>
-      <div class="lineAllVisited">000794| &nbsp;&nbsp;&nbsp;&nbsp;(*[493022]*){&nbsp;buf&nbsp;=&nbsp;Buffer.create&nbsp;128;&nbsp;len&nbsp;=&nbsp;0;&nbsp;last&nbsp;=&nbsp;0&nbsp;}</div>
+      <div class="lineAllVisited">000794| &nbsp;&nbsp;&nbsp;&nbsp;(*[493152]*){&nbsp;buf&nbsp;=&nbsp;Buffer.create&nbsp;128;&nbsp;len&nbsp;=&nbsp;0;&nbsp;last&nbsp;=&nbsp;0&nbsp;}</div>
       <div class="lineNone">000795| &nbsp;</div>
       <div class="lineNone">000796| &nbsp;&nbsp;let&nbsp;contents&nbsp;{&nbsp;buf&nbsp;=&nbsp;buf;&nbsp;len&nbsp;=&nbsp;len;&nbsp;last&nbsp;=&nbsp;last&nbsp;}&nbsp;=</div>
-      <div class="lineAllVisited">000797| &nbsp;&nbsp;&nbsp;&nbsp;(*[493022]*)let&nbsp;data&nbsp;=</div>
+      <div class="lineAllVisited">000797| &nbsp;&nbsp;&nbsp;&nbsp;(*[493152]*)let&nbsp;data&nbsp;=</div>
       <div class="lineNone">000798| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;len&nbsp;land&nbsp;7&nbsp;=&nbsp;0&nbsp;then</div>
-      <div class="lineAllVisited">000799| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[63287]*)Buffer.contents&nbsp;buf</div>
+      <div class="lineAllVisited">000799| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[63280]*)Buffer.contents&nbsp;buf</div>
       <div class="lineNone">000800| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else</div>
-      <div class="lineAllVisited">000801| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[429735]*)Buffer.contents&nbsp;buf&nbsp;^&nbsp;(String.make&nbsp;1&nbsp;(Char.chr&nbsp;last))&nbsp;in</div>
-      <div class="lineAllVisited">000802| &nbsp;&nbsp;&nbsp;&nbsp;(*[493022]*)data,&nbsp;0,&nbsp;len</div>
+      <div class="lineAllVisited">000801| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[429872]*)Buffer.contents&nbsp;buf&nbsp;^&nbsp;(String.make&nbsp;1&nbsp;(Char.chr&nbsp;last))&nbsp;in</div>
+      <div class="lineAllVisited">000802| &nbsp;&nbsp;&nbsp;&nbsp;(*[493152]*)data,&nbsp;0,&nbsp;len</div>
       <div class="lineNone">000803| &nbsp;</div>
       <div class="lineNone">000804| &nbsp;&nbsp;(*&nbsp;Add&nbsp;exactly&nbsp;8&nbsp;bits.&nbsp;*)</div>
       <div class="lineNone">000805| &nbsp;&nbsp;let&nbsp;add_byte&nbsp;({&nbsp;buf&nbsp;=&nbsp;buf;&nbsp;len&nbsp;=&nbsp;len;&nbsp;last&nbsp;=&nbsp;last&nbsp;}&nbsp;as&nbsp;t)&nbsp;byte&nbsp;=</div>
-      <div class="lineMixed">000806| &nbsp;&nbsp;&nbsp;&nbsp;(*[8255562]*)if&nbsp;(*[8255562]*)byte&nbsp;&lt;&nbsp;0&nbsp;||&nbsp;(*[8255562]*)byte&nbsp;&gt;&nbsp;255&nbsp;then&nbsp;(*[0]*)invalid_arg&nbsp;&quot;Bitstring.Buffer.add_byte&quot;;</div>
-      <div class="lineAllVisited">000807| &nbsp;&nbsp;&nbsp;&nbsp;(*[8255562]*)let&nbsp;shift&nbsp;=&nbsp;len&nbsp;land&nbsp;7&nbsp;in</div>
-      <div class="lineAllVisited">000808| &nbsp;&nbsp;&nbsp;&nbsp;(*[8255562]*)if&nbsp;shift&nbsp;=&nbsp;0&nbsp;then</div>
+      <div class="lineMixed">000806| &nbsp;&nbsp;&nbsp;&nbsp;(*[8266092]*)if&nbsp;(*[8266092]*)byte&nbsp;&lt;&nbsp;0&nbsp;||&nbsp;(*[8266092]*)byte&nbsp;&gt;&nbsp;255&nbsp;then&nbsp;(*[0]*)invalid_arg&nbsp;&quot;Bitstring.Buffer.add_byte&quot;;</div>
+      <div class="lineAllVisited">000807| &nbsp;&nbsp;&nbsp;&nbsp;(*[8266092]*)let&nbsp;shift&nbsp;=&nbsp;len&nbsp;land&nbsp;7&nbsp;in</div>
+      <div class="lineAllVisited">000808| &nbsp;&nbsp;&nbsp;&nbsp;(*[8266092]*)if&nbsp;shift&nbsp;=&nbsp;0&nbsp;then</div>
       <div class="lineNone">000809| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Target&nbsp;buffer&nbsp;is&nbsp;byte-aligned.&nbsp;*)</div>
-      <div class="lineAllVisited">000810| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[519924]*)Buffer.add_char&nbsp;buf&nbsp;(Char.chr&nbsp;byte)</div>
+      <div class="lineAllVisited">000810| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[521241]*)Buffer.add_char&nbsp;buf&nbsp;(Char.chr&nbsp;byte)</div>
       <div class="lineNone">000811| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(</div>
       <div class="lineNone">000812| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Target&nbsp;buffer&nbsp;is&nbsp;unaligned.&nbsp;&nbsp;'last'&nbsp;is&nbsp;meaningful.&nbsp;*)</div>
-      <div class="lineAllVisited">000813| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[7735638]*)let&nbsp;first&nbsp;=&nbsp;byte&nbsp;lsr&nbsp;shift&nbsp;in</div>
-      <div class="lineAllVisited">000814| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[7735638]*)let&nbsp;second&nbsp;=&nbsp;(byte&nbsp;lsl&nbsp;(8&nbsp;-&nbsp;shift))&nbsp;land&nbsp;0xff&nbsp;in</div>
-      <div class="lineAllVisited">000815| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[7735638]*)Buffer.add_char&nbsp;buf&nbsp;(*[7735638]*)(Char.chr&nbsp;(last&nbsp;lor&nbsp;first));</div>
-      <div class="lineAllVisited">000816| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[7735638]*)t.last&nbsp;&lt;-&nbsp;second</div>
+      <div class="lineAllVisited">000813| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[7744851]*)let&nbsp;first&nbsp;=&nbsp;byte&nbsp;lsr&nbsp;shift&nbsp;in</div>
+      <div class="lineAllVisited">000814| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[7744851]*)let&nbsp;second&nbsp;=&nbsp;(byte&nbsp;lsl&nbsp;(8&nbsp;-&nbsp;shift))&nbsp;land&nbsp;0xff&nbsp;in</div>
+      <div class="lineAllVisited">000815| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[7744851]*)Buffer.add_char&nbsp;buf&nbsp;(*[7744851]*)(Char.chr&nbsp;(last&nbsp;lor&nbsp;first));</div>
+      <div class="lineAllVisited">000816| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[7744851]*)t.last&nbsp;&lt;-&nbsp;second</div>
       <div class="lineNone">000817| &nbsp;&nbsp;&nbsp;&nbsp;);</div>
-      <div class="lineAllVisited">000818| &nbsp;&nbsp;&nbsp;&nbsp;(*[8255562]*)t.len&nbsp;&lt;-&nbsp;t.len&nbsp;+&nbsp;8</div>
+      <div class="lineAllVisited">000818| &nbsp;&nbsp;&nbsp;&nbsp;(*[8266092]*)t.len&nbsp;&lt;-&nbsp;t.len&nbsp;+&nbsp;8</div>
       <div class="lineNone">000819| &nbsp;</div>
       <div class="lineNone">000820| &nbsp;&nbsp;(*&nbsp;Add&nbsp;exactly&nbsp;1&nbsp;bit.&nbsp;*)</div>
       <div class="lineNone">000821| &nbsp;&nbsp;let&nbsp;add_bit&nbsp;({&nbsp;buf&nbsp;=&nbsp;buf;&nbsp;len&nbsp;=&nbsp;len;&nbsp;last&nbsp;=&nbsp;last&nbsp;}&nbsp;as&nbsp;t)&nbsp;bit&nbsp;=</div>
-      <div class="lineAllVisited">000822| &nbsp;&nbsp;&nbsp;&nbsp;(*[4421229]*)let&nbsp;shift&nbsp;=&nbsp;7&nbsp;-&nbsp;(len&nbsp;land&nbsp;7)&nbsp;in</div>
-      <div class="lineAllVisited">000823| &nbsp;&nbsp;&nbsp;&nbsp;(*[4421229]*)if&nbsp;shift&nbsp;&gt;&nbsp;0&nbsp;then</div>
+      <div class="lineAllVisited">000822| &nbsp;&nbsp;&nbsp;&nbsp;(*[4426193]*)let&nbsp;shift&nbsp;=&nbsp;7&nbsp;-&nbsp;(len&nbsp;land&nbsp;7)&nbsp;in</div>
+      <div class="lineAllVisited">000823| &nbsp;&nbsp;&nbsp;&nbsp;(*[4426193]*)if&nbsp;shift&nbsp;&gt;&nbsp;0&nbsp;then</div>
       <div class="lineNone">000824| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Somewhere&nbsp;in&nbsp;the&nbsp;middle&nbsp;of&nbsp;'last'.&nbsp;*)</div>
-      <div class="lineAllVisited">000825| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[3888935]*)t.last&nbsp;&lt;-&nbsp;last&nbsp;lor&nbsp;((if&nbsp;bit&nbsp;then&nbsp;(*[3003091]*)1&nbsp;else&nbsp;(*[885844]*)0)&nbsp;lsl&nbsp;shift)</div>
+      <div class="lineAllVisited">000825| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[3893270]*)t.last&nbsp;&lt;-&nbsp;last&nbsp;lor&nbsp;((if&nbsp;bit&nbsp;then&nbsp;(*[3004643]*)1&nbsp;else&nbsp;(*[888627]*)0)&nbsp;lsl&nbsp;shift)</div>
       <div class="lineNone">000826| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(</div>
       <div class="lineNone">000827| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Just&nbsp;a&nbsp;single&nbsp;spare&nbsp;bit&nbsp;in&nbsp;'last'.&nbsp;*)</div>
-      <div class="lineAllVisited">000828| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[532294]*)let&nbsp;last&nbsp;=&nbsp;last&nbsp;lor&nbsp;if&nbsp;bit&nbsp;then&nbsp;(*[407635]*)1&nbsp;else&nbsp;(*[124659]*)0&nbsp;in</div>
-      <div class="lineAllVisited">000829| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[532294]*)Buffer.add_char&nbsp;buf&nbsp;(*[532294]*)(Char.chr&nbsp;last);</div>
-      <div class="lineAllVisited">000830| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[532294]*)t.last&nbsp;&lt;-&nbsp;0</div>
+      <div class="lineAllVisited">000828| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[532923]*)let&nbsp;last&nbsp;=&nbsp;last&nbsp;lor&nbsp;if&nbsp;bit&nbsp;then&nbsp;(*[407944]*)1&nbsp;else&nbsp;(*[124979]*)0&nbsp;in</div>
+      <div class="lineAllVisited">000829| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[532923]*)Buffer.add_char&nbsp;buf&nbsp;(*[532923]*)(Char.chr&nbsp;last);</div>
+      <div class="lineAllVisited">000830| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[532923]*)t.last&nbsp;&lt;-&nbsp;0</div>
       <div class="lineNone">000831| &nbsp;&nbsp;&nbsp;&nbsp;);</div>
-      <div class="lineAllVisited">000832| &nbsp;&nbsp;&nbsp;&nbsp;(*[4421229]*)t.len&nbsp;&lt;-&nbsp;len&nbsp;+&nbsp;1</div>
+      <div class="lineAllVisited">000832| &nbsp;&nbsp;&nbsp;&nbsp;(*[4426193]*)t.len&nbsp;&lt;-&nbsp;len&nbsp;+&nbsp;1</div>
       <div class="lineNone">000833| &nbsp;</div>
       <div class="lineNone">000834| &nbsp;&nbsp;(*&nbsp;Add&nbsp;a&nbsp;small&nbsp;number&nbsp;of&nbsp;bits&nbsp;(definitely&nbsp;&lt;&nbsp;8).&nbsp;&nbsp;This&nbsp;uses&nbsp;a&nbsp;loop</div>
       <div class="lineNone">000835| &nbsp;&nbsp;&nbsp;*&nbsp;to&nbsp;call&nbsp;add_bit&nbsp;so&nbsp;it's&nbsp;slow.</div>
       <div class="lineNone">000836| &nbsp;&nbsp;&nbsp;*)</div>
       <div class="lineNone">000837| &nbsp;&nbsp;let&nbsp;_add_bits&nbsp;t&nbsp;c&nbsp;slen&nbsp;=</div>
-      <div class="lineMixed">000838| &nbsp;&nbsp;&nbsp;&nbsp;(*[317200]*)if&nbsp;(*[317200]*)slen&nbsp;&lt;&nbsp;1&nbsp;||&nbsp;(*[317200]*)slen&nbsp;&gt;=&nbsp;8&nbsp;then&nbsp;(*[0]*)invalid_arg&nbsp;&quot;Bitstring.Buffer._add_bits&quot;;</div>
-      <div class="lineAllVisited">000839| &nbsp;&nbsp;&nbsp;&nbsp;(*[317200]*)for&nbsp;i&nbsp;=&nbsp;slen-1&nbsp;downto&nbsp;0&nbsp;do</div>
-      <div class="lineAllVisited">000840| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1268974]*)let&nbsp;bit&nbsp;=&nbsp;c&nbsp;land&nbsp;(1&nbsp;lsl&nbsp;i)&nbsp;&lt;&gt;&nbsp;0&nbsp;in</div>
-      <div class="lineAllVisited">000841| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1268974]*)add_bit&nbsp;t&nbsp;bit</div>
+      <div class="lineMixed">000838| &nbsp;&nbsp;&nbsp;&nbsp;(*[318370]*)if&nbsp;(*[318370]*)slen&nbsp;&lt;&nbsp;1&nbsp;||&nbsp;(*[318370]*)slen&nbsp;&gt;=&nbsp;8&nbsp;then&nbsp;(*[0]*)invalid_arg&nbsp;&quot;Bitstring.Buffer._add_bits&quot;;</div>
+      <div class="lineAllVisited">000839| &nbsp;&nbsp;&nbsp;&nbsp;(*[318370]*)for&nbsp;i&nbsp;=&nbsp;slen-1&nbsp;downto&nbsp;0&nbsp;do</div>
+      <div class="lineAllVisited">000840| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1273808]*)let&nbsp;bit&nbsp;=&nbsp;c&nbsp;land&nbsp;(1&nbsp;lsl&nbsp;i)&nbsp;&lt;&gt;&nbsp;0&nbsp;in</div>
+      <div class="lineAllVisited">000841| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1273808]*)add_bit&nbsp;t&nbsp;bit</div>
       <div class="lineNone">000842| &nbsp;&nbsp;&nbsp;&nbsp;done</div>
       <div class="lineNone">000843| &nbsp;</div>
       <div class="lineNone">000844| &nbsp;&nbsp;let&nbsp;add_bits&nbsp;({&nbsp;buf&nbsp;=&nbsp;buf;&nbsp;len&nbsp;=&nbsp;len&nbsp;}&nbsp;as&nbsp;t)&nbsp;str&nbsp;slen&nbsp;=</div>
-      <div class="lineAllVisited">000845| &nbsp;&nbsp;&nbsp;&nbsp;(*[26866]*)if&nbsp;slen&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(</div>
-      <div class="lineAllVisited">000846| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1388985]*)if&nbsp;len&nbsp;land&nbsp;7&nbsp;=&nbsp;0&nbsp;then&nbsp;(</div>
-      <div class="lineAllVisited">000847| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[575655]*)if&nbsp;slen&nbsp;land&nbsp;7&nbsp;=&nbsp;0&nbsp;then</div>
+      <div class="lineAllVisited">000845| &nbsp;&nbsp;&nbsp;&nbsp;(*[26867]*)if&nbsp;slen&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000846| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[1389114]*)if&nbsp;len&nbsp;land&nbsp;7&nbsp;=&nbsp;0&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">000847| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[575784]*)if&nbsp;slen&nbsp;land&nbsp;7&nbsp;=&nbsp;0&nbsp;then</div>
       <div class="lineNone">000848| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Common&nbsp;case&nbsp;-&nbsp;everything&nbsp;is&nbsp;byte-aligned.&nbsp;*)</div>
-      <div class="lineAllVisited">000849| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[64306]*)Buffer.add_substring&nbsp;buf&nbsp;str&nbsp;0&nbsp;(slen&nbsp;lsr&nbsp;3)</div>
+      <div class="lineAllVisited">000849| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[64322]*)Buffer.add_substring&nbsp;buf&nbsp;str&nbsp;0&nbsp;(slen&nbsp;lsr&nbsp;3)</div>
       <div class="lineNone">000850| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(</div>
       <div class="lineNone">000851| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Target&nbsp;buffer&nbsp;is&nbsp;aligned.&nbsp;&nbsp;Copy&nbsp;whole&nbsp;bytes&nbsp;then&nbsp;leave&nbsp;the</div>
       <div class="lineNone">000852| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;remaining&nbsp;bits&nbsp;in&nbsp;last.</div>
       <div class="lineNone">000853| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*)</div>
-      <div class="lineAllVisited">000854| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[511349]*)let&nbsp;slenbytes&nbsp;=&nbsp;slen&nbsp;lsr&nbsp;3&nbsp;in</div>
-      <div class="lineAllVisited">000855| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[345648]*)if&nbsp;slenbytes&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(*[165701]*)Buffer.add_substring&nbsp;buf&nbsp;str&nbsp;0&nbsp;slenbytes;</div>
-      <div class="lineAllVisited">000856| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[511349]*)let&nbsp;last&nbsp;=&nbsp;Char.code&nbsp;str.[slenbytes]&nbsp;in&nbsp;(*&nbsp;last&nbsp;char&nbsp;*)</div>
-      <div class="lineAllVisited">000857| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[511349]*)let&nbsp;mask&nbsp;=&nbsp;0xff&nbsp;lsl&nbsp;(8&nbsp;-&nbsp;(slen&nbsp;land&nbsp;7))&nbsp;in</div>
-      <div class="lineAllVisited">000858| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[511349]*)t.last&nbsp;&lt;-&nbsp;last&nbsp;land&nbsp;mask</div>
+      <div class="lineAllVisited">000854| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[511462]*)let&nbsp;slenbytes&nbsp;=&nbsp;slen&nbsp;lsr&nbsp;3&nbsp;in</div>
+      <div class="lineAllVisited">000855| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[345655]*)if&nbsp;slenbytes&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(*[165807]*)Buffer.add_substring&nbsp;buf&nbsp;str&nbsp;0&nbsp;slenbytes;</div>
+      <div class="lineAllVisited">000856| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[511462]*)let&nbsp;last&nbsp;=&nbsp;Char.code&nbsp;str.[slenbytes]&nbsp;in&nbsp;(*&nbsp;last&nbsp;char&nbsp;*)</div>
+      <div class="lineAllVisited">000857| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[511462]*)let&nbsp;mask&nbsp;=&nbsp;0xff&nbsp;lsl&nbsp;(8&nbsp;-&nbsp;(slen&nbsp;land&nbsp;7))&nbsp;in</div>
+      <div class="lineAllVisited">000858| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[511462]*)t.last&nbsp;&lt;-&nbsp;last&nbsp;land&nbsp;mask</div>
       <div class="lineNone">000859| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);</div>
-      <div class="lineAllVisited">000860| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[575655]*)t.len&nbsp;&lt;-&nbsp;len&nbsp;+&nbsp;slen</div>
+      <div class="lineAllVisited">000860| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[575784]*)t.len&nbsp;&lt;-&nbsp;len&nbsp;+&nbsp;slen</div>
       <div class="lineNone">000861| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(</div>
       <div class="lineNone">000862| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Target&nbsp;buffer&nbsp;is&nbsp;unaligned.&nbsp;&nbsp;Copy&nbsp;whole&nbsp;bytes&nbsp;using</div>
       <div class="lineNone">000863| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;add_byte&nbsp;which&nbsp;knows&nbsp;how&nbsp;to&nbsp;deal&nbsp;with&nbsp;an&nbsp;unaligned</div>
@@ -911,35 +911,35 @@
       <div class="lineNone">000884| &nbsp;</div>
       <div class="lineNone">000885| (*&nbsp;Construct&nbsp;a&nbsp;single&nbsp;bit.&nbsp;*)</div>
       <div class="lineNone">000886| let&nbsp;construct_bit&nbsp;buf&nbsp;b&nbsp;_&nbsp;_&nbsp;=</div>
-      <div class="lineAllUnvisited">000887| &nbsp;&nbsp;(*[0]*)Buffer.add_bit&nbsp;buf&nbsp;b</div>
+      <div class="lineAllVisited">000887| &nbsp;&nbsp;(*[130]*)Buffer.add_bit&nbsp;buf&nbsp;b</div>
       <div class="lineNone">000888| &nbsp;</div>
       <div class="lineNone">000889| (*&nbsp;Construct&nbsp;a&nbsp;field,&nbsp;flen&nbsp;=&nbsp;[2..8].&nbsp;*)</div>
       <div class="lineNone">000890| let&nbsp;construct_char_unsigned&nbsp;buf&nbsp;v&nbsp;flen&nbsp;exn&nbsp;=</div>
-      <div class="lineAllVisited">000891| &nbsp;&nbsp;(*[1203570]*)let&nbsp;max_val&nbsp;=&nbsp;1&nbsp;lsl&nbsp;flen&nbsp;in</div>
-      <div class="lineMixed">000892| &nbsp;&nbsp;(*[1203570]*)if&nbsp;(*[1203570]*)v&nbsp;&lt;&nbsp;0&nbsp;||&nbsp;(*[1203570]*)v&nbsp;&gt;=&nbsp;max_val&nbsp;then&nbsp;(*[0]*)raise&nbsp;exn;</div>
-      <div class="lineAllVisited">000893| &nbsp;&nbsp;(*[1203570]*)if&nbsp;flen&nbsp;=&nbsp;8&nbsp;then</div>
-      <div class="lineAllVisited">000894| &nbsp;&nbsp;&nbsp;&nbsp;(*[1203570]*)Buffer.add_byte&nbsp;buf&nbsp;v</div>
+      <div class="lineAllVisited">000891| &nbsp;&nbsp;(*[1204740]*)let&nbsp;max_val&nbsp;=&nbsp;1&nbsp;lsl&nbsp;flen&nbsp;in</div>
+      <div class="lineMixed">000892| &nbsp;&nbsp;(*[1204740]*)if&nbsp;(*[1204740]*)v&nbsp;&lt;&nbsp;0&nbsp;||&nbsp;(*[1204740]*)v&nbsp;&gt;=&nbsp;max_val&nbsp;then&nbsp;(*[0]*)raise&nbsp;exn;</div>
+      <div class="lineAllVisited">000893| &nbsp;&nbsp;(*[1204740]*)if&nbsp;flen&nbsp;=&nbsp;8&nbsp;then</div>
+      <div class="lineAllVisited">000894| &nbsp;&nbsp;&nbsp;&nbsp;(*[1203960]*)Buffer.add_byte&nbsp;buf&nbsp;v</div>
       <div class="lineNone">000895| &nbsp;&nbsp;else</div>
-      <div class="lineAllUnvisited">000896| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)Buffer._add_bits&nbsp;buf&nbsp;v&nbsp;flen</div>
+      <div class="lineAllVisited">000896| &nbsp;&nbsp;&nbsp;&nbsp;(*[780]*)Buffer._add_bits&nbsp;buf&nbsp;v&nbsp;flen</div>
       <div class="lineNone">000897| &nbsp;</div>
       <div class="lineNone">000898| (*&nbsp;Construct&nbsp;a&nbsp;field&nbsp;of&nbsp;up&nbsp;to&nbsp;31&nbsp;bits.&nbsp;*)</div>
       <div class="lineNone">000899| let&nbsp;construct_int_be_unsigned&nbsp;buf&nbsp;v&nbsp;flen&nbsp;exn&nbsp;=</div>
       <div class="lineNone">000900| &nbsp;&nbsp;(*&nbsp;Check&nbsp;value&nbsp;is&nbsp;within&nbsp;range.&nbsp;*)</div>
-      <div class="lineMixed">000901| &nbsp;&nbsp;(*[2]*)if&nbsp;not&nbsp;(I.range_unsigned&nbsp;v&nbsp;flen)&nbsp;then&nbsp;(*[0]*)raise&nbsp;exn;</div>
+      <div class="lineMixed">000901| &nbsp;&nbsp;(*[392]*)if&nbsp;not&nbsp;(I.range_unsigned&nbsp;v&nbsp;flen)&nbsp;then&nbsp;(*[0]*)raise&nbsp;exn;</div>
       <div class="lineNone">000902| &nbsp;&nbsp;(*&nbsp;Add&nbsp;the&nbsp;bytes.&nbsp;*)</div>
-      <div class="lineAllVisited">000903| &nbsp;&nbsp;(*[2]*)I.map_bytes_be&nbsp;(Buffer._add_bits&nbsp;buf)&nbsp;(Buffer.add_byte&nbsp;buf)&nbsp;v&nbsp;flen</div>
+      <div class="lineAllVisited">000903| &nbsp;&nbsp;(*[392]*)I.map_bytes_be&nbsp;(Buffer._add_bits&nbsp;buf)&nbsp;(Buffer.add_byte&nbsp;buf)&nbsp;v&nbsp;flen</div>
       <div class="lineNone">000904| &nbsp;</div>
       <div class="lineNone">000905| (*&nbsp;Construct&nbsp;a&nbsp;field&nbsp;of&nbsp;up&nbsp;to&nbsp;31&nbsp;bits.&nbsp;*)</div>
       <div class="lineNone">000906| let&nbsp;construct_int_le_unsigned&nbsp;buf&nbsp;v&nbsp;flen&nbsp;exn&nbsp;=</div>
       <div class="lineNone">000907| &nbsp;&nbsp;(*&nbsp;Check&nbsp;value&nbsp;is&nbsp;within&nbsp;range.&nbsp;*)</div>
-      <div class="lineAllUnvisited">000908| &nbsp;&nbsp;(*[0]*)if&nbsp;not&nbsp;(I.range_unsigned&nbsp;v&nbsp;flen)&nbsp;then&nbsp;(*[0]*)raise&nbsp;exn;</div>
+      <div class="lineMixed">000908| &nbsp;&nbsp;(*[780]*)if&nbsp;not&nbsp;(I.range_unsigned&nbsp;v&nbsp;flen)&nbsp;then&nbsp;(*[0]*)raise&nbsp;exn;</div>
       <div class="lineNone">000909| &nbsp;&nbsp;(*&nbsp;Add&nbsp;the&nbsp;bytes.&nbsp;*)</div>
-      <div class="lineAllUnvisited">000910| &nbsp;&nbsp;(*[0]*)I.map_bytes_le&nbsp;(Buffer._add_bits&nbsp;buf)&nbsp;(Buffer.add_byte&nbsp;buf)&nbsp;v&nbsp;flen</div>
+      <div class="lineAllVisited">000910| &nbsp;&nbsp;(*[780]*)I.map_bytes_le&nbsp;(Buffer._add_bits&nbsp;buf)&nbsp;(Buffer.add_byte&nbsp;buf)&nbsp;v&nbsp;flen</div>
       <div class="lineNone">000911| &nbsp;</div>
       <div class="lineNone">000912| let&nbsp;construct_int_ne_unsigned&nbsp;=</div>
-      <div class="lineAllVisited">000913| &nbsp;&nbsp;(*[34]*)if&nbsp;nativeendian&nbsp;=&nbsp;BigEndian</div>
+      <div class="lineAllVisited">000913| &nbsp;&nbsp;(*[43]*)if&nbsp;nativeendian&nbsp;=&nbsp;BigEndian</div>
       <div class="lineAllUnvisited">000914| &nbsp;&nbsp;then&nbsp;(*[0]*)construct_int_be_unsigned</div>
-      <div class="lineAllVisited">000915| &nbsp;&nbsp;else&nbsp;(*[34]*)construct_int_le_unsigned</div>
+      <div class="lineAllVisited">000915| &nbsp;&nbsp;else&nbsp;(*[43]*)construct_int_le_unsigned</div>
       <div class="lineNone">000916| &nbsp;</div>
       <div class="lineNone">000917| let&nbsp;construct_int_ee_unsigned&nbsp;=&nbsp;function</div>
       <div class="lineAllUnvisited">000918| &nbsp;&nbsp;|&nbsp;BigEndian&nbsp;-&gt;&nbsp;(*[0]*)construct_int_be_unsigned</div>
@@ -948,29 +948,29 @@
       <div class="lineNone">000921| &nbsp;</div>
       <div class="lineNone">000922| (*&nbsp;Construct&nbsp;a&nbsp;field&nbsp;of&nbsp;exactly&nbsp;32&nbsp;bits.&nbsp;*)</div>
       <div class="lineNone">000923| let&nbsp;construct_int32_be_unsigned&nbsp;buf&nbsp;v&nbsp;flen&nbsp;_&nbsp;=</div>
-      <div class="lineAllVisited">000924| &nbsp;&nbsp;(*[6]*)Buffer.add_byte&nbsp;buf</div>
+      <div class="lineAllVisited">000924| &nbsp;&nbsp;(*[136]*)Buffer.add_byte&nbsp;buf</div>
       <div class="lineNone">000925| &nbsp;&nbsp;&nbsp;&nbsp;(Int32.to_int&nbsp;(Int32.shift_right_logical&nbsp;v&nbsp;24));</div>
-      <div class="lineAllVisited">000926| &nbsp;&nbsp;(*[6]*)Buffer.add_byte&nbsp;buf</div>
+      <div class="lineAllVisited">000926| &nbsp;&nbsp;(*[136]*)Buffer.add_byte&nbsp;buf</div>
       <div class="lineNone">000927| &nbsp;&nbsp;&nbsp;&nbsp;(Int32.to_int&nbsp;((Int32.logand&nbsp;(Int32.shift_right_logical&nbsp;v&nbsp;16)&nbsp;0xff_l)));</div>
-      <div class="lineAllVisited">000928| &nbsp;&nbsp;(*[6]*)Buffer.add_byte&nbsp;buf</div>
-      <div class="lineAllVisited">000929| &nbsp;&nbsp;&nbsp;&nbsp;(*[6]*)(Int32.to_int&nbsp;((Int32.logand&nbsp;(Int32.shift_right_logical&nbsp;v&nbsp;8)&nbsp;0xff_l)));</div>
-      <div class="lineAllVisited">000930| &nbsp;&nbsp;(*[6]*)Buffer.add_byte&nbsp;buf</div>
+      <div class="lineAllVisited">000928| &nbsp;&nbsp;(*[136]*)Buffer.add_byte&nbsp;buf</div>
+      <div class="lineAllVisited">000929| &nbsp;&nbsp;&nbsp;&nbsp;(*[136]*)(Int32.to_int&nbsp;((Int32.logand&nbsp;(Int32.shift_right_logical&nbsp;v&nbsp;8)&nbsp;0xff_l)));</div>
+      <div class="lineAllVisited">000930| &nbsp;&nbsp;(*[136]*)Buffer.add_byte&nbsp;buf</div>
       <div class="lineNone">000931| &nbsp;&nbsp;&nbsp;&nbsp;(Int32.to_int&nbsp;(Int32.logand&nbsp;v&nbsp;0xff_l))</div>
       <div class="lineNone">000932| &nbsp;</div>
       <div class="lineNone">000933| let&nbsp;construct_int32_le_unsigned&nbsp;buf&nbsp;v&nbsp;flen&nbsp;_&nbsp;=</div>
-      <div class="lineAllVisited">000934| &nbsp;&nbsp;(*[12]*)Buffer.add_byte&nbsp;buf</div>
+      <div class="lineAllVisited">000934| &nbsp;&nbsp;(*[272]*)Buffer.add_byte&nbsp;buf</div>
       <div class="lineNone">000935| &nbsp;&nbsp;&nbsp;&nbsp;(Int32.to_int&nbsp;(Int32.logand&nbsp;v&nbsp;0xff_l));</div>
-      <div class="lineAllVisited">000936| &nbsp;&nbsp;(*[12]*)Buffer.add_byte&nbsp;buf</div>
+      <div class="lineAllVisited">000936| &nbsp;&nbsp;(*[272]*)Buffer.add_byte&nbsp;buf</div>
       <div class="lineNone">000937| &nbsp;&nbsp;&nbsp;&nbsp;(Int32.to_int&nbsp;((Int32.logand&nbsp;(Int32.shift_right_logical&nbsp;v&nbsp;8)&nbsp;0xff_l)));</div>
-      <div class="lineAllVisited">000938| &nbsp;&nbsp;(*[12]*)Buffer.add_byte&nbsp;buf</div>
-      <div class="lineAllVisited">000939| &nbsp;&nbsp;&nbsp;&nbsp;(*[12]*)(Int32.to_int&nbsp;((Int32.logand&nbsp;(Int32.shift_right_logical&nbsp;v&nbsp;16)&nbsp;0xff_l)));</div>
-      <div class="lineAllVisited">000940| &nbsp;&nbsp;(*[12]*)Buffer.add_byte&nbsp;buf</div>
+      <div class="lineAllVisited">000938| &nbsp;&nbsp;(*[272]*)Buffer.add_byte&nbsp;buf</div>
+      <div class="lineAllVisited">000939| &nbsp;&nbsp;&nbsp;&nbsp;(*[272]*)(Int32.to_int&nbsp;((Int32.logand&nbsp;(Int32.shift_right_logical&nbsp;v&nbsp;16)&nbsp;0xff_l)));</div>
+      <div class="lineAllVisited">000940| &nbsp;&nbsp;(*[272]*)Buffer.add_byte&nbsp;buf</div>
       <div class="lineNone">000941| &nbsp;&nbsp;&nbsp;&nbsp;(Int32.to_int&nbsp;(Int32.shift_right_logical&nbsp;v&nbsp;24))</div>
       <div class="lineNone">000942| &nbsp;</div>
       <div class="lineNone">000943| let&nbsp;construct_int32_ne_unsigned&nbsp;=</div>
-      <div class="lineAllVisited">000944| &nbsp;&nbsp;(*[34]*)if&nbsp;nativeendian&nbsp;=&nbsp;BigEndian</div>
+      <div class="lineAllVisited">000944| &nbsp;&nbsp;(*[43]*)if&nbsp;nativeendian&nbsp;=&nbsp;BigEndian</div>
       <div class="lineAllUnvisited">000945| &nbsp;&nbsp;then&nbsp;(*[0]*)construct_int32_be_unsigned</div>
-      <div class="lineAllVisited">000946| &nbsp;&nbsp;else&nbsp;(*[34]*)construct_int32_le_unsigned</div>
+      <div class="lineAllVisited">000946| &nbsp;&nbsp;else&nbsp;(*[43]*)construct_int32_le_unsigned</div>
       <div class="lineNone">000947| &nbsp;</div>
       <div class="lineNone">000948| let&nbsp;construct_int32_ee_unsigned&nbsp;=&nbsp;function</div>
       <div class="lineAllVisited">000949| &nbsp;&nbsp;|&nbsp;BigEndian&nbsp;-&gt;&nbsp;(*[6]*)construct_int32_be_unsigned</div>
@@ -980,232 +980,230 @@
       <div class="lineNone">000953| (*&nbsp;Construct&nbsp;a&nbsp;field&nbsp;of&nbsp;up&nbsp;to&nbsp;64&nbsp;bits.&nbsp;*)</div>
       <div class="lineNone">000954| let&nbsp;construct_int64_be_unsigned&nbsp;buf&nbsp;v&nbsp;flen&nbsp;exn&nbsp;=</div>
       <div class="lineNone">000955| &nbsp;&nbsp;(*&nbsp;Check&nbsp;value&nbsp;is&nbsp;within&nbsp;range.&nbsp;*)</div>
-      <div class="lineMixed">000956| &nbsp;&nbsp;(*[351850]*)if&nbsp;not&nbsp;(I64.range_unsigned&nbsp;v&nbsp;flen)&nbsp;then&nbsp;(*[0]*)raise&nbsp;exn;</div>
+      <div class="lineMixed">000956| &nbsp;&nbsp;(*[352110]*)if&nbsp;not&nbsp;(I64.range_unsigned&nbsp;v&nbsp;flen)&nbsp;then&nbsp;(*[0]*)raise&nbsp;exn;</div>
       <div class="lineNone">000957| &nbsp;&nbsp;(*&nbsp;Add&nbsp;the&nbsp;bytes.&nbsp;*)</div>
-      <div class="lineAllVisited">000958| &nbsp;&nbsp;(*[351850]*)I64.map_bytes_be&nbsp;(Buffer._add_bits&nbsp;buf)&nbsp;(Buffer.add_byte&nbsp;buf)&nbsp;v&nbsp;flen</div>
+      <div class="lineAllVisited">000958| &nbsp;&nbsp;(*[352110]*)I64.map_bytes_be&nbsp;(Buffer._add_bits&nbsp;buf)&nbsp;(Buffer.add_byte&nbsp;buf)&nbsp;v&nbsp;flen</div>
       <div class="lineNone">000959| &nbsp;</div>
       <div class="lineNone">000960| (*&nbsp;Construct&nbsp;a&nbsp;field&nbsp;of&nbsp;up&nbsp;to&nbsp;64&nbsp;bits.&nbsp;*)</div>
       <div class="lineNone">000961| let&nbsp;construct_int64_le_unsigned&nbsp;buf&nbsp;v&nbsp;flen&nbsp;exn&nbsp;=</div>
       <div class="lineNone">000962| &nbsp;&nbsp;(*&nbsp;Check&nbsp;value&nbsp;is&nbsp;within&nbsp;range.&nbsp;*)</div>
-      <div class="lineAllUnvisited">000963| &nbsp;&nbsp;(*[0]*)if&nbsp;not&nbsp;(I64.range_unsigned&nbsp;v&nbsp;flen)&nbsp;then&nbsp;(*[0]*)raise&nbsp;exn;</div>
+      <div class="lineMixed">000963| &nbsp;&nbsp;(*[520]*)if&nbsp;not&nbsp;(I64.range_unsigned&nbsp;v&nbsp;flen)&nbsp;then&nbsp;(*[0]*)raise&nbsp;exn;</div>
       <div class="lineNone">000964| &nbsp;&nbsp;(*&nbsp;Add&nbsp;the&nbsp;bytes.&nbsp;*)</div>
-      <div class="lineAllUnvisited">000965| &nbsp;&nbsp;(*[0]*)I64.map_bytes_le&nbsp;(Buffer._add_bits&nbsp;buf)&nbsp;(Buffer.add_byte&nbsp;buf)&nbsp;v&nbsp;flen</div>
+      <div class="lineAllVisited">000965| &nbsp;&nbsp;(*[520]*)I64.map_bytes_le&nbsp;(Buffer._add_bits&nbsp;buf)&nbsp;(Buffer.add_byte&nbsp;buf)&nbsp;v&nbsp;flen</div>
       <div class="lineNone">000966| &nbsp;</div>
       <div class="lineNone">000967| let&nbsp;construct_int64_ne_unsigned&nbsp;=</div>
-      <div class="lineAllVisited">000968| &nbsp;&nbsp;(*[34]*)if&nbsp;nativeendian&nbsp;=&nbsp;BigEndian</div>
+      <div class="lineAllVisited">000968| &nbsp;&nbsp;(*[43]*)if&nbsp;nativeendian&nbsp;=&nbsp;BigEndian</div>
       <div class="lineAllUnvisited">000969| &nbsp;&nbsp;then&nbsp;(*[0]*)construct_int64_be_unsigned</div>
-      <div class="lineNone">000970| &nbsp;&nbsp;else&nbsp;(*construct_int64_le_unsigned*)</div>
-      <div class="lineAllUnvisited">000971| &nbsp;&nbsp;&nbsp;&nbsp;fun&nbsp;_&nbsp;_&nbsp;_&nbsp;_&nbsp;-&gt;&nbsp;(*[0]*)failwith&nbsp;&quot;construct_int64_le_unsigned&quot;</div>
-      <div class="lineNone">000972| &nbsp;</div>
-      <div class="lineNone">000973| let&nbsp;construct_int64_ee_unsigned&nbsp;=&nbsp;function</div>
-      <div class="lineAllUnvisited">000974| &nbsp;&nbsp;|&nbsp;BigEndian&nbsp;-&gt;&nbsp;(*[0]*)construct_int64_be_unsigned</div>
-      <div class="lineNone">000975| &nbsp;&nbsp;|&nbsp;LittleEndian&nbsp;-&gt;&nbsp;(*construct_int64_le_unsigned*)</div>
-      <div class="lineAllUnvisited">000976| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fun&nbsp;_&nbsp;_&nbsp;_&nbsp;_&nbsp;-&gt;&nbsp;(*[0]*)failwith&nbsp;&quot;construct_int64_le_unsigned&quot;)</div>
-      <div class="lineAllUnvisited">000977| &nbsp;&nbsp;|&nbsp;NativeEndian&nbsp;-&gt;&nbsp;(*[0]*)construct_int64_ne_unsigned</div>
-      <div class="lineNone">000978| &nbsp;</div>
-      <div class="lineNone">000979| (*&nbsp;Construct&nbsp;from&nbsp;a&nbsp;string&nbsp;of&nbsp;bytes,&nbsp;exact&nbsp;multiple&nbsp;of&nbsp;8&nbsp;bits</div>
-      <div class="lineNone">000980| &nbsp;*&nbsp;in&nbsp;length&nbsp;of&nbsp;course.</div>
-      <div class="lineNone">000981| &nbsp;*)</div>
-      <div class="lineNone">000982| let&nbsp;construct_string&nbsp;buf&nbsp;str&nbsp;=</div>
-      <div class="lineAllVisited">000983| &nbsp;&nbsp;(*[89505]*)let&nbsp;len&nbsp;=&nbsp;String.length&nbsp;str&nbsp;in</div>
-      <div class="lineAllVisited">000984| &nbsp;&nbsp;(*[89505]*)Buffer.add_bits&nbsp;buf&nbsp;str&nbsp;(len&nbsp;lsl&nbsp;3)</div>
-      <div class="lineNone">000985| &nbsp;</div>
-      <div class="lineNone">000986| (*&nbsp;Construct&nbsp;from&nbsp;a&nbsp;bitstring.&nbsp;*)</div>
-      <div class="lineNone">000987| let&nbsp;construct_bitstring&nbsp;buf&nbsp;(data,&nbsp;off,&nbsp;len)&nbsp;=</div>
-      <div class="lineNone">000988| &nbsp;&nbsp;(*&nbsp;Add&nbsp;individual&nbsp;bits&nbsp;until&nbsp;we&nbsp;get&nbsp;to&nbsp;the&nbsp;next&nbsp;byte&nbsp;boundary&nbsp;of</div>
-      <div class="lineNone">000989| &nbsp;&nbsp;&nbsp;*&nbsp;the&nbsp;underlying&nbsp;string.</div>
-      <div class="lineNone">000990| &nbsp;&nbsp;&nbsp;*)</div>
-      <div class="lineAllVisited">000991| &nbsp;&nbsp;(*[1317766]*)let&nbsp;blen&nbsp;=&nbsp;7&nbsp;-&nbsp;((off&nbsp;+&nbsp;7)&nbsp;land&nbsp;7)&nbsp;in</div>
-      <div class="lineAllVisited">000992| &nbsp;&nbsp;(*[1317766]*)let&nbsp;blen&nbsp;=&nbsp;min&nbsp;blen&nbsp;len&nbsp;in</div>
-      <div class="lineAllVisited">000993| &nbsp;&nbsp;(*[1317766]*)let&nbsp;rec&nbsp;loop&nbsp;off&nbsp;len&nbsp;blen&nbsp;=</div>
-      <div class="lineAllVisited">000994| &nbsp;&nbsp;&nbsp;&nbsp;(*[1317766]*)if&nbsp;blen&nbsp;=&nbsp;0&nbsp;then&nbsp;((*[1317766]*)off,&nbsp;len)</div>
-      <div class="lineNone">000995| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(</div>
-      <div class="lineAllUnvisited">000996| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;b&nbsp;=&nbsp;extract_bit&nbsp;data&nbsp;off&nbsp;len&nbsp;1</div>
-      <div class="lineNone">000997| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;1&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;+&nbsp;1&nbsp;in</div>
-      <div class="lineAllUnvisited">000998| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)Buffer.add_bit&nbsp;buf&nbsp;(*[0]*)b;</div>
-      <div class="lineAllUnvisited">000999| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)loop&nbsp;off&nbsp;len&nbsp;(blen-1)</div>
-      <div class="lineNone">001000| &nbsp;&nbsp;&nbsp;&nbsp;)</div>
-      <div class="lineNone">001001| &nbsp;&nbsp;in</div>
-      <div class="lineAllVisited">001002| &nbsp;&nbsp;(*[1317766]*)let&nbsp;off,&nbsp;len&nbsp;=&nbsp;loop&nbsp;off&nbsp;len&nbsp;blen&nbsp;in</div>
-      <div class="lineAllVisited">001003| &nbsp;&nbsp;(*[1317766]*)assert&nbsp;((*[1317766]*)len&nbsp;=&nbsp;0&nbsp;||&nbsp;(off&nbsp;(*[1290965]*)land&nbsp;7)&nbsp;=&nbsp;0);</div>
-      <div class="lineNone">001004| &nbsp;</div>
-      <div class="lineNone">001005| &nbsp;&nbsp;(*&nbsp;Add&nbsp;the&nbsp;remaining&nbsp;'len'&nbsp;bits.&nbsp;*)</div>
-      <div class="lineAllVisited">001006| &nbsp;&nbsp;(*[1317766]*)let&nbsp;data&nbsp;=</div>
-      <div class="lineNone">001007| &nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;off&nbsp;=&nbsp;off&nbsp;lsr&nbsp;3&nbsp;in</div>
-      <div class="lineNone">001008| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;XXX&nbsp;dangerous&nbsp;allocation&nbsp;*)</div>
-      <div class="lineAllVisited">001009| &nbsp;&nbsp;&nbsp;&nbsp;(*[1317766]*)if&nbsp;off&nbsp;=&nbsp;0&nbsp;then&nbsp;(*[1317766]*)data</div>
-      <div class="lineAllUnvisited">001010| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[0]*)String.sub&nbsp;data&nbsp;off&nbsp;(String.length&nbsp;data&nbsp;-&nbsp;off)&nbsp;in</div>
+      <div class="lineAllVisited">000970| &nbsp;&nbsp;else&nbsp;(*[43]*)construct_int64_le_unsigned</div>
+      <div class="lineNone">000971| &nbsp;</div>
+      <div class="lineNone">000972| let&nbsp;construct_int64_ee_unsigned&nbsp;=&nbsp;function</div>
+      <div class="lineAllUnvisited">000973| &nbsp;&nbsp;|&nbsp;BigEndian&nbsp;-&gt;&nbsp;(*[0]*)construct_int64_be_unsigned</div>
+      <div class="lineAllUnvisited">000974| &nbsp;&nbsp;|&nbsp;LittleEndian&nbsp;-&gt;&nbsp;(*[0]*)construct_int64_le_unsigned</div>
+      <div class="lineAllUnvisited">000975| &nbsp;&nbsp;|&nbsp;NativeEndian&nbsp;-&gt;&nbsp;(*[0]*)construct_int64_ne_unsigned</div>
+      <div class="lineNone">000976| &nbsp;</div>
+      <div class="lineNone">000977| (*&nbsp;Construct&nbsp;from&nbsp;a&nbsp;string&nbsp;of&nbsp;bytes,&nbsp;exact&nbsp;multiple&nbsp;of&nbsp;8&nbsp;bits</div>
+      <div class="lineNone">000978| &nbsp;*&nbsp;in&nbsp;length&nbsp;of&nbsp;course.</div>
+      <div class="lineNone">000979| &nbsp;*)</div>
+      <div class="lineNone">000980| let&nbsp;construct_string&nbsp;buf&nbsp;str&nbsp;=</div>
+      <div class="lineAllVisited">000981| &nbsp;&nbsp;(*[89505]*)let&nbsp;len&nbsp;=&nbsp;String.length&nbsp;str&nbsp;in</div>
+      <div class="lineAllVisited">000982| &nbsp;&nbsp;(*[89505]*)Buffer.add_bits&nbsp;buf&nbsp;str&nbsp;(len&nbsp;lsl&nbsp;3)</div>
+      <div class="lineNone">000983| &nbsp;</div>
+      <div class="lineNone">000984| (*&nbsp;Construct&nbsp;from&nbsp;a&nbsp;bitstring.&nbsp;*)</div>
+      <div class="lineNone">000985| let&nbsp;construct_bitstring&nbsp;buf&nbsp;(data,&nbsp;off,&nbsp;len)&nbsp;=</div>
+      <div class="lineNone">000986| &nbsp;&nbsp;(*&nbsp;Add&nbsp;individual&nbsp;bits&nbsp;until&nbsp;we&nbsp;get&nbsp;to&nbsp;the&nbsp;next&nbsp;byte&nbsp;boundary&nbsp;of</div>
+      <div class="lineNone">000987| &nbsp;&nbsp;&nbsp;*&nbsp;the&nbsp;underlying&nbsp;string.</div>
+      <div class="lineNone">000988| &nbsp;&nbsp;&nbsp;*)</div>
+      <div class="lineAllVisited">000989| &nbsp;&nbsp;(*[1317896]*)let&nbsp;blen&nbsp;=&nbsp;7&nbsp;-&nbsp;((off&nbsp;+&nbsp;7)&nbsp;land&nbsp;7)&nbsp;in</div>
+      <div class="lineAllVisited">000990| &nbsp;&nbsp;(*[1317896]*)let&nbsp;blen&nbsp;=&nbsp;min&nbsp;blen&nbsp;len&nbsp;in</div>
+      <div class="lineAllVisited">000991| &nbsp;&nbsp;(*[1317896]*)let&nbsp;rec&nbsp;loop&nbsp;off&nbsp;len&nbsp;blen&nbsp;=</div>
+      <div class="lineAllVisited">000992| &nbsp;&nbsp;&nbsp;&nbsp;(*[1317896]*)if&nbsp;blen&nbsp;=&nbsp;0&nbsp;then&nbsp;((*[1317896]*)off,&nbsp;len)</div>
+      <div class="lineNone">000993| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(</div>
+      <div class="lineAllUnvisited">000994| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;b&nbsp;=&nbsp;extract_bit&nbsp;data&nbsp;off&nbsp;len&nbsp;1</div>
+      <div class="lineNone">000995| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;1&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;+&nbsp;1&nbsp;in</div>
+      <div class="lineAllUnvisited">000996| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)Buffer.add_bit&nbsp;buf&nbsp;(*[0]*)b;</div>
+      <div class="lineAllUnvisited">000997| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)loop&nbsp;off&nbsp;len&nbsp;(blen-1)</div>
+      <div class="lineNone">000998| &nbsp;&nbsp;&nbsp;&nbsp;)</div>
+      <div class="lineNone">000999| &nbsp;&nbsp;in</div>
+      <div class="lineAllVisited">001000| &nbsp;&nbsp;(*[1317896]*)let&nbsp;off,&nbsp;len&nbsp;=&nbsp;loop&nbsp;off&nbsp;len&nbsp;blen&nbsp;in</div>
+      <div class="lineAllVisited">001001| &nbsp;&nbsp;(*[1317896]*)assert&nbsp;((*[1317896]*)len&nbsp;=&nbsp;0&nbsp;||&nbsp;(off&nbsp;(*[1291094]*)land&nbsp;7)&nbsp;=&nbsp;0);</div>
+      <div class="lineNone">001002| &nbsp;</div>
+      <div class="lineNone">001003| &nbsp;&nbsp;(*&nbsp;Add&nbsp;the&nbsp;remaining&nbsp;'len'&nbsp;bits.&nbsp;*)</div>
+      <div class="lineAllVisited">001004| &nbsp;&nbsp;(*[1317896]*)let&nbsp;data&nbsp;=</div>
+      <div class="lineNone">001005| &nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;off&nbsp;=&nbsp;off&nbsp;lsr&nbsp;3&nbsp;in</div>
+      <div class="lineNone">001006| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;XXX&nbsp;dangerous&nbsp;allocation&nbsp;*)</div>
+      <div class="lineAllVisited">001007| &nbsp;&nbsp;&nbsp;&nbsp;(*[1317896]*)if&nbsp;off&nbsp;=&nbsp;0&nbsp;then&nbsp;(*[1317896]*)data</div>
+      <div class="lineAllUnvisited">001008| &nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[0]*)String.sub&nbsp;data&nbsp;off&nbsp;(String.length&nbsp;data&nbsp;-&nbsp;off)&nbsp;in</div>
+      <div class="lineNone">001009| &nbsp;</div>
+      <div class="lineAllVisited">001010| &nbsp;&nbsp;(*[1317896]*)Buffer.add_bits&nbsp;buf&nbsp;data&nbsp;len</div>
       <div class="lineNone">001011| &nbsp;</div>
-      <div class="lineAllVisited">001012| &nbsp;&nbsp;(*[1317766]*)Buffer.add_bits&nbsp;buf&nbsp;data&nbsp;len</div>
-      <div class="lineNone">001013| &nbsp;</div>
-      <div class="lineNone">001014| (*&nbsp;Concatenate&nbsp;bitstrings.&nbsp;*)</div>
-      <div class="lineNone">001015| let&nbsp;concat&nbsp;bs&nbsp;=</div>
-      <div class="lineAllVisited">001016| &nbsp;&nbsp;(*[40461]*)let&nbsp;buf&nbsp;=&nbsp;Buffer.create&nbsp;()&nbsp;in</div>
-      <div class="lineAllVisited">001017| &nbsp;&nbsp;(*[40461]*)List.iter&nbsp;(construct_bitstring&nbsp;buf)&nbsp;(*[40461]*)bs;</div>
-      <div class="lineAllVisited">001018| &nbsp;&nbsp;(*[40461]*)Buffer.contents&nbsp;buf</div>
-      <div class="lineNone">001019| &nbsp;</div>
-      <div class="lineNone">001020| (*----------------------------------------------------------------------*)</div>
-      <div class="lineNone">001021| (*&nbsp;Extract&nbsp;a&nbsp;string&nbsp;from&nbsp;a&nbsp;bitstring.&nbsp;*)</div>
-      <div class="lineNone">001022| let&nbsp;string_of_bitstring&nbsp;(data,&nbsp;off,&nbsp;len)&nbsp;=</div>
-      <div class="lineAllVisited">001023| &nbsp;&nbsp;(*[73011]*)if&nbsp;off&nbsp;(*[73011]*)land&nbsp;7&nbsp;=&nbsp;0&nbsp;&amp;&amp;&nbsp;len&nbsp;(*[16597]*)land&nbsp;7&nbsp;=&nbsp;0&nbsp;then</div>
-      <div class="lineNone">001024| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Easy&nbsp;case:&nbsp;everything&nbsp;is&nbsp;byte-aligned.&nbsp;*)</div>
-      <div class="lineAllVisited">001025| &nbsp;&nbsp;&nbsp;&nbsp;(*[9037]*)String.sub&nbsp;data&nbsp;(off&nbsp;lsr&nbsp;3)&nbsp;(len&nbsp;lsr&nbsp;3)</div>
-      <div class="lineNone">001026| &nbsp;&nbsp;else&nbsp;(</div>
-      <div class="lineNone">001027| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Bit-twiddling&nbsp;case.&nbsp;*)</div>
-      <div class="lineAllVisited">001028| &nbsp;&nbsp;&nbsp;&nbsp;(*[63974]*)let&nbsp;strlen&nbsp;=&nbsp;(len&nbsp;+&nbsp;7)&nbsp;lsr&nbsp;3&nbsp;in</div>
-      <div class="lineAllVisited">001029| &nbsp;&nbsp;&nbsp;&nbsp;(*[63974]*)let&nbsp;str&nbsp;=&nbsp;String.make&nbsp;strlen&nbsp;'\000'&nbsp;in</div>
-      <div class="lineAllVisited">001030| &nbsp;&nbsp;&nbsp;&nbsp;(*[63974]*)let&nbsp;rec&nbsp;loop&nbsp;data&nbsp;off&nbsp;len&nbsp;i&nbsp;=</div>
-      <div class="lineAllVisited">001031| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[326148]*)if&nbsp;len&nbsp;&gt;=&nbsp;8&nbsp;then&nbsp;(</div>
-      <div class="lineAllVisited">001032| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[262174]*)let&nbsp;c&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
-      <div class="lineNone">001033| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
-      <div class="lineAllVisited">001034| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[262174]*)str.[i]&nbsp;(*[262174]*)&lt;-&nbsp;Char.chr&nbsp;c;</div>
-      <div class="lineAllVisited">001035| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[262174]*)loop&nbsp;data&nbsp;off&nbsp;len&nbsp;(i+1)</div>
-      <div class="lineAllVisited">001036| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[52324]*)if&nbsp;len&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(</div>
-      <div class="lineAllVisited">001037| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[11650]*)let&nbsp;c&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;len&nbsp;in</div>
-      <div class="lineAllVisited">001038| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[11650]*)str.[i]&nbsp;&lt;-&nbsp;Char.chr&nbsp;(c&nbsp;lsl&nbsp;(8-len))</div>
-      <div class="lineNone">001039| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</div>
-      <div class="lineNone">001040| &nbsp;&nbsp;&nbsp;&nbsp;in</div>
-      <div class="lineAllVisited">001041| &nbsp;&nbsp;&nbsp;&nbsp;(*[63974]*)loop&nbsp;data&nbsp;off&nbsp;len&nbsp;(*[63974]*)0;</div>
-      <div class="lineAllVisited">001042| &nbsp;&nbsp;&nbsp;&nbsp;(*[63974]*)str</div>
-      <div class="lineNone">001043| &nbsp;&nbsp;)</div>
+      <div class="lineNone">001012| (*&nbsp;Concatenate&nbsp;bitstrings.&nbsp;*)</div>
+      <div class="lineNone">001013| let&nbsp;concat&nbsp;bs&nbsp;=</div>
+      <div class="lineAllVisited">001014| &nbsp;&nbsp;(*[40461]*)let&nbsp;buf&nbsp;=&nbsp;Buffer.create&nbsp;()&nbsp;in</div>
+      <div class="lineAllVisited">001015| &nbsp;&nbsp;(*[40461]*)List.iter&nbsp;(construct_bitstring&nbsp;buf)&nbsp;(*[40461]*)bs;</div>
+      <div class="lineAllVisited">001016| &nbsp;&nbsp;(*[40461]*)Buffer.contents&nbsp;buf</div>
+      <div class="lineNone">001017| &nbsp;</div>
+      <div class="lineNone">001018| (*----------------------------------------------------------------------*)</div>
+      <div class="lineNone">001019| (*&nbsp;Extract&nbsp;a&nbsp;string&nbsp;from&nbsp;a&nbsp;bitstring.&nbsp;*)</div>
+      <div class="lineNone">001020| let&nbsp;string_of_bitstring&nbsp;(data,&nbsp;off,&nbsp;len)&nbsp;=</div>
+      <div class="lineAllVisited">001021| &nbsp;&nbsp;(*[73011]*)if&nbsp;off&nbsp;(*[73011]*)land&nbsp;7&nbsp;=&nbsp;0&nbsp;&amp;&amp;&nbsp;len&nbsp;(*[16597]*)land&nbsp;7&nbsp;=&nbsp;0&nbsp;then</div>
+      <div class="lineNone">001022| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Easy&nbsp;case:&nbsp;everything&nbsp;is&nbsp;byte-aligned.&nbsp;*)</div>
+      <div class="lineAllVisited">001023| &nbsp;&nbsp;&nbsp;&nbsp;(*[9037]*)String.sub&nbsp;data&nbsp;(off&nbsp;lsr&nbsp;3)&nbsp;(len&nbsp;lsr&nbsp;3)</div>
+      <div class="lineNone">001024| &nbsp;&nbsp;else&nbsp;(</div>
+      <div class="lineNone">001025| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Bit-twiddling&nbsp;case.&nbsp;*)</div>
+      <div class="lineAllVisited">001026| &nbsp;&nbsp;&nbsp;&nbsp;(*[63974]*)let&nbsp;strlen&nbsp;=&nbsp;(len&nbsp;+&nbsp;7)&nbsp;lsr&nbsp;3&nbsp;in</div>
+      <div class="lineAllVisited">001027| &nbsp;&nbsp;&nbsp;&nbsp;(*[63974]*)let&nbsp;str&nbsp;=&nbsp;String.make&nbsp;strlen&nbsp;'\000'&nbsp;in</div>
+      <div class="lineAllVisited">001028| &nbsp;&nbsp;&nbsp;&nbsp;(*[63974]*)let&nbsp;rec&nbsp;loop&nbsp;data&nbsp;off&nbsp;len&nbsp;i&nbsp;=</div>
+      <div class="lineAllVisited">001029| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[326148]*)if&nbsp;len&nbsp;&gt;=&nbsp;8&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">001030| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[262174]*)let&nbsp;c&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;8</div>
+      <div class="lineNone">001031| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;off&nbsp;=&nbsp;off&nbsp;+&nbsp;8&nbsp;and&nbsp;len&nbsp;=&nbsp;len&nbsp;-&nbsp;8&nbsp;in</div>
+      <div class="lineAllVisited">001032| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[262174]*)str.[i]&nbsp;(*[262174]*)&lt;-&nbsp;Char.chr&nbsp;c;</div>
+      <div class="lineAllVisited">001033| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[262174]*)loop&nbsp;data&nbsp;off&nbsp;len&nbsp;(i+1)</div>
+      <div class="lineAllVisited">001034| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;else&nbsp;(*[52324]*)if&nbsp;len&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">001035| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[11650]*)let&nbsp;c&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;off&nbsp;len&nbsp;len&nbsp;in</div>
+      <div class="lineAllVisited">001036| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[11650]*)str.[i]&nbsp;&lt;-&nbsp;Char.chr&nbsp;(c&nbsp;lsl&nbsp;(8-len))</div>
+      <div class="lineNone">001037| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</div>
+      <div class="lineNone">001038| &nbsp;&nbsp;&nbsp;&nbsp;in</div>
+      <div class="lineAllVisited">001039| &nbsp;&nbsp;&nbsp;&nbsp;(*[63974]*)loop&nbsp;data&nbsp;off&nbsp;len&nbsp;(*[63974]*)0;</div>
+      <div class="lineAllVisited">001040| &nbsp;&nbsp;&nbsp;&nbsp;(*[63974]*)str</div>
+      <div class="lineNone">001041| &nbsp;&nbsp;)</div>
+      <div class="lineNone">001042| &nbsp;</div>
+      <div class="lineNone">001043| (*&nbsp;To&nbsp;channel.&nbsp;*)</div>
       <div class="lineNone">001044| &nbsp;</div>
-      <div class="lineNone">001045| (*&nbsp;To&nbsp;channel.&nbsp;*)</div>
-      <div class="lineNone">001046| &nbsp;</div>
-      <div class="lineNone">001047| let&nbsp;bitstring_to_chan&nbsp;((data,&nbsp;off,&nbsp;len)&nbsp;as&nbsp;bits)&nbsp;chan&nbsp;=</div>
-      <div class="lineNone">001048| &nbsp;&nbsp;(*&nbsp;Fail&nbsp;if&nbsp;the&nbsp;bitstring&nbsp;length&nbsp;isn't&nbsp;a&nbsp;multiple&nbsp;of&nbsp;8.&nbsp;*)</div>
-      <div class="lineMixed">001049| &nbsp;&nbsp;(*[1]*)if&nbsp;len&nbsp;land&nbsp;7&nbsp;&lt;&gt;&nbsp;0&nbsp;then&nbsp;(*[0]*)invalid_arg&nbsp;&quot;bitstring_to_chan&quot;;</div>
-      <div class="lineNone">001050| &nbsp;</div>
-      <div class="lineAllVisited">001051| &nbsp;&nbsp;(*[1]*)if&nbsp;off&nbsp;land&nbsp;7&nbsp;=&nbsp;0&nbsp;then</div>
-      <div class="lineNone">001052| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Easy&nbsp;case:&nbsp;string&nbsp;is&nbsp;byte-aligned.&nbsp;*)</div>
-      <div class="lineAllVisited">001053| &nbsp;&nbsp;&nbsp;&nbsp;(*[1]*)output&nbsp;chan&nbsp;data&nbsp;(off&nbsp;lsr&nbsp;3)&nbsp;(len&nbsp;lsr&nbsp;3)</div>
-      <div class="lineNone">001054| &nbsp;&nbsp;else&nbsp;(</div>
-      <div class="lineNone">001055| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Bit-twiddling&nbsp;case:&nbsp;reuse&nbsp;string_of_bitstring&nbsp;*)</div>
-      <div class="lineAllUnvisited">001056| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;str&nbsp;=&nbsp;string_of_bitstring&nbsp;bits&nbsp;in</div>
-      <div class="lineAllUnvisited">001057| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)output_string&nbsp;chan&nbsp;str</div>
-      <div class="lineNone">001058| &nbsp;&nbsp;)</div>
-      <div class="lineNone">001059| &nbsp;</div>
-      <div class="lineNone">001060| let&nbsp;bitstring_to_file&nbsp;bits&nbsp;filename&nbsp;=</div>
-      <div class="lineAllUnvisited">001061| &nbsp;&nbsp;(*[0]*)let&nbsp;chan&nbsp;=&nbsp;open_out_bin&nbsp;filename&nbsp;in</div>
-      <div class="lineAllUnvisited">001062| &nbsp;&nbsp;(*[0]*)try</div>
-      <div class="lineAllUnvisited">001063| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)bitstring_to_chan&nbsp;bits&nbsp;chan;</div>
-      <div class="lineAllUnvisited">001064| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)close_out&nbsp;chan</div>
-      <div class="lineNone">001065| &nbsp;&nbsp;with&nbsp;exn&nbsp;-&gt;</div>
-      <div class="lineAllUnvisited">001066| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)close_out&nbsp;(*[0]*)chan;</div>
-      <div class="lineAllUnvisited">001067| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)raise&nbsp;exn</div>
-      <div class="lineNone">001068| &nbsp;</div>
-      <div class="lineNone">001069| (*----------------------------------------------------------------------*)</div>
-      <div class="lineNone">001070| (*&nbsp;Comparison.&nbsp;*)</div>
-      <div class="lineNone">001071| let&nbsp;compare&nbsp;((data1,&nbsp;off1,&nbsp;len1)&nbsp;as&nbsp;bs1)&nbsp;((data2,&nbsp;off2,&nbsp;len2)&nbsp;as&nbsp;bs2)&nbsp;=</div>
-      <div class="lineNone">001072| &nbsp;&nbsp;(*&nbsp;In&nbsp;the&nbsp;fully-aligned&nbsp;case,&nbsp;this&nbsp;is&nbsp;reduced&nbsp;to&nbsp;string&nbsp;comparison&nbsp;...&nbsp;*)</div>
-      <div class="lineAllVisited">001073| &nbsp;&nbsp;(*[4624]*)if&nbsp;off1&nbsp;(*[4624]*)land&nbsp;7&nbsp;=&nbsp;0&nbsp;&amp;&amp;&nbsp;len1&nbsp;(*[4624]*)land&nbsp;7&nbsp;(*[4624]*)=&nbsp;0&nbsp;&amp;&amp;&nbsp;off2&nbsp;(*[680]*)land&nbsp;7&nbsp;(*[680]*)=&nbsp;0&nbsp;&amp;&amp;&nbsp;len2&nbsp;(*[535]*)land&nbsp;7&nbsp;=&nbsp;0</div>
-      <div class="lineNone">001074| &nbsp;&nbsp;then&nbsp;(</div>
-      <div class="lineNone">001075| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;...&nbsp;but&nbsp;we&nbsp;have&nbsp;to&nbsp;do&nbsp;that&nbsp;by&nbsp;hand&nbsp;because&nbsp;the&nbsp;bits&nbsp;may</div>
-      <div class="lineNone">001076| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;not&nbsp;extend&nbsp;to&nbsp;the&nbsp;full&nbsp;length&nbsp;of&nbsp;the&nbsp;underlying&nbsp;string.</div>
-      <div class="lineNone">001077| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*)</div>
-      <div class="lineAllVisited">001078| &nbsp;&nbsp;&nbsp;&nbsp;(*[100]*)let&nbsp;off1&nbsp;=&nbsp;off1&nbsp;lsr&nbsp;3&nbsp;and&nbsp;off2&nbsp;=&nbsp;off2&nbsp;lsr&nbsp;3</div>
-      <div class="lineNone">001079| &nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;len1&nbsp;=&nbsp;len1&nbsp;lsr&nbsp;3&nbsp;and&nbsp;len2&nbsp;=&nbsp;len2&nbsp;lsr&nbsp;3&nbsp;in</div>
-      <div class="lineAllVisited">001080| &nbsp;&nbsp;&nbsp;&nbsp;(*[100]*)let&nbsp;rec&nbsp;loop&nbsp;i&nbsp;=</div>
-      <div class="lineAllVisited">001081| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[240]*)if&nbsp;(*[240]*)i&nbsp;&lt;&nbsp;len1&nbsp;&amp;&amp;&nbsp;(*[170]*)i&nbsp;&lt;&nbsp;len2&nbsp;then&nbsp;(</div>
-      <div class="lineAllVisited">001082| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[140]*)let&nbsp;c1&nbsp;=&nbsp;String.unsafe_get&nbsp;data1&nbsp;(off1&nbsp;+&nbsp;i)</div>
-      <div class="lineNone">001083| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;c2&nbsp;=&nbsp;String.unsafe_get&nbsp;data2&nbsp;(off2&nbsp;+&nbsp;i)&nbsp;in</div>
-      <div class="lineAllVisited">001084| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[140]*)let&nbsp;r&nbsp;=&nbsp;compare&nbsp;c1&nbsp;c2&nbsp;in</div>
-      <div class="lineMixed">001085| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[140]*)if&nbsp;r&nbsp;&lt;&gt;&nbsp;0&nbsp;then&nbsp;(*[0]*)r</div>
-      <div class="lineAllVisited">001086| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[140]*)loop&nbsp;(i+1)</div>
-      <div class="lineNone">001087| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</div>
-      <div class="lineAllVisited">001088| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[100]*)len1&nbsp;-&nbsp;len2</div>
-      <div class="lineNone">001089| &nbsp;&nbsp;&nbsp;&nbsp;in</div>
-      <div class="lineAllVisited">001090| &nbsp;&nbsp;&nbsp;&nbsp;(*[100]*)loop&nbsp;0</div>
-      <div class="lineNone">001091| &nbsp;&nbsp;)</div>
-      <div class="lineNone">001092| &nbsp;&nbsp;else&nbsp;(</div>
-      <div class="lineNone">001093| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Slow/unaligned.&nbsp;*)</div>
-      <div class="lineAllVisited">001094| &nbsp;&nbsp;&nbsp;&nbsp;(*[4524]*)let&nbsp;str1&nbsp;=&nbsp;string_of_bitstring&nbsp;bs1</div>
-      <div class="lineNone">001095| &nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;str2&nbsp;=&nbsp;string_of_bitstring&nbsp;bs2&nbsp;in</div>
-      <div class="lineAllVisited">001096| &nbsp;&nbsp;&nbsp;&nbsp;(*[4524]*)let&nbsp;r&nbsp;=&nbsp;String.compare&nbsp;str1&nbsp;str2&nbsp;in</div>
-      <div class="lineAllVisited">001097| &nbsp;&nbsp;&nbsp;&nbsp;(*[4524]*)if&nbsp;r&nbsp;&lt;&gt;&nbsp;0&nbsp;then&nbsp;(*[3058]*)r&nbsp;else&nbsp;(*[1466]*)len1&nbsp;-&nbsp;len2</div>
-      <div class="lineNone">001098| &nbsp;&nbsp;)</div>
-      <div class="lineNone">001099| &nbsp;</div>
-      <div class="lineNone">001100| let&nbsp;equals&nbsp;((_,&nbsp;_,&nbsp;len1)&nbsp;as&nbsp;bs1)&nbsp;((_,&nbsp;_,&nbsp;len2)&nbsp;as&nbsp;bs2)&nbsp;=</div>
-      <div class="lineMixed">001101| &nbsp;&nbsp;(*[7]*)if&nbsp;len1&nbsp;&lt;&gt;&nbsp;len2&nbsp;then&nbsp;(*[0]*)false</div>
-      <div class="lineAllVisited">001102| &nbsp;&nbsp;else&nbsp;(*[7]*)if&nbsp;bs1&nbsp;=&nbsp;bs2&nbsp;then&nbsp;(*[7]*)true</div>
-      <div class="lineAllUnvisited">001103| &nbsp;&nbsp;else&nbsp;(*[0]*)0&nbsp;=&nbsp;compare&nbsp;bs1&nbsp;bs2</div>
-      <div class="lineNone">001104| &nbsp;</div>
-      <div class="lineNone">001105| (*----------------------------------------------------------------------*)</div>
-      <div class="lineNone">001106| (*&nbsp;Bit&nbsp;get/set&nbsp;functions.&nbsp;*)</div>
+      <div class="lineNone">001045| let&nbsp;bitstring_to_chan&nbsp;((data,&nbsp;off,&nbsp;len)&nbsp;as&nbsp;bits)&nbsp;chan&nbsp;=</div>
+      <div class="lineNone">001046| &nbsp;&nbsp;(*&nbsp;Fail&nbsp;if&nbsp;the&nbsp;bitstring&nbsp;length&nbsp;isn't&nbsp;a&nbsp;multiple&nbsp;of&nbsp;8.&nbsp;*)</div>
+      <div class="lineMixed">001047| &nbsp;&nbsp;(*[1]*)if&nbsp;len&nbsp;land&nbsp;7&nbsp;&lt;&gt;&nbsp;0&nbsp;then&nbsp;(*[0]*)invalid_arg&nbsp;&quot;bitstring_to_chan&quot;;</div>
+      <div class="lineNone">001048| &nbsp;</div>
+      <div class="lineAllVisited">001049| &nbsp;&nbsp;(*[1]*)if&nbsp;off&nbsp;land&nbsp;7&nbsp;=&nbsp;0&nbsp;then</div>
+      <div class="lineNone">001050| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Easy&nbsp;case:&nbsp;string&nbsp;is&nbsp;byte-aligned.&nbsp;*)</div>
+      <div class="lineAllVisited">001051| &nbsp;&nbsp;&nbsp;&nbsp;(*[1]*)output&nbsp;chan&nbsp;data&nbsp;(off&nbsp;lsr&nbsp;3)&nbsp;(len&nbsp;lsr&nbsp;3)</div>
+      <div class="lineNone">001052| &nbsp;&nbsp;else&nbsp;(</div>
+      <div class="lineNone">001053| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Bit-twiddling&nbsp;case:&nbsp;reuse&nbsp;string_of_bitstring&nbsp;*)</div>
+      <div class="lineAllUnvisited">001054| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;str&nbsp;=&nbsp;string_of_bitstring&nbsp;bits&nbsp;in</div>
+      <div class="lineAllUnvisited">001055| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)output_string&nbsp;chan&nbsp;str</div>
+      <div class="lineNone">001056| &nbsp;&nbsp;)</div>
+      <div class="lineNone">001057| &nbsp;</div>
+      <div class="lineNone">001058| let&nbsp;bitstring_to_file&nbsp;bits&nbsp;filename&nbsp;=</div>
+      <div class="lineAllUnvisited">001059| &nbsp;&nbsp;(*[0]*)let&nbsp;chan&nbsp;=&nbsp;open_out_bin&nbsp;filename&nbsp;in</div>
+      <div class="lineAllUnvisited">001060| &nbsp;&nbsp;(*[0]*)try</div>
+      <div class="lineAllUnvisited">001061| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)bitstring_to_chan&nbsp;bits&nbsp;chan;</div>
+      <div class="lineAllUnvisited">001062| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)close_out&nbsp;chan</div>
+      <div class="lineNone">001063| &nbsp;&nbsp;with&nbsp;exn&nbsp;-&gt;</div>
+      <div class="lineAllUnvisited">001064| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)close_out&nbsp;(*[0]*)chan;</div>
+      <div class="lineAllUnvisited">001065| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)raise&nbsp;exn</div>
+      <div class="lineNone">001066| &nbsp;</div>
+      <div class="lineNone">001067| (*----------------------------------------------------------------------*)</div>
+      <div class="lineNone">001068| (*&nbsp;Comparison.&nbsp;*)</div>
+      <div class="lineNone">001069| let&nbsp;compare&nbsp;((data1,&nbsp;off1,&nbsp;len1)&nbsp;as&nbsp;bs1)&nbsp;((data2,&nbsp;off2,&nbsp;len2)&nbsp;as&nbsp;bs2)&nbsp;=</div>
+      <div class="lineNone">001070| &nbsp;&nbsp;(*&nbsp;In&nbsp;the&nbsp;fully-aligned&nbsp;case,&nbsp;this&nbsp;is&nbsp;reduced&nbsp;to&nbsp;string&nbsp;comparison&nbsp;...&nbsp;*)</div>
+      <div class="lineAllVisited">001071| &nbsp;&nbsp;(*[4624]*)if&nbsp;off1&nbsp;(*[4624]*)land&nbsp;7&nbsp;=&nbsp;0&nbsp;&amp;&amp;&nbsp;len1&nbsp;(*[4624]*)land&nbsp;7&nbsp;(*[4624]*)=&nbsp;0&nbsp;&amp;&amp;&nbsp;off2&nbsp;(*[680]*)land&nbsp;7&nbsp;(*[680]*)=&nbsp;0&nbsp;&amp;&amp;&nbsp;len2&nbsp;(*[535]*)land&nbsp;7&nbsp;=&nbsp;0</div>
+      <div class="lineNone">001072| &nbsp;&nbsp;then&nbsp;(</div>
+      <div class="lineNone">001073| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;...&nbsp;but&nbsp;we&nbsp;have&nbsp;to&nbsp;do&nbsp;that&nbsp;by&nbsp;hand&nbsp;because&nbsp;the&nbsp;bits&nbsp;may</div>
+      <div class="lineNone">001074| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;not&nbsp;extend&nbsp;to&nbsp;the&nbsp;full&nbsp;length&nbsp;of&nbsp;the&nbsp;underlying&nbsp;string.</div>
+      <div class="lineNone">001075| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*)</div>
+      <div class="lineAllVisited">001076| &nbsp;&nbsp;&nbsp;&nbsp;(*[100]*)let&nbsp;off1&nbsp;=&nbsp;off1&nbsp;lsr&nbsp;3&nbsp;and&nbsp;off2&nbsp;=&nbsp;off2&nbsp;lsr&nbsp;3</div>
+      <div class="lineNone">001077| &nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;len1&nbsp;=&nbsp;len1&nbsp;lsr&nbsp;3&nbsp;and&nbsp;len2&nbsp;=&nbsp;len2&nbsp;lsr&nbsp;3&nbsp;in</div>
+      <div class="lineAllVisited">001078| &nbsp;&nbsp;&nbsp;&nbsp;(*[100]*)let&nbsp;rec&nbsp;loop&nbsp;i&nbsp;=</div>
+      <div class="lineAllVisited">001079| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[240]*)if&nbsp;(*[240]*)i&nbsp;&lt;&nbsp;len1&nbsp;&amp;&amp;&nbsp;(*[170]*)i&nbsp;&lt;&nbsp;len2&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">001080| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[140]*)let&nbsp;c1&nbsp;=&nbsp;String.unsafe_get&nbsp;data1&nbsp;(off1&nbsp;+&nbsp;i)</div>
+      <div class="lineNone">001081| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;c2&nbsp;=&nbsp;String.unsafe_get&nbsp;data2&nbsp;(off2&nbsp;+&nbsp;i)&nbsp;in</div>
+      <div class="lineAllVisited">001082| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[140]*)let&nbsp;r&nbsp;=&nbsp;compare&nbsp;c1&nbsp;c2&nbsp;in</div>
+      <div class="lineMixed">001083| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[140]*)if&nbsp;r&nbsp;&lt;&gt;&nbsp;0&nbsp;then&nbsp;(*[0]*)r</div>
+      <div class="lineAllVisited">001084| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[140]*)loop&nbsp;(i+1)</div>
+      <div class="lineNone">001085| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</div>
+      <div class="lineAllVisited">001086| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;(*[100]*)len1&nbsp;-&nbsp;len2</div>
+      <div class="lineNone">001087| &nbsp;&nbsp;&nbsp;&nbsp;in</div>
+      <div class="lineAllVisited">001088| &nbsp;&nbsp;&nbsp;&nbsp;(*[100]*)loop&nbsp;0</div>
+      <div class="lineNone">001089| &nbsp;&nbsp;)</div>
+      <div class="lineNone">001090| &nbsp;&nbsp;else&nbsp;(</div>
+      <div class="lineNone">001091| &nbsp;&nbsp;&nbsp;&nbsp;(*&nbsp;Slow/unaligned.&nbsp;*)</div>
+      <div class="lineAllVisited">001092| &nbsp;&nbsp;&nbsp;&nbsp;(*[4524]*)let&nbsp;str1&nbsp;=&nbsp;string_of_bitstring&nbsp;bs1</div>
+      <div class="lineNone">001093| &nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;str2&nbsp;=&nbsp;string_of_bitstring&nbsp;bs2&nbsp;in</div>
+      <div class="lineAllVisited">001094| &nbsp;&nbsp;&nbsp;&nbsp;(*[4524]*)let&nbsp;r&nbsp;=&nbsp;String.compare&nbsp;str1&nbsp;str2&nbsp;in</div>
+      <div class="lineAllVisited">001095| &nbsp;&nbsp;&nbsp;&nbsp;(*[4524]*)if&nbsp;r&nbsp;&lt;&gt;&nbsp;0&nbsp;then&nbsp;(*[3058]*)r&nbsp;else&nbsp;(*[1466]*)len1&nbsp;-&nbsp;len2</div>
+      <div class="lineNone">001096| &nbsp;&nbsp;)</div>
+      <div class="lineNone">001097| &nbsp;</div>
+      <div class="lineNone">001098| let&nbsp;equals&nbsp;((_,&nbsp;_,&nbsp;len1)&nbsp;as&nbsp;bs1)&nbsp;((_,&nbsp;_,&nbsp;len2)&nbsp;as&nbsp;bs2)&nbsp;=</div>
+      <div class="lineMixed">001099| &nbsp;&nbsp;(*[7]*)if&nbsp;len1&nbsp;&lt;&gt;&nbsp;len2&nbsp;then&nbsp;(*[0]*)false</div>
+      <div class="lineAllVisited">001100| &nbsp;&nbsp;else&nbsp;(*[7]*)if&nbsp;bs1&nbsp;=&nbsp;bs2&nbsp;then&nbsp;(*[7]*)true</div>
+      <div class="lineAllUnvisited">001101| &nbsp;&nbsp;else&nbsp;(*[0]*)0&nbsp;=&nbsp;compare&nbsp;bs1&nbsp;bs2</div>
+      <div class="lineNone">001102| &nbsp;</div>
+      <div class="lineNone">001103| (*----------------------------------------------------------------------*)</div>
+      <div class="lineNone">001104| (*&nbsp;Bit&nbsp;get/set&nbsp;functions.&nbsp;*)</div>
+      <div class="lineNone">001105| &nbsp;</div>
+      <div class="lineAllUnvisited">001106| let&nbsp;index_out_of_bounds&nbsp;()&nbsp;=&nbsp;(*[0]*)invalid_arg&nbsp;&quot;index&nbsp;out&nbsp;of&nbsp;bounds&quot;</div>
       <div class="lineNone">001107| &nbsp;</div>
-      <div class="lineAllUnvisited">001108| let&nbsp;index_out_of_bounds&nbsp;()&nbsp;=&nbsp;(*[0]*)invalid_arg&nbsp;&quot;index&nbsp;out&nbsp;of&nbsp;bounds&quot;</div>
-      <div class="lineNone">001109| &nbsp;</div>
-      <div class="lineNone">001110| let&nbsp;put&nbsp;(data,&nbsp;off,&nbsp;len)&nbsp;n&nbsp;v&nbsp;=</div>
-      <div class="lineAllUnvisited">001111| &nbsp;&nbsp;(*[0]*)if&nbsp;(*[0]*)n&nbsp;&lt;&nbsp;0&nbsp;||&nbsp;(*[0]*)off+n&nbsp;&gt;=&nbsp;len&nbsp;then&nbsp;(*[0]*)index_out_of_bounds&nbsp;()</div>
-      <div class="lineNone">001112| &nbsp;&nbsp;else&nbsp;(</div>
-      <div class="lineAllUnvisited">001113| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;i&nbsp;=&nbsp;off+n&nbsp;in</div>
-      <div class="lineAllUnvisited">001114| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;si&nbsp;=&nbsp;i&nbsp;lsr&nbsp;3&nbsp;and&nbsp;mask&nbsp;=&nbsp;0x80&nbsp;lsr&nbsp;(i&nbsp;land&nbsp;7)&nbsp;in</div>
-      <div class="lineAllUnvisited">001115| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c&nbsp;=&nbsp;Char.code&nbsp;data.[si]&nbsp;in</div>
-      <div class="lineAllUnvisited">001116| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c&nbsp;=&nbsp;if&nbsp;v&nbsp;&lt;&gt;&nbsp;0&nbsp;then&nbsp;c&nbsp;(*[0]*)lor&nbsp;mask&nbsp;else&nbsp;c&nbsp;(*[0]*)land&nbsp;(lnot&nbsp;mask)&nbsp;in</div>
-      <div class="lineAllUnvisited">001117| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)data.[si]&nbsp;&lt;-&nbsp;Char.unsafe_chr&nbsp;c</div>
-      <div class="lineNone">001118| &nbsp;&nbsp;)</div>
+      <div class="lineNone">001108| let&nbsp;put&nbsp;(data,&nbsp;off,&nbsp;len)&nbsp;n&nbsp;v&nbsp;=</div>
+      <div class="lineAllUnvisited">001109| &nbsp;&nbsp;(*[0]*)if&nbsp;(*[0]*)n&nbsp;&lt;&nbsp;0&nbsp;||&nbsp;(*[0]*)off+n&nbsp;&gt;=&nbsp;len&nbsp;then&nbsp;(*[0]*)index_out_of_bounds&nbsp;()</div>
+      <div class="lineNone">001110| &nbsp;&nbsp;else&nbsp;(</div>
+      <div class="lineAllUnvisited">001111| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;i&nbsp;=&nbsp;off+n&nbsp;in</div>
+      <div class="lineAllUnvisited">001112| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;si&nbsp;=&nbsp;i&nbsp;lsr&nbsp;3&nbsp;and&nbsp;mask&nbsp;=&nbsp;0x80&nbsp;lsr&nbsp;(i&nbsp;land&nbsp;7)&nbsp;in</div>
+      <div class="lineAllUnvisited">001113| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c&nbsp;=&nbsp;Char.code&nbsp;data.[si]&nbsp;in</div>
+      <div class="lineAllUnvisited">001114| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;c&nbsp;=&nbsp;if&nbsp;v&nbsp;&lt;&gt;&nbsp;0&nbsp;then&nbsp;c&nbsp;(*[0]*)lor&nbsp;mask&nbsp;else&nbsp;c&nbsp;(*[0]*)land&nbsp;(lnot&nbsp;mask)&nbsp;in</div>
+      <div class="lineAllUnvisited">001115| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)data.[si]&nbsp;&lt;-&nbsp;Char.unsafe_chr&nbsp;c</div>
+      <div class="lineNone">001116| &nbsp;&nbsp;)</div>
+      <div class="lineNone">001117| &nbsp;</div>
+      <div class="lineAllUnvisited">001118| let&nbsp;set&nbsp;bits&nbsp;n&nbsp;=&nbsp;(*[0]*)put&nbsp;bits&nbsp;n&nbsp;1</div>
       <div class="lineNone">001119| &nbsp;</div>
-      <div class="lineAllUnvisited">001120| let&nbsp;set&nbsp;bits&nbsp;n&nbsp;=&nbsp;(*[0]*)put&nbsp;bits&nbsp;n&nbsp;1</div>
+      <div class="lineAllUnvisited">001120| let&nbsp;clear&nbsp;bits&nbsp;n&nbsp;=&nbsp;(*[0]*)put&nbsp;bits&nbsp;n&nbsp;0</div>
       <div class="lineNone">001121| &nbsp;</div>
-      <div class="lineAllUnvisited">001122| let&nbsp;clear&nbsp;bits&nbsp;n&nbsp;=&nbsp;(*[0]*)put&nbsp;bits&nbsp;n&nbsp;0</div>
-      <div class="lineNone">001123| &nbsp;</div>
-      <div class="lineNone">001124| let&nbsp;get&nbsp;(data,&nbsp;off,&nbsp;len)&nbsp;n&nbsp;=</div>
-      <div class="lineMixed">001125| &nbsp;&nbsp;(*[1945548]*)if&nbsp;(*[1945548]*)n&nbsp;&lt;&nbsp;0&nbsp;||&nbsp;(*[1945548]*)off+n&nbsp;&gt;=&nbsp;len&nbsp;then&nbsp;(*[0]*)index_out_of_bounds&nbsp;()</div>
-      <div class="lineNone">001126| &nbsp;&nbsp;else&nbsp;(</div>
-      <div class="lineAllVisited">001127| &nbsp;&nbsp;&nbsp;&nbsp;(*[1945548]*)let&nbsp;i&nbsp;=&nbsp;off+n&nbsp;in</div>
-      <div class="lineAllVisited">001128| &nbsp;&nbsp;&nbsp;&nbsp;(*[1945548]*)let&nbsp;si&nbsp;=&nbsp;i&nbsp;lsr&nbsp;3&nbsp;and&nbsp;mask&nbsp;=&nbsp;0x80&nbsp;lsr&nbsp;(i&nbsp;land&nbsp;7)&nbsp;in</div>
-      <div class="lineAllVisited">001129| &nbsp;&nbsp;&nbsp;&nbsp;(*[1945548]*)let&nbsp;c&nbsp;=&nbsp;Char.code&nbsp;data.[si]&nbsp;in</div>
-      <div class="lineAllVisited">001130| &nbsp;&nbsp;&nbsp;&nbsp;c&nbsp;(*[1945548]*)land&nbsp;mask</div>
-      <div class="lineNone">001131| &nbsp;&nbsp;)</div>
+      <div class="lineNone">001122| let&nbsp;get&nbsp;(data,&nbsp;off,&nbsp;len)&nbsp;n&nbsp;=</div>
+      <div class="lineMixed">001123| &nbsp;&nbsp;(*[1945548]*)if&nbsp;(*[1945548]*)n&nbsp;&lt;&nbsp;0&nbsp;||&nbsp;(*[1945548]*)off+n&nbsp;&gt;=&nbsp;len&nbsp;then&nbsp;(*[0]*)index_out_of_bounds&nbsp;()</div>
+      <div class="lineNone">001124| &nbsp;&nbsp;else&nbsp;(</div>
+      <div class="lineAllVisited">001125| &nbsp;&nbsp;&nbsp;&nbsp;(*[1945548]*)let&nbsp;i&nbsp;=&nbsp;off+n&nbsp;in</div>
+      <div class="lineAllVisited">001126| &nbsp;&nbsp;&nbsp;&nbsp;(*[1945548]*)let&nbsp;si&nbsp;=&nbsp;i&nbsp;lsr&nbsp;3&nbsp;and&nbsp;mask&nbsp;=&nbsp;0x80&nbsp;lsr&nbsp;(i&nbsp;land&nbsp;7)&nbsp;in</div>
+      <div class="lineAllVisited">001127| &nbsp;&nbsp;&nbsp;&nbsp;(*[1945548]*)let&nbsp;c&nbsp;=&nbsp;Char.code&nbsp;data.[si]&nbsp;in</div>
+      <div class="lineAllVisited">001128| &nbsp;&nbsp;&nbsp;&nbsp;c&nbsp;(*[1945548]*)land&nbsp;mask</div>
+      <div class="lineNone">001129| &nbsp;&nbsp;)</div>
+      <div class="lineNone">001130| &nbsp;</div>
+      <div class="lineAllVisited">001131| let&nbsp;is_set&nbsp;bits&nbsp;n&nbsp;=&nbsp;(*[1297032]*)get&nbsp;bits&nbsp;n&nbsp;&lt;&gt;&nbsp;0</div>
       <div class="lineNone">001132| &nbsp;</div>
-      <div class="lineAllVisited">001133| let&nbsp;is_set&nbsp;bits&nbsp;n&nbsp;=&nbsp;(*[1297032]*)get&nbsp;bits&nbsp;n&nbsp;&lt;&gt;&nbsp;0</div>
+      <div class="lineAllVisited">001133| let&nbsp;is_clear&nbsp;bits&nbsp;n&nbsp;=&nbsp;(*[648516]*)get&nbsp;bits&nbsp;n&nbsp;=&nbsp;0</div>
       <div class="lineNone">001134| &nbsp;</div>
-      <div class="lineAllVisited">001135| let&nbsp;is_clear&nbsp;bits&nbsp;n&nbsp;=&nbsp;(*[648516]*)get&nbsp;bits&nbsp;n&nbsp;=&nbsp;0</div>
-      <div class="lineNone">001136| &nbsp;</div>
-      <div class="lineNone">001137| (*----------------------------------------------------------------------*)</div>
-      <div class="lineNone">001138| (*&nbsp;Display&nbsp;functions.&nbsp;*)</div>
-      <div class="lineNone">001139| &nbsp;</div>
-      <div class="lineNone">001140| let&nbsp;isprint&nbsp;c&nbsp;=</div>
-      <div class="lineAllUnvisited">001141| &nbsp;&nbsp;(*[0]*)let&nbsp;c&nbsp;=&nbsp;Char.code&nbsp;c&nbsp;in</div>
-      <div class="lineAllUnvisited">001142| &nbsp;&nbsp;(*[0]*)c&nbsp;(*[0]*)&gt;=&nbsp;32&nbsp;&amp;&amp;&nbsp;(*[0]*)c&nbsp;&lt;&nbsp;127</div>
-      <div class="lineNone">001143| &nbsp;</div>
-      <div class="lineNone">001144| let&nbsp;hexdump_bitstring&nbsp;chan&nbsp;(data,&nbsp;off,&nbsp;len)&nbsp;=</div>
-      <div class="lineAllUnvisited">001145| &nbsp;&nbsp;(*[0]*)let&nbsp;count&nbsp;=&nbsp;ref&nbsp;0&nbsp;in</div>
-      <div class="lineAllUnvisited">001146| &nbsp;&nbsp;(*[0]*)let&nbsp;off&nbsp;=&nbsp;ref&nbsp;off&nbsp;in</div>
-      <div class="lineAllUnvisited">001147| &nbsp;&nbsp;(*[0]*)let&nbsp;len&nbsp;=&nbsp;ref&nbsp;len&nbsp;in</div>
-      <div class="lineAllUnvisited">001148| &nbsp;&nbsp;(*[0]*)let&nbsp;linelen&nbsp;=&nbsp;ref&nbsp;0&nbsp;in</div>
-      <div class="lineAllUnvisited">001149| &nbsp;&nbsp;(*[0]*)let&nbsp;linechars&nbsp;=&nbsp;String.make&nbsp;16&nbsp;'&nbsp;'&nbsp;in</div>
+      <div class="lineNone">001135| (*----------------------------------------------------------------------*)</div>
+      <div class="lineNone">001136| (*&nbsp;Display&nbsp;functions.&nbsp;*)</div>
+      <div class="lineNone">001137| &nbsp;</div>
+      <div class="lineNone">001138| let&nbsp;isprint&nbsp;c&nbsp;=</div>
+      <div class="lineAllVisited">001139| &nbsp;&nbsp;(*[356]*)let&nbsp;c&nbsp;=&nbsp;Char.code&nbsp;c&nbsp;in</div>
+      <div class="lineAllVisited">001140| &nbsp;&nbsp;(*[356]*)c&nbsp;(*[356]*)&gt;=&nbsp;32&nbsp;&amp;&amp;&nbsp;(*[311]*)c&nbsp;&lt;&nbsp;127</div>
+      <div class="lineNone">001141| &nbsp;</div>
+      <div class="lineNone">001142| let&nbsp;hexdump_bitstring&nbsp;chan&nbsp;(data,&nbsp;off,&nbsp;len)&nbsp;=</div>
+      <div class="lineAllVisited">001143| &nbsp;&nbsp;(*[34]*)let&nbsp;count&nbsp;=&nbsp;ref&nbsp;0&nbsp;in</div>
+      <div class="lineAllVisited">001144| &nbsp;&nbsp;(*[34]*)let&nbsp;off&nbsp;=&nbsp;ref&nbsp;off&nbsp;in</div>
+      <div class="lineAllVisited">001145| &nbsp;&nbsp;(*[34]*)let&nbsp;len&nbsp;=&nbsp;ref&nbsp;len&nbsp;in</div>
+      <div class="lineAllVisited">001146| &nbsp;&nbsp;(*[34]*)let&nbsp;linelen&nbsp;=&nbsp;ref&nbsp;0&nbsp;in</div>
+      <div class="lineAllVisited">001147| &nbsp;&nbsp;(*[34]*)let&nbsp;linechars&nbsp;=&nbsp;String.make&nbsp;16&nbsp;'&nbsp;'&nbsp;in</div>
+      <div class="lineNone">001148| &nbsp;</div>
+      <div class="lineAllVisited">001149| &nbsp;&nbsp;(*[34]*)fprintf&nbsp;chan&nbsp;&quot;00000000&nbsp;&nbsp;&quot;;</div>
       <div class="lineNone">001150| &nbsp;</div>
-      <div class="lineAllUnvisited">001151| &nbsp;&nbsp;(*[0]*)fprintf&nbsp;chan&nbsp;&quot;00000000&nbsp;&nbsp;&quot;;</div>
-      <div class="lineNone">001152| &nbsp;</div>
-      <div class="lineAllUnvisited">001153| &nbsp;&nbsp;(*[0]*)while&nbsp;!len&nbsp;&gt;&nbsp;0&nbsp;do</div>
-      <div class="lineAllUnvisited">001154| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;bits&nbsp;=&nbsp;min&nbsp;!len&nbsp;8&nbsp;in</div>
-      <div class="lineAllUnvisited">001155| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;byte&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;!off&nbsp;!len&nbsp;bits&nbsp;in</div>
-      <div class="lineAllUnvisited">001156| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)off&nbsp;:=&nbsp;!off&nbsp;+&nbsp;bits;&nbsp;(*[0]*)len&nbsp;(*[0]*):=&nbsp;!len&nbsp;-&nbsp;bits;</div>
-      <div class="lineNone">001157| &nbsp;</div>
-      <div class="lineAllUnvisited">001158| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;byte&nbsp;=&nbsp;byte&nbsp;lsl&nbsp;(8-bits)&nbsp;in</div>
-      <div class="lineAllUnvisited">001159| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)fprintf&nbsp;chan&nbsp;&quot;%02x&nbsp;&quot;&nbsp;byte;</div>
-      <div class="lineNone">001160| &nbsp;</div>
-      <div class="lineAllUnvisited">001161| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)incr&nbsp;count;</div>
-      <div class="lineAllUnvisited">001162| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)linechars.[!linelen]&nbsp;&lt;-</div>
-      <div class="lineNone">001163| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;c&nbsp;=&nbsp;Char.chr&nbsp;byte&nbsp;in</div>
-      <div class="lineAllUnvisited">001164| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)if&nbsp;isprint&nbsp;c&nbsp;then&nbsp;(*[0]*)c&nbsp;else&nbsp;(*[0]*)'.');</div>
-      <div class="lineAllUnvisited">001165| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)incr&nbsp;linelen;</div>
-      <div class="lineAllUnvisited">001166| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)if&nbsp;!linelen&nbsp;=&nbsp;8&nbsp;then&nbsp;(*[0]*)fprintf&nbsp;chan&nbsp;&quot;&nbsp;&quot;;</div>
-      <div class="lineAllUnvisited">001167| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)if&nbsp;!linelen&nbsp;=&nbsp;16&nbsp;then&nbsp;(</div>
-      <div class="lineAllUnvisited">001168| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)fprintf&nbsp;chan&nbsp;&quot;&nbsp;|%s|\n%08x&nbsp;&nbsp;&quot;&nbsp;linechars&nbsp;!count;</div>
-      <div class="lineAllUnvisited">001169| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)linelen&nbsp;(*[0]*):=&nbsp;0;</div>
-      <div class="lineAllUnvisited">001170| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)for&nbsp;i&nbsp;=&nbsp;0&nbsp;to&nbsp;15&nbsp;do&nbsp;(*[0]*)linechars.[i]&nbsp;&lt;-&nbsp;'&nbsp;'&nbsp;done</div>
-      <div class="lineNone">001171| &nbsp;&nbsp;&nbsp;&nbsp;)</div>
-      <div class="lineNone">001172| &nbsp;&nbsp;done;</div>
-      <div class="lineNone">001173| &nbsp;</div>
-      <div class="lineAllUnvisited">001174| &nbsp;&nbsp;(*[0]*)if&nbsp;!linelen&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(</div>
-      <div class="lineAllUnvisited">001175| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)let&nbsp;skip&nbsp;=&nbsp;(16&nbsp;-&nbsp;!linelen)&nbsp;*&nbsp;3&nbsp;+&nbsp;if&nbsp;!linelen&nbsp;&lt;&nbsp;8&nbsp;then&nbsp;(*[0]*)1&nbsp;else&nbsp;(*[0]*)0&nbsp;in</div>
-      <div class="lineAllUnvisited">001176| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)for&nbsp;i&nbsp;=&nbsp;0&nbsp;to&nbsp;skip-1&nbsp;do&nbsp;(*[0]*)fprintf&nbsp;chan&nbsp;&quot;&nbsp;&quot;&nbsp;done;</div>
-      <div class="lineAllUnvisited">001177| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)fprintf&nbsp;chan&nbsp;&quot;&nbsp;|%s|\n%!&quot;&nbsp;linechars</div>
-      <div class="lineNone">001178| &nbsp;&nbsp;)&nbsp;else</div>
-      <div class="lineAllUnvisited">001179| &nbsp;&nbsp;&nbsp;&nbsp;(*[0]*)fprintf&nbsp;chan&nbsp;&quot;\n%!&quot;</div>
+      <div class="lineAllVisited">001151| &nbsp;&nbsp;(*[34]*)while&nbsp;!len&nbsp;&gt;&nbsp;0&nbsp;do</div>
+      <div class="lineAllVisited">001152| &nbsp;&nbsp;&nbsp;&nbsp;(*[356]*)let&nbsp;bits&nbsp;=&nbsp;min&nbsp;!len&nbsp;8&nbsp;in</div>
+      <div class="lineAllVisited">001153| &nbsp;&nbsp;&nbsp;&nbsp;(*[356]*)let&nbsp;byte&nbsp;=&nbsp;extract_char_unsigned&nbsp;data&nbsp;!off&nbsp;!len&nbsp;bits&nbsp;in</div>
+      <div class="lineAllVisited">001154| &nbsp;&nbsp;&nbsp;&nbsp;(*[356]*)off&nbsp;:=&nbsp;!off&nbsp;+&nbsp;bits;&nbsp;(*[356]*)len&nbsp;(*[356]*):=&nbsp;!len&nbsp;-&nbsp;bits;</div>
+      <div class="lineNone">001155| &nbsp;</div>
+      <div class="lineAllVisited">001156| &nbsp;&nbsp;&nbsp;&nbsp;(*[356]*)let&nbsp;byte&nbsp;=&nbsp;byte&nbsp;lsl&nbsp;(8-bits)&nbsp;in</div>
+      <div class="lineAllVisited">001157| &nbsp;&nbsp;&nbsp;&nbsp;(*[356]*)fprintf&nbsp;chan&nbsp;&quot;%02x&nbsp;&quot;&nbsp;byte;</div>
+      <div class="lineNone">001158| &nbsp;</div>
+      <div class="lineAllVisited">001159| &nbsp;&nbsp;&nbsp;&nbsp;(*[356]*)incr&nbsp;count;</div>
+      <div class="lineAllVisited">001160| &nbsp;&nbsp;&nbsp;&nbsp;(*[356]*)linechars.[!linelen]&nbsp;&lt;-</div>
+      <div class="lineNone">001161| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;c&nbsp;=&nbsp;Char.chr&nbsp;byte&nbsp;in</div>
+      <div class="lineAllVisited">001162| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[356]*)if&nbsp;isprint&nbsp;c&nbsp;then&nbsp;(*[110]*)c&nbsp;else&nbsp;(*[246]*)'.');</div>
+      <div class="lineAllVisited">001163| &nbsp;&nbsp;&nbsp;&nbsp;(*[356]*)incr&nbsp;linelen;</div>
+      <div class="lineAllVisited">001164| &nbsp;&nbsp;&nbsp;&nbsp;(*[335]*)if&nbsp;!linelen&nbsp;=&nbsp;8&nbsp;then&nbsp;(*[21]*)fprintf&nbsp;chan&nbsp;&quot;&nbsp;&quot;;</div>
+      <div class="lineAllVisited">001165| &nbsp;&nbsp;&nbsp;&nbsp;(*[343]*)if&nbsp;!linelen&nbsp;=&nbsp;16&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">001166| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[13]*)fprintf&nbsp;chan&nbsp;&quot;&nbsp;|%s|\n%08x&nbsp;&nbsp;&quot;&nbsp;linechars&nbsp;!count;</div>
+      <div class="lineAllVisited">001167| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[13]*)linelen&nbsp;(*[13]*):=&nbsp;0;</div>
+      <div class="lineAllVisited">001168| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(*[13]*)for&nbsp;i&nbsp;=&nbsp;0&nbsp;to&nbsp;15&nbsp;do&nbsp;(*[208]*)linechars.[i]&nbsp;&lt;-&nbsp;'&nbsp;'&nbsp;done</div>
+      <div class="lineNone">001169| &nbsp;&nbsp;&nbsp;&nbsp;)</div>
+      <div class="lineNone">001170| &nbsp;&nbsp;done;</div>
+      <div class="lineNone">001171| &nbsp;</div>
+      <div class="lineAllVisited">001172| &nbsp;&nbsp;(*[34]*)if&nbsp;!linelen&nbsp;&gt;&nbsp;0&nbsp;then&nbsp;(</div>
+      <div class="lineAllVisited">001173| &nbsp;&nbsp;&nbsp;&nbsp;(*[32]*)let&nbsp;skip&nbsp;=&nbsp;(16&nbsp;-&nbsp;!linelen)&nbsp;*&nbsp;3&nbsp;+&nbsp;if&nbsp;!linelen&nbsp;&lt;&nbsp;8&nbsp;then&nbsp;(*[24]*)1&nbsp;else&nbsp;(*[8]*)0&nbsp;in</div>
+      <div class="lineAllVisited">001174| &nbsp;&nbsp;&nbsp;&nbsp;(*[32]*)for&nbsp;i&nbsp;=&nbsp;0&nbsp;to&nbsp;skip-1&nbsp;do&nbsp;(*[1116]*)fprintf&nbsp;chan&nbsp;&quot;&nbsp;&quot;&nbsp;done;</div>
+      <div class="lineAllVisited">001175| &nbsp;&nbsp;&nbsp;&nbsp;(*[32]*)fprintf&nbsp;chan&nbsp;&quot;&nbsp;|%s|\n%!&quot;&nbsp;linechars</div>
+      <div class="lineNone">001176| &nbsp;&nbsp;)&nbsp;else</div>
+      <div class="lineAllVisited">001177| &nbsp;&nbsp;&nbsp;&nbsp;(*[2]*)fprintf&nbsp;chan&nbsp;&quot;\n%!&quot;</div>
     </code>
     <hr class="codeSep"/>
-    <p class="footer">Generated by <a href="http://bisect.x9c.fr">Bisect</a> on 2008-08-26 17:29:02</p>
+    <p class="footer">Generated by <a href="http://bisect.x9c.fr">Bisect</a> on 2008-08-27 13:53:18</p>
   </body>
 </html>
