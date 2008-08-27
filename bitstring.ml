@@ -967,13 +967,11 @@ let construct_int64_le_unsigned buf v flen exn =
 let construct_int64_ne_unsigned =
   if nativeendian = BigEndian
   then construct_int64_be_unsigned
-  else (*construct_int64_le_unsigned*)
-    fun _ _ _ _ -> failwith "construct_int64_le_unsigned"
+  else construct_int64_le_unsigned
 
 let construct_int64_ee_unsigned = function
   | BigEndian -> construct_int64_be_unsigned
-  | LittleEndian -> (*construct_int64_le_unsigned*)
-      (fun _ _ _ _ -> failwith "construct_int64_le_unsigned")
+  | LittleEndian -> construct_int64_le_unsigned
   | NativeEndian -> construct_int64_ne_unsigned
 
 (* Construct from a string of bytes, exact multiple of 8 bits
