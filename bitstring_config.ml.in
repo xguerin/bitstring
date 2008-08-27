@@ -30,3 +30,5 @@ let nativeendian = Bitstring_types.@NATIVEENDIAN@
 let package = "@PACKAGE_NAME@"
 let version = "@PACKAGE_VERSION@"
 let ocamllibdir = "@OCAMLLIB@"
+
+let diff = "@DIFF@"

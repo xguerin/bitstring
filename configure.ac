@@ -78,6 +78,13 @@ if test "x$TIME" = "xno"; then
     AC_MSG_ERROR(['time' command not found])
 fi
 
+dnl Check for diff and get full path.
+AC_PATH_PROG(DIFF,diff,no)
+if test "x$DIFF" = "xno"; then
+    AC_MSG_ERROR(['diff' command not found])
+fi
+AC_SUBST(DIFF)
+
 dnl Check for gprof (optional).
 AC_CHECK_PROG(GPROF,gprof,gprof,no)
 
