@@ -38,6 +38,8 @@ exception Construct_failure of string * string * int * int
  *)
 type bitstring = string * int * int
 
+type t = bitstring
+
 (* Functions to create and load bitstrings. *)
 let empty_bitstring = "", 0, 0
 
@@ -1009,9 +1011,14 @@ let construct_bitstring buf (data, off, len) =
 
   Buffer.add_bits buf data len
 
+(* Concatenate bitstrings. *)
+let concat bs =
+  let buf = Buffer.create () in
+  List.iter (construct_bitstring buf) bs;
+  Buffer.contents buf
+
 (*----------------------------------------------------------------------*)
 (* Extract a string from a bitstring. *)
-
 let string_of_bitstring (data, off, len) =
   if off land 7 = 0 && len land 7 = 0 then
     (* Easy case: everything is byte-aligned. *)
@@ -1058,6 +1065,74 @@ let bitstring_to_file bits filename =
   with exn ->
     close_out chan;
     raise exn
+
+(*----------------------------------------------------------------------*)
+(* Comparison. *)
+let compare ((data1, off1, len1) as bs1) ((data2, off2, len2) as bs2) =
+  (* In the fully-aligned case, this is reduced to string comparison ... *)
+  if off1 land 7 = 0 && len1 land 7 = 0 && off2 land 7 = 0 && len2 land 7 = 0
+  then (
+    (* ... but we have to do that by hand because the bits may
+     * not extend to the full length of the underlying string.
+     *)
+    let off1 = off1 lsr 3 and off2 = off2 lsr 3
+    and len1 = len1 lsr 3 and len2 = len2 lsr 3 in
+    let rec loop i =
+      if i < len1 && i < len2 then (
+	let c1 = String.unsafe_get data1 (off1 + i)
+	and c2 = String.unsafe_get data2 (off2 + i) in
+	let r = compare c1 c2 in
+	if r <> 0 then r
+	else loop (i+1)
+      )
+      else len1 - len2
+    in
+    loop 0
+  )
+  else (
+    (* Slow/unaligned. *)
+    let str1 = string_of_bitstring bs1
+    and str2 = string_of_bitstring bs2 in
+    let r = String.compare str1 str2 in
+    if r <> 0 then r else len1 - len2
+  )
+
+let equals ((_, _, len1) as bs1) ((_, _, len2) as bs2) =
+  if len1 <> len2 then false
+  else if bs1 = bs2 then true
+  else 0 = compare bs1 bs2
+
+(*----------------------------------------------------------------------*)
+(* Bit get/set functions. *)
+
+let index_out_of_bounds () = invalid_arg "index out of bounds"
+
+let put (data, off, len) n v =
+  if n < 0 || off+n >= len then index_out_of_bounds ()
+  else (
+    let i = off+n in
+    let si = i lsr 3 and mask = 0x80 lsr (i land 7) in
+    let c = Char.code data.[si] in
+    let c = if v <> 0 then c lor mask else c land (lnot mask) in
+    data.[si] <- Char.unsafe_chr c
+  )
+
+let set bits n = put bits n 1
+
+let clear bits n = put bits n 0
+
+let get (data, off, len) n =
+  if n < 0 || off+n >= len then index_out_of_bounds ()
+  else (
+    let i = off+n in
+    let si = i lsr 3 and mask = 0x80 lsr (i land 7) in
+    let c = Char.code data.[si] in
+    c land mask
+  )
+
+let is_set bits n = get bits n <> 0
+
+let is_clear bits n = get bits n = 0
 
 (*----------------------------------------------------------------------*)
 (* Display functions. *)

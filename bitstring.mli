@@ -667,6 +667,12 @@ type bitstring = string * int * int
     {!hexdump_bitstring}, {!bitstring_length}.
 *)
 
+type t = bitstring
+(** [t] is a synonym for the {!bitstring} type.
+
+    This allows you to use this module with functors like
+    [Set] and [Map] from the stdlib. *)
+
 (** {3 Exceptions} *)
 
 exception Construct_failure of string * string * int * int
@@ -682,6 +688,24 @@ exception Construct_failure of string * string * int * int
     [file], [line] and [char] point to the original source
     location of the [BITSTRING] constructor that failed.
 *)
+
+(** {3 Bitstring comparison} *)
+
+val compare : bitstring -> bitstring -> int
+(** [compare bs1 bs2] compares two bitstrings and returns zero
+    if they are equal, a negative number if [bs1 < bs2], or a
+    positive number if [bs1 > bs2].
+
+    This tests "semantic equality" which is not affected by
+    the offset or alignment of the underlying representation
+    (see {!bitstring}).
+
+    The ordering is total and lexicographic. *)
+
+val equals : bitstring -> bitstring -> bool
+(** [equals] returns true if and only if the two bitstrings are
+    semantically equal.  It is the same as calling [compare] and
+    testing if the result is [0], but usually more efficient. *)
 
 (** {3 Bitstring manipulation} *)
 
@@ -721,6 +745,10 @@ val takebits : int -> bitstring -> bitstring
 
     Note that this function just changes the offset and length
     fields of the {!bitstring} tuple, so is very efficient. *)
+
+val concat : bitstring list -> bitstring
+(** Concatenate a list of bitstrings together into a single
+    bitstring. *)
 
 (** {3 Constructing bitstrings} *)
 
@@ -849,6 +877,36 @@ end
 (** Buffers are mainly used by the [BITSTRING] constructor, but
     may also be useful for end users.  They work much like the
     standard library [Buffer] module. *)
+
+(** {3 Get/set bits}
+
+    These functions let you manipulate individual bits in the
+    bitstring.  However they are not particularly efficient and you
+    should generally use the [bitmatch] and [BITSTRING] operators when
+    building and parsing bitstrings.
+
+    These functions all raise [Invalid_argument "index out of bounds"]
+    if the index is out of range of the bitstring.
+*)
+
+val set : bitstring -> int -> unit
+  (** [set bits n] sets the [n]th bit in the bitstring to 1. *)
+
+val clear : bitstring -> int -> unit
+  (** [clear bits n] sets the [n]th bit in the bitstring to 0. *)
+
+val is_set : bitstring -> int -> bool
+  (** [is_set bits n] is true if the [n]th bit is set to 1. *)
+
+val is_clear : bitstring -> int -> bool
+  (** [is_clear bits n] is true if the [n]th bit is set to 0. *)
+
+val put : bitstring -> int -> int -> unit
+  (** [put bits n v] sets the [n]th bit in the bitstring to 1
+      if [v] is not zero, or to 0 if [v] is zero. *)
+
+val get : bitstring -> int -> int
+  (** [get bits n] returns the [n]th bit (returns non-zero or 0). *)
 
 (** {3 Miscellaneous} *)
 
