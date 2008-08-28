@@ -274,6 +274,9 @@ install:
 		pa_bitstring.cmo
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 
+uninstall: 
+	ocamlfind remove bitstring
+
 # Standard rules.
 
 .mli.cmi:
