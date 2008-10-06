@@ -1106,7 +1106,7 @@ let equals ((_, _, len1) as bs1) ((_, _, len2) as bs2) =
 let index_out_of_bounds () = invalid_arg "index out of bounds"
 
 let put (data, off, len) n v =
-  if n < 0 || off+n >= len then index_out_of_bounds ()
+  if n < 0 || n >= len then index_out_of_bounds ()
   else (
     let i = off+n in
     let si = i lsr 3 and mask = 0x80 lsr (i land 7) in
@@ -1120,7 +1120,7 @@ let set bits n = put bits n 1
 let clear bits n = put bits n 0
 
 let get (data, off, len) n =
-  if n < 0 || off+n >= len then index_out_of_bounds ()
+  if n < 0 || n >= len then index_out_of_bounds ()
   else (
     let i = off+n in
     let si = i lsr 3 and mask = 0x80 lsr (i land 7) in
