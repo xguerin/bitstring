@@ -9,6 +9,7 @@ bitstring_objinfo.ml
 bitstring_persistent.ml
 bitstring_persistent.mli
 bitstring_types.ml
+bootstrap
 byteswap.in.h
 .depend
 cil-tools/bitstring_import_c.ml
@@ -50,6 +51,7 @@ tests/02_run.ml
 tests/10_match_bits.ml
 tests/11_match_ints.ml
 tests/15_extract_int.ml
+tests/18_extract_32_64_int.ml
 tests/20_varsize.ml
 tests/30_bitbuffer.ml
 tests/31_bitstring_concat.ml
