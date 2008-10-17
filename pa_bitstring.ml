@@ -666,9 +666,17 @@ let output_bitmatch _loc bs cases =
 		  | 16 ->
 		      <:expr< Bitstring.$lid:name$ $lid:data$ o >>
 		  | 32 ->
-		      <:expr< Bitstring.$lid:name$ $lid:data$ o 0l >>
+		      <:expr<
+			(* must allocate a new zero each time *)
+			let zero = Int32.of_int 0 in
+			Bitstring.$lid:name$ $lid:data$ o zero
+		      >>
 		  | 64 ->
-		      <:expr< Bitstring.$lid:name$ $lid:data$ o 0L >>
+		      <:expr<
+			(* must allocate a new zero each time *)
+			let zero = Int64.of_int 0 in
+			Bitstring.$lid:name$ $lid:data$ o zero
+		      >>
 		  | _ -> assert false in
 		<:expr<
 		  (* Starting offset within the string. *)
