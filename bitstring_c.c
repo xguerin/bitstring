@@ -86,8 +86,6 @@ fastpath1(16,be,signed,int16_t)
 fastpath1(16,le,signed,int16_t)
 fastpath1(16,ne,signed,int16_t)
 
-/* XXX This probably doesn't work on ARCH_ALIGN_INT64 platforms. */
-
 #define fastpath2(size,endian,signed,type,rval)				\
   CAMLprim value							\
   ocaml_bitstring_extract_fastpath_int##size##_##endian##_##signed	\
@@ -108,9 +106,32 @@ fastpath2(32,be,signed,int32_t,Int32_val)
 fastpath2(32,le,signed,int32_t,Int32_val)
 fastpath2(32,ne,signed,int32_t,Int32_val)
 
-fastpath2(64,be,unsigned,uint64_t,Int64_val)
-fastpath2(64,le,unsigned,uint64_t,Int64_val)
-fastpath2(64,ne,unsigned,uint64_t,Int64_val)
-fastpath2(64,be,signed,int64_t,Int64_val)
-fastpath2(64,le,signed,int64_t,Int64_val)
-fastpath2(64,ne,signed,int64_t,Int64_val)
+/* Special care needs to be taken on ARCH_ALIGN_INT64 platforms
+   (hppa and sparc in Debian). */
+
+#ifdef ARCH_ALIGN_INT64
+#include <caml/memory.h>
+#include <caml/alloc.h>
+#define fastpath3(size,endian,signed,type,rval)				\
+  CAMLprim value							\
+  ocaml_bitstring_extract_fastpath_int##size##_##endian##_##signed	\
+  (value strv, value offv, value rv)					\
+  {									\
+    CAMLparam3(strv, offv, rv);						\
+    type *ptr = (type *) ((void *) String_val (strv) + Int_val (offv));	\
+    type r;								\
+    r = *ptr;								\
+    swap_##endian(size,r);						\
+    CAMLreturn(caml_copy_int64(r));					\
+  }
+
+#else
+#define fastpath3 fastpath2
+#endif
+
+fastpath3(64,be,unsigned,uint64_t,Int64_val)
+fastpath3(64,le,unsigned,uint64_t,Int64_val)
+fastpath3(64,ne,unsigned,uint64_t,Int64_val)
+fastpath3(64,be,signed,int64_t,Int64_val)
+fastpath3(64,le,signed,int64_t,Int64_val)
+fastpath3(64,ne,signed,int64_t,Int64_val)
