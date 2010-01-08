@@ -17,6 +17,7 @@
 /* Include files necessary to get the structure(s) and constant(s) we're
  * interested in.
  */
+#include <linux/fs.h>
 #include <linux/magic.h>
 #include <linux/ext2_fs.h>
 
