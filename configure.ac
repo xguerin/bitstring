@@ -66,11 +66,9 @@ fi
 
 dnl Check for Extlib (optional)
 AC_CHECK_OCAML_PKG(extlib)
-AC_SUBST(pkg_extlib)
 
 dnl Check for CIL (optional)
 AC_CHECK_OCAML_PKG(cil)
-AC_SUBST(pkg_cil)
 
 dnl Check for /usr/bin/time and get full path.
 AC_PATH_PROG(TIME,time,no)
