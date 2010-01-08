@@ -1123,6 +1123,10 @@ EXTEND Gram
       fields = LIST0 patt_field SEP ";";
       "}" ->
 	List.concat fields
+    | "{";
+      "_";
+      "}" ->
+	[]
     ]
   ];
 
