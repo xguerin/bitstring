@@ -17,7 +17,7 @@
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(ocaml-bitstring,2.0.1)
+AC_INIT(ocaml-bitstring,2.0.2)
 
 dnl Check for basic C environment.
 AC_PROG_CC
