@@ -109,11 +109,11 @@ bitstring_persistent.cmi: bitstring_persistent.mli
 	  -I +camlp4 -pp camlp4of -c $<
 
 pa_bitstring.cmo: pa_bitstring.ml bitstring.cma bitstring_persistent.cma
-	$(OCAMLFIND) ocamlc bitstring.cma -I +camlp4 camlp4lib.cma \
+	$(OCAMLFIND) ocamlc bitstring.cma -I +camlp4 dynlink.cma camlp4lib.cma \
 	  -pp camlp4of -c $< -o $@
 
 bitstring-objinfo: bitstring_objinfo.cmo bitstring.cma bitstring_persistent.cma
-	$(OCAMLFIND) ocamlc -I +camlp4 unix.cma camlp4lib.cma \
+	$(OCAMLFIND) ocamlc -I +camlp4 unix.cma dynlink.cma camlp4lib.cma \
 	  $(OCAMLCLIBS) \
 	  bitstring.cma bitstring_persistent.cma \
 	  $< -o $@
@@ -155,7 +155,7 @@ tests/test.bmpp: create_test_pattern
 
 create_test_pattern: create_test_pattern.cmo
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) -pp camlp4of \
-	  unix.cma -I +camlp4 camlp4lib.cma \
+	  unix.cma -I +camlp4 dynlink.cma camlp4lib.cma \
 	  $(OCAMLCLIBS) \
 	  -I . bitstring.cma bitstring_persistent.cma $< -o $@
 
