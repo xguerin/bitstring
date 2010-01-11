@@ -15,8 +15,8 @@ package "persistent" (
 
 package "syntax" (
   version = "@PACKAGE_VERSION@"
+  requires = "camlp4"
   description = "Syntax extension: bitstring operators"
   archive(syntax,preprocessor) = "unix.cma bitstring.cma bitstring_persistent.cma pa_bitstring.cmo"
   archive(syntax,toploop) = "unix.cma bitstring.cma bitstring_persistent.cma pa_bitstring.cmo"
-  preprocessor = "camlp4of"
 )
