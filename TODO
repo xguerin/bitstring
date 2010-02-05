@@ -98,3 +98,39 @@ Major to-do items.
      save_offset_to(patt) binds the current match offset to
      the variable, for later use within bind(), when() or
      any later parts of the match.
+
+(21) derive() so you can add your own variable decls:
+
+     { field : 32 : derive (field_as_int, Int32.to_int field) }
+
+     This would add a let derivation, equivalent to:
+
+     let field_as_int = Int32.to_int field
+
+     allowing you to use both the original field and field_as_int
+     as variables.
+
+     Note you can do this clumsily using bind():
+
+     { field : 32 : bind (field, Int32.to_int field) }
+
+     which redefines 'field' as a pair of (old value, derived value).
+
+(22) Allow constant 0 to be used in constructors to mean a zero-length
+     bitstring of the right length, eg:
+
+     BITSTRING { 0 : 32*8 : bitstring }
+
+     which would be equivalent to:
+
+     BITSTRING { zeroes_bitstring (32*8) : 32*8 : bitstring }
+
+(23) Add predicate Bitstring.is_zero_bitstring : bitstring -> bool
+
+(24) Add a function to turn bitstrings into printable strings.
+
+(25) Folding over bitstrings.  A narrow usage for this is to generate
+     checksums and hashes, where usually you want to fold over every
+     8/16/32-bit word.  So a set of functions which just enabled this
+     would be useful.  (However you still need le/be/ne variations so
+     it involves at least 7 functions).
