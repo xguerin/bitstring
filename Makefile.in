@@ -135,6 +135,8 @@ else
 PP	= -pp 'camlp4o $(OCAMLLIB)/bisect/bisect.cma bitstring.cma bitstring_persistent.cma pa_bitstring.cmo'
 endif
 
+check: test
+
 test: pa_bitstring.cmo \
 	bitstring.cma bitstring_persistent.cma \
 	bitstring.cmxa bitstring_persistent.cmxa \

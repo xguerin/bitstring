@@ -1,4 +1,4 @@
-ocaml-bitstring Copyright (C) 2008 Red Hat Inc, Richard W.M. Jones.
+ocaml-bitstring Copyright (C) 2008-2012 Red Hat Inc, Richard W.M. Jones.
 
 This library was formerly known as 'bitmatch'.
 
@@ -17,7 +17,7 @@ To build:
 
 Other make targets:
 
-	make test		# build and run the test suite
+	make check		# build and run the test suite
 
 	make examples		# build the examples
 
