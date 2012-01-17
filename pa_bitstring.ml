@@ -989,7 +989,8 @@ let output_bitmatch _loc bs cases =
 	match bind with
 	| Some name ->
 	    <:expr<
-	      let $lid:name$ = ($lid:data$, $lid:off$, $lid:len$) in
+	      let $lid:name$ = ($lid:data$,
+                                $lid:original_off$, $lid:original_len$) in
 	      $inner$
 	      >>
 	| None -> inner in
