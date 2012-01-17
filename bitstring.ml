@@ -853,7 +853,8 @@ module Buffer = struct
 	   *)
 	  let slenbytes = slen lsr 3 in
 	  if slenbytes > 0 then Buffer.add_substring buf str 0 slenbytes;
-	  let last = Char.code str.[slenbytes] in (* last char *)
+	  let lastidx = min slenbytes (String.length str - 1) in
+	  let last = Char.code str.[lastidx] in (* last char *)
 	  let mask = 0xff lsl (8 - (slen land 7)) in
 	  t.last <- last land mask
 	);
@@ -992,7 +993,7 @@ let construct_bitstring buf (data, off, len) =
     if blen = 0 then (off, len)
     else (
       let b = extract_bit data off len 1
-      and off = off + 1 and len = len + 1 in
+      and off = off + 1 and len = len - 1 in
       Buffer.add_bit buf b;
       loop off len (blen-1)
     )
