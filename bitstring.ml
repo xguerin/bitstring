@@ -130,7 +130,7 @@ let bitstring_length (_, _, len) = len
 
 let subbitstring (data, off, len) off' len' =
   let off = off + off' in
-  if len < off' + len' then invalid_arg "subbitstring";
+  if off' < 0 || len' < 0 || off' > len - len' then invalid_arg "subbitstring";
   (data, off, len')
 
 let dropbits n (data, off, len) =
