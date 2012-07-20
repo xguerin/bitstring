@@ -17,6 +17,6 @@ package "syntax" (
   version = "@PACKAGE_VERSION@"
   requires = "camlp4"
   description = "Syntax extension: bitstring operators"
-  archive(syntax,preprocessor) = "unix.cma bitstring.cma bitstring_persistent.cma pa_bitstring.cmo"
+  archive(syntax,preprocessor) = "-parser o -parser op -printer p unix.cma bitstring.cma bitstring_persistent.cma pa_bitstring.cmo"
   archive(syntax,toploop) = "unix.cma bitstring.cma bitstring_persistent.cma pa_bitstring.cmo"
 )
