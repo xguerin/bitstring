@@ -26,6 +26,7 @@ OCAMLDOC	= @OCAMLDOC@
 INSTALL		= @INSTALL@
 TIME		= @TIME@
 GPROF		= @GPROF@
+SED		= @SED@
 BISECT_REPORT	= @BISECT_REPORT@
 
 BYTESWAP_H	= @BYTESWAP_H@
@@ -295,13 +296,20 @@ depend: .depend
 	  bitstring_persistent.ml bitstring_persistent.mli \
 	  bitstring_objinfo.ml \
 	  create_test_pattern.ml
-	rm -f .depend
+	rm -f $@ $@-t
 	$(OCAMLFIND) ocamldep $(OCAMLCPACKAGES) \
 	  bitstring.ml bitstring.mli \
-	  bitstring_objinfo.ml >> $@
+	  bitstring_objinfo.ml | \
+	  $(SED) 's/ :/:/' | \
+	  $(SED) 's/ *$$//' | \
+	  $(SED) -e :a -e '/ *\\$$/N; s/ *\\\n */ /; ta' >> $@-t
 	$(OCAMLFIND) ocamldep $(OCAMLCPACKAGES) -pp camlp4of \
 	  bitstring_persistent.ml bitstring_persistent.mli \
-	  create_test_pattern.ml >> $@
+	  create_test_pattern.ml | \
+	  $(SED) 's/ :/:/' | \
+	  $(SED) 's/ *$$//' | \
+	  $(SED) -e :a -e '/ *\\$$/N; s/ *\\\n */ /; ta' >> $@-t
+	mv $@-t $@
 
 ifeq ($(wildcard .depend),.depend)
 include .depend
