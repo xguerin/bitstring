@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <byteswap.h>
+#include <string.h>
 
 #include <caml/mlvalues.h>
 #include <caml/fail.h>
@@ -74,7 +75,7 @@
   {									\
     type *ptr = (type *) ((void *) String_val (strv) + Int_val (offv));	\
     type r;								\
-    r = *ptr;								\
+    memcpy(&r, ptr, sizeof(r));					\
     swap_##endian(size,r);						\
     return Val_int (r);							\
   }
@@ -93,7 +94,7 @@ fastpath1(16,ne,signed,int16_t)
   {									\
     type *ptr = (type *) ((void *) String_val (strv) + Int_val (offv));	\
     type r;								\
-    r = *ptr;								\
+    memcpy(&r, ptr, sizeof(r));					\
     swap_##endian(size,r);						\
     rval(rv) = r;							\
     return rv;								\
@@ -117,12 +118,12 @@ fastpath2(32,ne,signed,int32_t,Int32_val)
   ocaml_bitstring_extract_fastpath_int##size##_##endian##_##signed	\
   (value strv, value offv, value rv)					\
   {									\
-    CAMLparam3(strv, offv, rv);						\
     type *ptr = (type *) ((void *) String_val (strv) + Int_val (offv));	\
     type r;								\
-    r = *ptr;								\
+    memcpy(&r, ptr, sizeof(r));					\
     swap_##endian(size,r);						\
-    CAMLreturn(caml_copy_int64(r));					\
+    memcpy(Data_custom_val(rv), &r, sizeof(r));			\
+    return rv;								\
   }
 
 #else
