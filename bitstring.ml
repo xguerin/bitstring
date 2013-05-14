@@ -1101,6 +1101,42 @@ let equals ((_, _, len1) as bs1) ((_, _, len2) as bs2) =
   else if bs1 = bs2 then true
   else 0 = compare bs1 bs2
 
+let is_zeroes_bitstring ((data, off, len) as bits) =
+  if off land 7 = 0 && len land 7 = 0 then (
+    let off = off lsr 3 and len = len lsr 3 in
+    let rec loop i =
+      if i < len then (
+        if String.unsafe_get data (off + i) <> '\000' then false
+        else loop (i+1)
+      ) else true
+    in
+    loop 0
+  )
+  else (
+    (* Slow/unaligned case. *)
+    let len = bitstring_length bits in
+    let zeroes = zeroes_bitstring len in
+    0 = compare bits zeroes
+  )
+
+let is_ones_bitstring ((data, off, len) as bits) =
+  if off land 7 = 0 && len land 7 = 0 then (
+    let off = off lsr 3 and len = len lsr 3 in
+    let rec loop i =
+      if i < len then (
+        if String.unsafe_get data (off + i) <> '\xff' then false
+        else loop (i+1)
+      ) else true
+    in
+    loop 0
+  )
+  else (
+    (* Slow/unaligned case. *)
+    let len = bitstring_length bits in
+    let ones = ones_bitstring len in
+    0 = compare bits ones
+  )
+
 (*----------------------------------------------------------------------*)
 (* Bit get/set functions. *)
 

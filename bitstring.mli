@@ -707,6 +707,12 @@ val equals : bitstring -> bitstring -> bool
     semantically equal.  It is the same as calling [compare] and
     testing if the result is [0], but usually more efficient. *)
 
+val is_zeroes_bitstring : bitstring -> bool
+(** Tests if the bitstring is all zero bits (cf. {!zeroes_bitstring}) *)
+
+val is_ones_bitstring : bitstring -> bool
+(** Tests if the bitstring is all one bits (cf. {!ones_bitstring}). *)
+
 (** {3 Bitstring manipulation} *)
 
 val bitstring_length : bitstring -> int
