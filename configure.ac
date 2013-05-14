@@ -1,5 +1,5 @@
 # Bitstring syntax extension.
-# Copyright (C) 2008-2012 Red Hat Inc., Richard W.M. Jones
+# Copyright (C) 2008-2013 Red Hat Inc., Richard W.M. Jones
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,7 @@
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(ocaml-bitstring,2.0.3)
+AC_INIT(ocaml-bitstring,2.0.4)
 
 AC_PROG_SED
 
