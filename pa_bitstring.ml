@@ -631,7 +631,7 @@ let output_bitmatch _loc bs cases =
 		<:expr<
                   let o =
 		    ($lid:original_off$ lsr 3) + $`int:field_byte_offset$ in
-                  Char.code (String.unsafe_get $lid:data$ o)              
+                  Bitstring.char_code (String.unsafe_get $lid:data$ o)              
                 >> in
 
               <:expr<
@@ -668,7 +668,7 @@ let output_bitmatch _loc bs cases =
 		  | 32 ->
 		      <:expr<
 			(* must allocate a new zero each time *)
-			let zero = Int32.of_int 0 in
+			let zero = Bitstring.int32_of_int 0 in
 			Bitstring.$lid:name$ $lid:data$ o zero
 		      >>
 		  | 64 ->

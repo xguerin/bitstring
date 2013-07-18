@@ -1084,3 +1084,7 @@ val construct_int64_ee_unsigned : endian -> Buffer.t -> int64 -> int -> exn -> u
 val construct_string : Buffer.t -> string -> unit
 
 val construct_bitstring : Buffer.t -> bitstring -> unit
+
+(* Alias of functions shadowed by Core. *)
+val char_code : char -> int
+val int32_of_int : int -> int32

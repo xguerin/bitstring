@@ -1212,3 +1212,9 @@ let hexdump_bitstring chan (data, off, len) =
     fprintf chan " |%s|\n%!" linechars
   ) else
     fprintf chan "\n%!"
+
+(*----------------------------------------------------------------------*)
+(* Alias of functions shadowed by Core. *)
+
+let char_code = Char.code
+let int32_of_int = Int32.of_int
