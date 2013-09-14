@@ -42,8 +42,8 @@ enable_coverage = @enable_coverage@
 OCAMLCFLAGS	= -g
 OCAMLCPACKAGES	=
 OCAMLCLIBS	= -linkpkg
-OCAMLOPTFLAGS	=
-OCAMLOPTPACKAGES =
+OCAMLOPTFLAGS	= $(OCAMLCFLAGS)
+OCAMLOPTPACKAGES = $(OCAMLCPACKAGES)
 OCAMLOPTLIBS	= -linkpkg
 
 ifneq ($(enable_coverage),no)
@@ -88,7 +88,7 @@ bitstring.cma: bitstring_types.cmo bitstring_config.cmo \
 	$(OCAMLMKLIB) -o bitstring $^
 
 bitstring_persistent.cma: bitstring_persistent.cmo
-	$(OCAMLFIND) ocamlc -a -o $@ $^
+	$(OCAMLFIND) ocamlc -a $(OCAMLCFLAGS) -o $@ $^
 
 bitstring_persistent.cmo: bitstring_persistent.ml
 	$(OCAMLFIND) ocamlc $(OCAMLCFLAGS) $(OCAMLCPACKAGES) \
@@ -99,7 +99,7 @@ bitstring.cmxa: bitstring_types.cmx bitstring_config.cmx \
 	$(OCAMLMKLIB) -o bitstring $^
 
 bitstring_persistent.cmxa: bitstring_persistent.cmx
-	$(OCAMLFIND) ocamlopt -a -o $@ $^
+	$(OCAMLFIND) ocamlopt -a $(OCAMLOPTFLAGS) -o $@ $^
 
 bitstring_persistent.cmx: bitstring_persistent.ml
 	$(OCAMLFIND) ocamlopt $(OCAMLOPTFLAGS) $(OCAMLOPTPACKAGES) \
@@ -115,7 +115,7 @@ pa_bitstring.cmo: pa_bitstring.ml bitstring.cma bitstring_persistent.cma
 
 bitstring-objinfo: bitstring_objinfo.cmo bitstring.cma bitstring_persistent.cma
 	$(OCAMLFIND) ocamlc -I +camlp4 unix.cma dynlink.cma camlp4lib.cma \
-	  $(OCAMLCLIBS) \
+	  $(OCAMLCFLAGS) $(OCAMLCLIBS) \
 	  bitstring.cma bitstring_persistent.cma \
 	  $< -o $@
 
