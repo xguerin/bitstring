@@ -940,13 +940,23 @@ val extract_bit : string -> int -> int -> int -> bool
 
 val extract_char_unsigned : string -> int -> int -> int -> int
 
+val extract_char_signed : string -> int -> int -> int -> int
+
 val extract_int_be_unsigned : string -> int -> int -> int -> int
+
+val extract_int_be_signed : string -> int -> int -> int -> int
 
 val extract_int_le_unsigned : string -> int -> int -> int -> int
 
+val extract_int_le_signed : string -> int -> int -> int -> int
+
 val extract_int_ne_unsigned : string -> int -> int -> int -> int
 
+val extract_int_ne_signed : string -> int -> int -> int -> int
+
 val extract_int_ee_unsigned : endian -> string -> int -> int -> int -> int
+
+val extract_int_ee_signed : endian -> string -> int -> int -> int -> int
 
 val extract_int32_be_unsigned : string -> int -> int -> int -> int32
 
@@ -1057,6 +1067,8 @@ val construct_bit : Buffer.t -> bool -> int -> exn -> unit
 
 val construct_char_unsigned : Buffer.t -> int -> int -> exn -> unit
 
+val construct_char_signed : Buffer.t -> int -> int -> exn -> unit
+
 val construct_int_be_unsigned : Buffer.t -> int -> int -> exn -> unit
 
 val construct_int_le_unsigned : Buffer.t -> int -> int -> exn -> unit
@@ -1064,6 +1076,14 @@ val construct_int_le_unsigned : Buffer.t -> int -> int -> exn -> unit
 val construct_int_ne_unsigned : Buffer.t -> int -> int -> exn -> unit
 
 val construct_int_ee_unsigned : endian -> Buffer.t -> int -> int -> exn -> unit
+
+val construct_int_be_signed : Buffer.t -> int -> int -> exn -> unit
+
+val construct_int_le_signed : Buffer.t -> int -> int -> exn -> unit
+
+val construct_int_ne_signed : Buffer.t -> int -> int -> exn -> unit
+
+val construct_int_ee_signed : endian -> Buffer.t -> int -> int -> exn -> unit
 
 val construct_int32_be_unsigned : Buffer.t -> int32 -> int -> exn -> unit
 

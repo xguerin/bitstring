@@ -623,7 +623,7 @@ let output_bitmatch _loc bs cases =
 	     * be known at runtime) but we may be able to directly access
 	     * the bytes in the string.
 	     *)
-	  | P.Int, Some 8, Some field_byte_offset, _, _ ->
+	  | P.Int, Some 8, Some field_byte_offset, _, signed ->
 	      let extract_fn = int_extract_const 8 endian signed in
 
               (* The fast-path code when everything is aligned. *)
@@ -637,7 +637,7 @@ let output_bitmatch _loc bs cases =
               <:expr<
 		if $lid:len$ >= 8 then (
                   let v =
-                    if $lid:off_aligned$ then
+                    if not $`bool:signed$ && $lid:off_aligned$ then
                       $fastpath$
                     else
                       $extract_fn$ $lid:data$ $lid:off$ $lid:len$ 8 in

@@ -161,7 +161,8 @@ module I = struct
 
   (* Create a mask 0-31 bits wide. *)
   let mask bits =
-    if bits < 30 then
+    if bits < 30 || 
+      (bits < 32 && Sys.word_size = 64) then
       (one <<< bits) - 1
     else if bits = 30 then
       max_int
@@ -197,6 +198,19 @@ module I = struct
   let range_unsigned v bits =
     let mask = lnot (mask bits) in
     (v land mask) = zero
+
+  let range_signed v bits =
+    if 
+      v >= zero 
+    then
+      range_unsigned v bits
+    else
+      if
+	bits = 31 && Sys.word_size = 32
+      then
+	v >= min_int		
+      else
+	pred (minus_one <<< pred bits) < v
 
   (* Call function g on the top bits, then f on each full byte
    * (big endian - so start at top).
@@ -399,6 +413,16 @@ let _get_byte32 data byteoff strlen =
 let _get_byte64 data byteoff strlen =
   if strlen > byteoff then Int64.of_int (Char.code data.[byteoff]) else 0L
 
+(* Extend signed [2..31] bits int to 31 bits int or 63 bits int for 64
+   bits platform*)
+let extend_sign len v =
+  let b = pred Sys.word_size - len in
+    (v lsl b) asr b
+
+let extract_and_extend_sign f data off len flen =
+  let w = f data off len flen in
+    extend_sign len w
+
 (* Extract [2..8] bits.  Because the result fits into a single
  * byte we don't have to worry about endianness, only signedness.
  *)
@@ -428,6 +452,9 @@ let extract_char_unsigned data off len flen =
 
     word (*, off+flen, len-flen*)
   )
+
+let extract_char_signed =
+  extract_and_extend_sign extract_char_unsigned
 
 (* Extract [9..31] bits.  We have to consider endianness and signedness. *)
 let extract_int_be_unsigned data off len flen =
@@ -472,20 +499,32 @@ let extract_int_be_unsigned data off len flen =
     ) in
   word (*, off+flen, len-flen*)
 
+let extract_int_be_signed =
+  extract_and_extend_sign extract_int_be_unsigned
+
 let extract_int_le_unsigned data off len flen =
   let v = extract_int_be_unsigned data off len flen in
   let v = I.byteswap v flen in
   v
+
+let extract_int_le_signed =
+  extract_and_extend_sign extract_int_le_unsigned
 
 let extract_int_ne_unsigned =
   if nativeendian = BigEndian
   then extract_int_be_unsigned
   else extract_int_le_unsigned
 
+let extract_int_ne_signed = 
+  extract_and_extend_sign extract_int_ne_unsigned
+
 let extract_int_ee_unsigned = function
   | BigEndian -> extract_int_be_unsigned
   | LittleEndian -> extract_int_le_unsigned
   | NativeEndian -> extract_int_ne_unsigned
+
+let extract_int_ee_signed e =
+  extract_and_extend_sign (extract_int_ee_unsigned e)
 
 let _make_int32_be c0 c1 c2 c3 =
   Int32.logor
@@ -896,29 +935,52 @@ let construct_char_unsigned buf v flen exn =
   else
     Buffer._add_bits buf v flen
 
-(* Construct a field of up to 31 bits. *)
-let construct_int_be_unsigned buf v flen exn =
-  (* Check value is within range. *)
-  if not (I.range_unsigned v flen) then raise exn;
-  (* Add the bytes. *)
-  I.map_bytes_be (Buffer._add_bits buf) (Buffer.add_byte buf) v flen
+let construct_char_signed buf v flen exn =
+  let max_val = 1 lsl flen 
+  and min_val = - (1 lsl pred flen) in
+    if v < min_val || v >= max_val then
+	raise exn;
+    if flen = 8 then
+      Buffer.add_byte buf (if v >= 0 then v else 256 + v)
+    else 
+      Buffer._add_bits buf v flen
 
 (* Construct a field of up to 31 bits. *)
-let construct_int_le_unsigned buf v flen exn =
-  (* Check value is within range. *)
-  if not (I.range_unsigned v flen) then raise exn;
-  (* Add the bytes. *)
-  I.map_bytes_le (Buffer._add_bits buf) (Buffer.add_byte buf) v flen
+let construct_int check_func map_func buf v flen exn =
+  if not (check_func v flen) then raise exn;
+  map_func (Buffer._add_bits buf) (Buffer.add_byte buf) v flen
+
+let construct_int_be_unsigned =
+  construct_int I.range_unsigned I.map_bytes_be
+
+let construct_int_be_signed =
+  construct_int I.range_signed I.map_bytes_be
+
+let construct_int_le_unsigned =
+  construct_int I.range_unsigned I.map_bytes_le
+
+let construct_int_le_signed =
+  construct_int I.range_signed I.map_bytes_le
 
 let construct_int_ne_unsigned =
   if nativeendian = BigEndian
   then construct_int_be_unsigned
   else construct_int_le_unsigned
 
+let construct_int_ne_signed =
+  if nativeendian = BigEndian
+  then construct_int_be_signed
+  else construct_int_le_signed
+
 let construct_int_ee_unsigned = function
   | BigEndian -> construct_int_be_unsigned
   | LittleEndian -> construct_int_le_unsigned
   | NativeEndian -> construct_int_ne_unsigned
+
+let construct_int_ee_signed = function
+  | BigEndian -> construct_int_be_signed
+  | LittleEndian -> construct_int_le_signed
+  | NativeEndian -> construct_int_ne_signed
 
 (* Construct a field of exactly 32 bits. *)
 let construct_int32_be_unsigned buf v flen _ =
