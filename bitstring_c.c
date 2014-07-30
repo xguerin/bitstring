@@ -33,6 +33,8 @@
 
 #include <caml/mlvalues.h>
 #include <caml/fail.h>
+#include <caml/memory.h>
+#include <caml/alloc.h>
 
 /* Fastpath functions.  These are used in the common case for reading
  * ints where the following conditions are known to be true:
@@ -40,10 +42,10 @@
  * (b) the access in the match is byte-aligned
  * (c) the access in the underlying bitstring is byte-aligned
  *
- * These functions are all "noalloc" meaning they must not perform
- * any OCaml allocations.  For this reason, when the function returns
- * an int32 or int64, the OCaml code passes in the pre-allocated pointer
- * to the return value.
+ * These functions used to all be "noalloc" meaning they must not
+ * perform any OCaml allocations.  However starting with OCaml 4.02, a
+ * compiler optimization means that unforunately we now have to use
+ * ordinary alloc functions in some cases.
  *
  * The final offset in the string is calculated by the OCaml (caller)
  * code.  All we need to do is to read the string+offset and byteswap,
@@ -87,52 +89,31 @@ fastpath1(16,be,signed,int16_t)
 fastpath1(16,le,signed,int16_t)
 fastpath1(16,ne,signed,int16_t)
 
-#define fastpath2(size,endian,signed,type,rval)				\
+#define fastpath2(size,endian,signed,type,copy)				\
   CAMLprim value							\
   ocaml_bitstring_extract_fastpath_int##size##_##endian##_##signed	\
-  (value strv, value offv, value rv)					\
+  (value strv, value offv)                                              \
   {									\
+    CAMLparam2 (strv, offv);                                            \
+    CAMLlocal1 (rv);                                                    \
     type *ptr = (type *) ((void *) String_val (strv) + Int_val (offv));	\
     type r;								\
-    memcpy(&r, ptr, sizeof(r));					\
+    memcpy(&r, ptr, sizeof(r));                                         \
     swap_##endian(size,r);						\
-    rval(rv) = r;							\
-    return rv;								\
+    rv = copy (r);                                                      \
+    CAMLreturn (rv);                                                    \
   }
 
-fastpath2(32,be,unsigned,uint32_t,Int32_val)
-fastpath2(32,le,unsigned,uint32_t,Int32_val)
-fastpath2(32,ne,unsigned,uint32_t,Int32_val)
-fastpath2(32,be,signed,int32_t,Int32_val)
-fastpath2(32,le,signed,int32_t,Int32_val)
-fastpath2(32,ne,signed,int32_t,Int32_val)
+fastpath2(32,be,unsigned,uint32_t,caml_copy_int32)
+fastpath2(32,le,unsigned,uint32_t,caml_copy_int32)
+fastpath2(32,ne,unsigned,uint32_t,caml_copy_int32)
+fastpath2(32,be,signed,int32_t,caml_copy_int32)
+fastpath2(32,le,signed,int32_t,caml_copy_int32)
+fastpath2(32,ne,signed,int32_t,caml_copy_int32)
 
-/* Special care needs to be taken on ARCH_ALIGN_INT64 platforms
-   (hppa and sparc in Debian). */
-
-#ifdef ARCH_ALIGN_INT64
-#include <caml/memory.h>
-#include <caml/alloc.h>
-#define fastpath3(size,endian,signed,type,rval)				\
-  CAMLprim value							\
-  ocaml_bitstring_extract_fastpath_int##size##_##endian##_##signed	\
-  (value strv, value offv, value rv)					\
-  {									\
-    type *ptr = (type *) ((void *) String_val (strv) + Int_val (offv));	\
-    type r;								\
-    memcpy(&r, ptr, sizeof(r));					\
-    swap_##endian(size,r);						\
-    memcpy(Data_custom_val(rv), &r, sizeof(r));			\
-    return rv;								\
-  }
-
-#else
-#define fastpath3 fastpath2
-#endif
-
-fastpath3(64,be,unsigned,uint64_t,Int64_val)
-fastpath3(64,le,unsigned,uint64_t,Int64_val)
-fastpath3(64,ne,unsigned,uint64_t,Int64_val)
-fastpath3(64,be,signed,int64_t,Int64_val)
-fastpath3(64,le,signed,int64_t,Int64_val)
-fastpath3(64,ne,signed,int64_t,Int64_val)
+fastpath2(64,be,unsigned,uint64_t,caml_copy_int64)
+fastpath2(64,le,unsigned,uint64_t,caml_copy_int64)
+fastpath2(64,ne,unsigned,uint64_t,caml_copy_int64)
+fastpath2(64,be,signed,int64_t,caml_copy_int64)
+fastpath2(64,le,signed,int64_t,caml_copy_int64)
+fastpath2(64,ne,signed,int64_t,caml_copy_int64)
