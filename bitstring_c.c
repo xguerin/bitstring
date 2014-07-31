@@ -75,7 +75,7 @@
   ocaml_bitstring_extract_fastpath_int##size##_##endian##_##signed	\
   (value strv, value offv)						\
   {									\
-    type *ptr = (type *) ((void *) String_val (strv) + Int_val (offv));	\
+    type *ptr = (type *) ((char *) String_val (strv) + Int_val (offv));	\
     type r;								\
     memcpy(&r, ptr, sizeof(r));					\
     swap_##endian(size,r);						\
@@ -96,7 +96,7 @@ fastpath1(16,ne,signed,int16_t)
   {									\
     CAMLparam2 (strv, offv);                                            \
     CAMLlocal1 (rv);                                                    \
-    type *ptr = (type *) ((void *) String_val (strv) + Int_val (offv));	\
+    type *ptr = (type *) ((char *) String_val (strv) + Int_val (offv));	\
     type r;								\
     memcpy(&r, ptr, sizeof(r));                                         \
     swap_##endian(size,r);						\
