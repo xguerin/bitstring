@@ -161,7 +161,7 @@ module I = struct
 
   (* Create a mask 0-31 bits wide. *)
   let mask bits =
-    if bits < 30 || 
+    if bits < 30 ||
       (bits < 32 && Sys.word_size = 64) then
       (one <<< bits) - 1
     else if bits = 30 then
@@ -200,15 +200,15 @@ module I = struct
     (v land mask) = zero
 
   let range_signed v bits =
-    if 
-      v >= zero 
+    if
+      v >= zero
     then
       range_unsigned v bits
     else
       if
 	bits = 31 && Sys.word_size = 32
       then
-	v >= min_int		
+	v >= min_int
       else
 	pred (minus_one <<< pred bits) < v
 
@@ -421,7 +421,7 @@ let extend_sign len v =
 
 let extract_and_extend_sign f data off len flen =
   let w = f data off len flen in
-    extend_sign len w
+    extend_sign flen w
 
 (* Extract [2..8] bits.  Because the result fits into a single
  * byte we don't have to worry about endianness, only signedness.
@@ -515,7 +515,7 @@ let extract_int_ne_unsigned =
   then extract_int_be_unsigned
   else extract_int_le_unsigned
 
-let extract_int_ne_signed = 
+let extract_int_ne_signed =
   extract_and_extend_sign extract_int_ne_unsigned
 
 let extract_int_ee_unsigned = function
@@ -936,13 +936,13 @@ let construct_char_unsigned buf v flen exn =
     Buffer._add_bits buf v flen
 
 let construct_char_signed buf v flen exn =
-  let max_val = 1 lsl flen 
+  let max_val = 1 lsl flen
   and min_val = - (1 lsl pred flen) in
     if v < min_val || v >= max_val then
 	raise exn;
     if flen = 8 then
       Buffer.add_byte buf (if v >= 0 then v else 256 + v)
-    else 
+    else
       Buffer._add_bits buf v flen
 
 (* Construct a field of up to 31 bits. *)
