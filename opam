@@ -1,11 +1,13 @@
-opam-version: "1.2"
-maintainer: "contact@ocamlpro.com"
-authors: ["Richard W.M. Jones"]
-homepage: "http://code.google.com/p/bitstring"
-dev-repo: "https://code.google.com/p/bitstring.git"
-license: "LGPLv2+ with exceptions and GPLv2+"
+authors: [ "Richard W.M. Jones" ]
+bug-reports: "https://github.com/xguerin/ppx_bitstring/issues"
+dev-repo: "https://github.com/xguerin/bitstring.git"
 doc: ["http://et.redhat.com/~rjones/bitstring/html/Bitstring.html"]
-version: 2.1.0
+homepage: "https://github.com/xguerin/bitstring"
+license: "LGPLv2+ with exceptions and GPLv2+"
+maintainer: "Xavier Guérin <github@applepine.org>"
+opam-version: "1.2"
+version: "2.1.0"
+
 build: [
   ["./configure" "--prefix" prefix]
   [make "srcdir=./"]
