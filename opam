@@ -6,7 +6,7 @@ homepage: "https://github.com/xguerin/bitstring"
 license: "LGPLv2+ with exceptions and GPLv2+"
 maintainer: "Xavier Guérin <github@applepine.org>"
 opam-version: "1.2"
-version: "2.1.0"
+version: "2.1.1"
 
 build: [
   ["./configure" "--prefix" prefix]
