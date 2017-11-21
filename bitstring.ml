@@ -845,7 +845,8 @@ module Buffer = struct
     data, 0, len
 
   (* Add exactly 8 bits. *)
-  let add_byte ({ buf = buf; len = len; last = last } as t) byte =
+  let add_byte t byte =
+    let {buf; len; last} = t in
     if byte < 0 || byte > 255 then invalid_arg "Bitstring.Buffer.add_byte";
     let shift = len land 7 in
     if shift = 0 then
@@ -861,7 +862,8 @@ module Buffer = struct
     t.len <- t.len + 8
 
   (* Add exactly 1 bit. *)
-  let add_bit ({ buf = buf; len = len; last = last } as t) bit =
+  let add_bit t bit =
+    let {buf; len; last} = t in
     let shift = 7 - (len land 7) in
     if shift > 0 then
       (* Somewhere in the middle of 'last'. *)
@@ -884,7 +886,8 @@ module Buffer = struct
       add_bit t bit
     done
 
-  let add_bits ({ buf = buf; len = len } as t) str slen =
+  let add_bits t str slen =
+    let {buf; len; _} = t in
     if slen > 0 then (
       if len land 7 = 0 then (
 	if slen land 7 = 0 then
