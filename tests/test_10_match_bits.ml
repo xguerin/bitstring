@@ -43,7 +43,7 @@ let () =
       in
       loop bits in
     if actual <> expected then
-      failwith (sprintf "match bits: failed on 1 bit test, len = %d" len);
+      failwith (sprintf "match bits: failed on 2 bit test, len = %d" len);
 
     let actual =
       let rec loop bits =
@@ -55,7 +55,7 @@ let () =
       in
       loop bits in
     if actual <> expected then
-      failwith (sprintf "match bits: failed on 1 bit test, len = %d" len);
+      failwith (sprintf "match bits: failed on 3 bit test, len = %d" len);
 
     let actual =
       let rec loop bits =
@@ -67,7 +67,7 @@ let () =
       in
       loop bits in
     if actual <> expected then
-      failwith (sprintf "match bits: failed on 1 bit test, len = %d" len);
+      failwith (sprintf "match bits: failed on 4 bit test, len = %d" len);
 
     let actual =
       let rec loop bits =
@@ -82,5 +82,5 @@ let () =
       in
       loop bits in
     if actual <> expected then
-      failwith (sprintf "match bits: failed on 1 bit test, len = %d" len);
+      failwith (sprintf "match bits: failed on 9 bit test, len = %d" len);
   done

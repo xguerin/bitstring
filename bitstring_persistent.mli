@@ -305,7 +305,7 @@ val named_to_channel : out_channel -> named -> unit
 val named_to_string : named -> string
 (** Serialize a pattern/constructor to a string. *)
 
-val named_to_buffer : string -> int -> int -> named -> int
+val named_to_buffer : bytes -> int -> int -> named -> int
 (** Serialize a pattern/constructor to part of a string, return the length. *)
 
 val named_from_channel : in_channel -> named

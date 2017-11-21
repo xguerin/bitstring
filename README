@@ -4,7 +4,7 @@ This library was formerly known as 'bitmatch'.
 
 Please see the html subdirectory for developer documentation.
 
-The only requirements are OCaml >= 3.10.0, camlp4, ocamldoc, and findlib.
+The only requirements are OCaml >= 4.02.0, camlp4, ocamldoc, and findlib.
 
 If you optionally have CIL (http://cil.sourceforge.net/) installed
 then there are some nice extra tools for converting C header files

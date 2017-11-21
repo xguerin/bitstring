@@ -631,7 +631,7 @@ let output_bitmatch _loc bs cases =
 		<:expr<
                   let o =
 		    ($lid:original_off$ lsr 3) + $`int:field_byte_offset$ in
-                  Bitstring.char_code (String.unsafe_get $lid:data$ o)              
+                  Bitstring.char_code (Bytes.unsafe_get $lid:data$ o)
                 >> in
 
               <:expr<
@@ -737,7 +737,7 @@ let output_bitmatch _loc bs cases =
 		  (* Starting offset within the string. *)
 		  let o =
 		    ($lid:original_off$ lsr 3) + $`int:field_byte_offset$ in
-		  String.sub $lid:data$ o $`int:(i lsr 3)$
+		  Bytes.sub_string $lid:data$ o $`int:(i lsr 3)$
 		>> in
 
 	      let slowpath =
