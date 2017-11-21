@@ -974,30 +974,30 @@ val extract_int64_ne_unsigned : string -> int -> int -> int -> int64
 
 val extract_int64_ee_unsigned : endian -> string -> int -> int -> int -> int64
 
-external extract_fastpath_int16_be_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_be_unsigned" "noalloc"
+external extract_fastpath_int16_be_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_be_unsigned"
 
-external extract_fastpath_int16_le_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_le_unsigned" "noalloc"
+external extract_fastpath_int16_le_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_le_unsigned"
 
-external extract_fastpath_int16_ne_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_ne_unsigned" "noalloc"
+external extract_fastpath_int16_ne_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_ne_unsigned"
 
-external extract_fastpath_int16_be_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_be_signed" "noalloc"
+external extract_fastpath_int16_be_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_be_signed"
 
-external extract_fastpath_int16_le_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_le_signed" "noalloc"
+external extract_fastpath_int16_le_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_le_signed"
 
-external extract_fastpath_int16_ne_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_ne_signed" "noalloc"
+external extract_fastpath_int16_ne_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_ne_signed"
 
 (*
-external extract_fastpath_int24_be_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_be_unsigned" "noalloc"
+external extract_fastpath_int24_be_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_be_unsigned"
 
-external extract_fastpath_int24_le_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_le_unsigned" "noalloc"
+external extract_fastpath_int24_le_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_le_unsigned"
 
-external extract_fastpath_int24_ne_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_ne_unsigned" "noalloc"
+external extract_fastpath_int24_ne_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_ne_unsigned"
 
-external extract_fastpath_int24_be_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_be_signed" "noalloc"
+external extract_fastpath_int24_be_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_be_signed"
 
-external extract_fastpath_int24_le_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_le_signed" "noalloc"
+external extract_fastpath_int24_le_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_le_signed"
 
-external extract_fastpath_int24_ne_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_ne_signed" "noalloc"
+external extract_fastpath_int24_ne_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_ne_signed"
 *)
 
 external extract_fastpath_int32_be_unsigned : string -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_be_unsigned"
