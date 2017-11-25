@@ -32,19 +32,19 @@ let debug = ref false
 (* Exceptions. *)
 exception Construct_failure of string * string * int * int
 
-(* A bitstring is simply the data itself (as a string), and the
- * bitoffset and the bitlength within the string.  Note offset/length
+(* A bitstring is simply the data itself (as a byte sequence), and the
+ * bitoffset and the bitlength within the byte sequence.  Note offset/length
  * are counted in bits, not bytes.
  *)
-type bitstring = string * int * int
+type bitstring = bytes * int * int
 
 type t = bitstring
 
 (* Functions to create and load bitstrings. *)
-let empty_bitstring = "", 0, 0
+let empty_bitstring = Bytes.create 0, 0, 0
 
 let make_bitstring len c =
-  if len >= 0 then String.make ((len+7) lsr 3) c, 0, len
+  if len >= 0 then Bytes.make ((len+7) lsr 3) c, 0, len
   else
     invalid_arg (
       sprintf "make_bitstring/create_bitstring: len %d < 0" len
@@ -56,65 +56,65 @@ let zeroes_bitstring = create_bitstring
 
 let ones_bitstring len = make_bitstring len '\xff'
 
-let bitstring_of_string str = str, 0, String.length str lsl 3
+let bitstring_of_string str = Bytes.of_string str, 0, String.length str lsl 3
 
 let bitstring_of_chan chan =
   let tmpsize = 16384 in
   let buf = Buffer.create tmpsize in
-  let tmp = String.create tmpsize in
+  let tmp = Bytes.create tmpsize in
   let n = ref 0 in
   while n := input chan tmp 0 tmpsize; !n > 0 do
-    Buffer.add_substring buf tmp 0 !n;
+    Buffer.add_subbytes buf tmp 0 !n;
   done;
-  Buffer.contents buf, 0, Buffer.length buf lsl 3
+  Buffer.to_bytes buf, 0, Buffer.length buf lsl 3
 
 let bitstring_of_chan_max chan max =
   let tmpsize = 16384 in
   let buf = Buffer.create tmpsize in
-  let tmp = String.create tmpsize in
+  let tmp = Bytes.create tmpsize in
   let len = ref 0 in
   let rec loop () =
     if !len < max then (
       let r = min tmpsize (max - !len) in
       let n = input chan tmp 0 r in
       if n > 0 then (
-	Buffer.add_substring buf tmp 0 n;
+	Buffer.add_subbytes buf tmp 0 n;
 	len := !len + n;
 	loop ()
       )
     )
   in
   loop ();
-  Buffer.contents buf, 0, !len lsl 3
+  Buffer.to_bytes buf, 0, !len lsl 3
 
 let bitstring_of_file_descr fd =
   let tmpsize = 16384 in
   let buf = Buffer.create tmpsize in
-  let tmp = String.create tmpsize in
+  let tmp = Bytes.create tmpsize in
   let n = ref 0 in
   while n := Unix.read fd tmp 0 tmpsize; !n > 0 do
-    Buffer.add_substring buf tmp 0 !n;
+    Buffer.add_subbytes buf tmp 0 !n;
   done;
-  Buffer.contents buf, 0, Buffer.length buf lsl 3
+  Buffer.to_bytes buf, 0, Buffer.length buf lsl 3
 
 let bitstring_of_file_descr_max fd max =
   let tmpsize = 16384 in
   let buf = Buffer.create tmpsize in
-  let tmp = String.create tmpsize in
+  let tmp = Bytes.create tmpsize in
   let len = ref 0 in
   let rec loop () =
     if !len < max then (
       let r = min tmpsize (max - !len) in
       let n = Unix.read fd tmp 0 r in
       if n > 0 then (
-	Buffer.add_substring buf tmp 0 n;
+	Buffer.add_subbytes buf tmp 0 n;
 	len := !len + n;
 	loop ()
       )
     )
   in
   loop ();
-  Buffer.contents buf, 0, !len lsl 3
+  Buffer.to_bytes buf, 0, !len lsl 3
 
 let bitstring_of_file fname =
   let chan = open_in_bin fname in
@@ -400,18 +400,22 @@ end
 let extract_bit data off len _ =	(* final param is always 1 *)
   let byteoff = off lsr 3 in
   let bitmask = 1 lsl (7 - (off land 7)) in
-  let b = Char.code data.[byteoff] land bitmask <> 0 in
+  let b = Char.code (Bytes.get data byteoff) land bitmask <> 0 in
   b (*, off+1, len-1*)
 
 (* Returns 8 bit unsigned aligned bytes from the string.
  * If the string ends then this returns 0's.
  *)
 let _get_byte data byteoff strlen =
-  if strlen > byteoff then Char.code data.[byteoff] else 0
+  if strlen > byteoff then Char.code (Bytes.get data byteoff) else 0
 let _get_byte32 data byteoff strlen =
-  if strlen > byteoff then Int32.of_int (Char.code data.[byteoff]) else 0l
+  if strlen > byteoff then
+    Int32.of_int (Char.code (Bytes.get data byteoff))
+  else 0l
 let _get_byte64 data byteoff strlen =
-  if strlen > byteoff then Int64.of_int (Char.code data.[byteoff]) else 0L
+  if strlen > byteoff then
+    Int64.of_int (Char.code (Bytes.get data byteoff))
+  else 0L
 
 (* Extend signed [2..31] bits int to 31 bits int or 63 bits int for 64
    bits platform*)
@@ -431,13 +435,13 @@ let extract_char_unsigned data off len flen =
 
   (* Optimize the common (byte-aligned) case. *)
   if off land 7 = 0 then (
-    let byte = Char.code data.[byteoff] in
+    let byte = Char.code (Bytes.get data byteoff) in
     byte lsr (8 - flen) (*, off+flen, len-flen*)
   ) else (
     (* Extract the 16 bits at byteoff and byteoff+1 (note that the
      * second byte might not exist in the original string).
      *)
-    let strlen = String.length data in
+    let strlen = Bytes.length data in
 
     let word =
       (_get_byte data byteoff strlen lsl 8) +
@@ -460,7 +464,7 @@ let extract_char_signed =
 let extract_int_be_unsigned data off len flen =
   let byteoff = off lsr 3 in
 
-  let strlen = String.length data in
+  let strlen = Bytes.length data in
 
   let word =
     (* Optimize the common (byte-aligned) case. *)
@@ -548,7 +552,7 @@ let _make_int32_le c0 c1 c2 c3 =
 let extract_int32_be_unsigned data off len flen =
   let byteoff = off lsr 3 in
 
-  let strlen = String.length data in
+  let strlen = Bytes.length data in
 
   let word =
     (* Optimize the common (byte-aligned) case. *)
@@ -618,7 +622,7 @@ let _make_int64_le c0 c1 c2 c3 c4 c5 c6 c7 =
 let extract_int64_be_unsigned data off len flen =
   let byteoff = off lsr 3 in
 
-  let strlen = String.length data in
+  let strlen = Bytes.length data in
 
   let word =
     (* Optimize the common (byte-aligned) case. *)
@@ -668,7 +672,7 @@ let extract_int64_be_unsigned data off len flen =
 let extract_int64_le_unsigned data off len flen =
   let byteoff = off lsr 3 in
 
-  let strlen = String.length data in
+  let strlen = Bytes.length data in
 
   let word =
     (* Optimize the common (byte-aligned) case. *)
@@ -725,93 +729,93 @@ let extract_int64_ee_unsigned = function
   | LittleEndian -> extract_int64_le_unsigned
   | NativeEndian -> extract_int64_ne_unsigned
 
-external extract_fastpath_int16_be_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_be_unsigned" "noalloc"
+external extract_fastpath_int16_be_unsigned : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int16_be_unsigned"
 
-external extract_fastpath_int16_le_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_le_unsigned" "noalloc"
+external extract_fastpath_int16_le_unsigned : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int16_le_unsigned"
 
-external extract_fastpath_int16_ne_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_ne_unsigned" "noalloc"
+external extract_fastpath_int16_ne_unsigned : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int16_ne_unsigned"
 
-external extract_fastpath_int16_be_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_be_signed" "noalloc"
+external extract_fastpath_int16_be_signed : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int16_be_signed"
 
-external extract_fastpath_int16_le_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_le_signed" "noalloc"
+external extract_fastpath_int16_le_signed : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int16_le_signed"
 
-external extract_fastpath_int16_ne_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int16_ne_signed" "noalloc"
-
-(*
-external extract_fastpath_int24_be_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_be_unsigned" "noalloc"
-
-external extract_fastpath_int24_le_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_le_unsigned" "noalloc"
-
-external extract_fastpath_int24_ne_unsigned : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_ne_unsigned" "noalloc"
-
-external extract_fastpath_int24_be_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_be_signed" "noalloc"
-
-external extract_fastpath_int24_le_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_le_signed" "noalloc"
-
-external extract_fastpath_int24_ne_signed : string -> int -> int = "ocaml_bitstring_extract_fastpath_int24_ne_signed" "noalloc"
-*)
-
-external extract_fastpath_int32_be_unsigned : string -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_be_unsigned"
-
-external extract_fastpath_int32_le_unsigned : string -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_le_unsigned"
-
-external extract_fastpath_int32_ne_unsigned : string -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_ne_unsigned"
-
-external extract_fastpath_int32_be_signed : string -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_be_signed"
-
-external extract_fastpath_int32_le_signed : string -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_le_signed"
-
-external extract_fastpath_int32_ne_signed : string -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_ne_signed"
+external extract_fastpath_int16_ne_signed : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int16_ne_signed"
 
 (*
-external extract_fastpath_int40_be_unsigned : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_be_unsigned"
+external extract_fastpath_int24_be_unsigned : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int24_be_unsigned"
 
-external extract_fastpath_int40_le_unsigned : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_le_unsigned"
+external extract_fastpath_int24_le_unsigned : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int24_le_unsigned"
 
-external extract_fastpath_int40_ne_unsigned : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_ne_unsigned"
+external extract_fastpath_int24_ne_unsigned : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int24_ne_unsigned"
 
-external extract_fastpath_int40_be_signed : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_be_signed"
+external extract_fastpath_int24_be_signed : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int24_be_signed"
 
-external extract_fastpath_int40_le_signed : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_le_signed"
+external extract_fastpath_int24_le_signed : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int24_le_signed"
 
-external extract_fastpath_int40_ne_signed : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_ne_signed"
-
-external extract_fastpath_int48_be_unsigned : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_be_unsigned"
-
-external extract_fastpath_int48_le_unsigned : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_le_unsigned"
-
-external extract_fastpath_int48_ne_unsigned : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_ne_unsigned"
-
-external extract_fastpath_int48_be_signed : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_be_signed"
-
-external extract_fastpath_int48_le_signed : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_le_signed"
-
-external extract_fastpath_int48_ne_signed : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_ne_signed"
-
-external extract_fastpath_int56_be_unsigned : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_be_unsigned"
-
-external extract_fastpath_int56_le_unsigned : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_le_unsigned"
-
-external extract_fastpath_int56_ne_unsigned : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_ne_unsigned"
-
-external extract_fastpath_int56_be_signed : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_be_signed"
-
-external extract_fastpath_int56_le_signed : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_le_signed"
-
-external extract_fastpath_int56_ne_signed : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_ne_signed"
+external extract_fastpath_int24_ne_signed : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int24_ne_signed"
 *)
 
-external extract_fastpath_int64_be_unsigned : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_be_unsigned"
+external extract_fastpath_int32_be_unsigned : bytes -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_be_unsigned"
 
-external extract_fastpath_int64_le_unsigned : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_le_unsigned"
+external extract_fastpath_int32_le_unsigned : bytes -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_le_unsigned"
 
-external extract_fastpath_int64_ne_unsigned : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_ne_unsigned"
+external extract_fastpath_int32_ne_unsigned : bytes -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_ne_unsigned"
 
-external extract_fastpath_int64_be_signed : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_be_signed"
+external extract_fastpath_int32_be_signed : bytes -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_be_signed"
 
-external extract_fastpath_int64_le_signed : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_le_signed"
+external extract_fastpath_int32_le_signed : bytes -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_le_signed"
 
-external extract_fastpath_int64_ne_signed : string -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_ne_signed"
+external extract_fastpath_int32_ne_signed : bytes -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_ne_signed"
+
+(*
+external extract_fastpath_int40_be_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_be_unsigned"
+
+external extract_fastpath_int40_le_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_le_unsigned"
+
+external extract_fastpath_int40_ne_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_ne_unsigned"
+
+external extract_fastpath_int40_be_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_be_signed"
+
+external extract_fastpath_int40_le_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_le_signed"
+
+external extract_fastpath_int40_ne_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_ne_signed"
+
+external extract_fastpath_int48_be_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_be_unsigned"
+
+external extract_fastpath_int48_le_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_le_unsigned"
+
+external extract_fastpath_int48_ne_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_ne_unsigned"
+
+external extract_fastpath_int48_be_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_be_signed"
+
+external extract_fastpath_int48_le_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_le_signed"
+
+external extract_fastpath_int48_ne_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_ne_signed"
+
+external extract_fastpath_int56_be_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_be_unsigned"
+
+external extract_fastpath_int56_le_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_le_unsigned"
+
+external extract_fastpath_int56_ne_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_ne_unsigned"
+
+external extract_fastpath_int56_be_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_be_signed"
+
+external extract_fastpath_int56_le_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_le_signed"
+
+external extract_fastpath_int56_ne_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_ne_signed"
+*)
+
+external extract_fastpath_int64_be_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_be_unsigned"
+
+external extract_fastpath_int64_le_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_le_unsigned"
+
+external extract_fastpath_int64_ne_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_ne_unsigned"
+
+external extract_fastpath_int64_be_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_be_signed"
+
+external extract_fastpath_int64_le_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_le_signed"
+
+external extract_fastpath_int64_ne_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_ne_signed"
 
 (*----------------------------------------------------------------------*)
 (* Constructor functions. *)
@@ -835,13 +839,14 @@ module Buffer = struct
   let contents { buf = buf; len = len; last = last } =
     let data =
       if len land 7 = 0 then
-	Buffer.contents buf
+	Buffer.to_bytes buf
       else
-	Buffer.contents buf ^ (String.make 1 (Char.chr last)) in
+	Bytes.cat (Buffer.to_bytes buf) (Bytes.make 1 (Char.chr last)) in
     data, 0, len
 
   (* Add exactly 8 bits. *)
-  let add_byte ({ buf = buf; len = len; last = last } as t) byte =
+  let add_byte t byte =
+    let {buf; len; last} = t in
     if byte < 0 || byte > 255 then invalid_arg "Bitstring.Buffer.add_byte";
     let shift = len land 7 in
     if shift = 0 then
@@ -857,7 +862,8 @@ module Buffer = struct
     t.len <- t.len + 8
 
   (* Add exactly 1 bit. *)
-  let add_bit ({ buf = buf; len = len; last = last } as t) bit =
+  let add_bit t bit =
+    let {buf; len; last} = t in
     let shift = 7 - (len land 7) in
     if shift > 0 then
       (* Somewhere in the middle of 'last'. *)
@@ -880,20 +886,21 @@ module Buffer = struct
       add_bit t bit
     done
 
-  let add_bits ({ buf = buf; len = len } as t) str slen =
+  let add_bits t str slen =
+    let {buf; len; _} = t in
     if slen > 0 then (
       if len land 7 = 0 then (
 	if slen land 7 = 0 then
 	  (* Common case - everything is byte-aligned. *)
-	  Buffer.add_substring buf str 0 (slen lsr 3)
+	  Buffer.add_subbytes buf str 0 (slen lsr 3)
 	else (
 	  (* Target buffer is aligned.  Copy whole bytes then leave the
 	   * remaining bits in last.
 	   *)
 	  let slenbytes = slen lsr 3 in
-	  if slenbytes > 0 then Buffer.add_substring buf str 0 slenbytes;
-	  let lastidx = min slenbytes (String.length str - 1) in
-	  let last = Char.code str.[lastidx] in (* last char *)
+	  if slenbytes > 0 then Buffer.add_subbytes buf str 0 slenbytes;
+	  let lastidx = min slenbytes (Bytes.length str - 1) in
+	  let last = Char.code (Bytes.get str lastidx) in (* last char *)
 	  let mask = 0xff lsl (8 - (slen land 7)) in
 	  t.last <- last land mask
 	);
@@ -907,12 +914,12 @@ module Buffer = struct
 	 *)
 	let slenbytes = slen lsr 3 in
 	for i = 0 to slenbytes-1 do
-	  let byte = Char.code str.[i] in
+	  let byte = Char.code (Bytes.get str i) in
 	  add_byte t byte
 	done;
 	let bitsleft = slen - (slenbytes lsl 3) in
 	if bitsleft > 0 then (
-	  let c = Char.code str.[slenbytes] in
+	  let c = Char.code (Bytes.get str slenbytes) in
 	  for i = 0 to bitsleft - 1 do
 	    let bit = c land (0x80 lsr i) <> 0 in
 	    add_bit t bit
@@ -1042,7 +1049,7 @@ let construct_int64_ee_unsigned = function
  *)
 let construct_string buf str =
   let len = String.length str in
-  Buffer.add_bits buf str (len lsl 3)
+  Buffer.add_bits buf (Bytes.unsafe_of_string str) (len lsl 3)
 
 (* Construct from a bitstring. *)
 let construct_bitstring buf (data, off, len) =
@@ -1068,7 +1075,7 @@ let construct_bitstring buf (data, off, len) =
     let off = off lsr 3 in
     (* XXX dangerous allocation *)
     if off = 0 then data
-    else String.sub data off (String.length data - off) in
+    else Bytes.sub data off (Bytes.length data - off) in
 
   Buffer.add_bits buf data len
 
@@ -1083,24 +1090,24 @@ let concat bs =
 let string_of_bitstring (data, off, len) =
   if off land 7 = 0 && len land 7 = 0 then
     (* Easy case: everything is byte-aligned. *)
-    String.sub data (off lsr 3) (len lsr 3)
+    String.sub (Bytes.unsafe_to_string data) (off lsr 3) (len lsr 3)
   else (
     (* Bit-twiddling case. *)
     let strlen = (len + 7) lsr 3 in
-    let str = String.make strlen '\000' in
+    let str = Bytes.make strlen '\000' in
     let rec loop data off len i =
       if len >= 8 then (
 	let c = extract_char_unsigned data off len 8
 	and off = off + 8 and len = len - 8 in
-	str.[i] <- Char.chr c;
+	Bytes.set str i (Char.chr c);
 	loop data off len (i+1)
       ) else if len > 0 then (
 	let c = extract_char_unsigned data off len len in
-	str.[i] <- Char.chr (c lsl (8-len))
+	Bytes.set str i (Char.chr (c lsl (8-len)))
       )
     in
     loop data off len 0;
-    str
+    Bytes.unsafe_to_string str
   )
 
 (* To channel. *)
@@ -1140,8 +1147,8 @@ let compare ((data1, off1, len1) as bs1) ((data2, off2, len2) as bs2) =
     and len1 = len1 lsr 3 and len2 = len2 lsr 3 in
     let rec loop i =
       if i < len1 && i < len2 then (
-	let c1 = String.unsafe_get data1 (off1 + i)
-	and c2 = String.unsafe_get data2 (off2 + i) in
+	let c1 = Bytes.unsafe_get data1 (off1 + i)
+	and c2 = Bytes.unsafe_get data2 (off2 + i) in
 	let r = compare c1 c2 in
 	if r <> 0 then r
 	else loop (i+1)
@@ -1168,7 +1175,7 @@ let is_zeroes_bitstring ((data, off, len) as bits) =
     let off = off lsr 3 and len = len lsr 3 in
     let rec loop i =
       if i < len then (
-        if String.unsafe_get data (off + i) <> '\000' then false
+        if Bytes.unsafe_get data (off + i) <> '\000' then false
         else loop (i+1)
       ) else true
     in
@@ -1186,7 +1193,7 @@ let is_ones_bitstring ((data, off, len) as bits) =
     let off = off lsr 3 and len = len lsr 3 in
     let rec loop i =
       if i < len then (
-        if String.unsafe_get data (off + i) <> '\xff' then false
+        if Bytes.unsafe_get data (off + i) <> '\xff' then false
         else loop (i+1)
       ) else true
     in
@@ -1209,9 +1216,9 @@ let put (data, off, len) n v =
   else (
     let i = off+n in
     let si = i lsr 3 and mask = 0x80 lsr (i land 7) in
-    let c = Char.code data.[si] in
+    let c = Char.code (Bytes.get data si) in
     let c = if v <> 0 then c lor mask else c land (lnot mask) in
-    data.[si] <- Char.unsafe_chr c
+    Bytes.set data si (Char.unsafe_chr c)
   )
 
 let set bits n = put bits n 1
@@ -1223,7 +1230,7 @@ let get (data, off, len) n =
   else (
     let i = off+n in
     let si = i lsr 3 and mask = 0x80 lsr (i land 7) in
-    let c = Char.code data.[si] in
+    let c = Char.code (Bytes.get data si) in
     c land mask
   )
 
@@ -1243,7 +1250,7 @@ let hexdump_bitstring chan (data, off, len) =
   let off = ref off in
   let len = ref len in
   let linelen = ref 0 in
-  let linechars = String.make 16 ' ' in
+  let linechars = Bytes.make 16 ' ' in
 
   fprintf chan "00000000  ";
 
@@ -1256,22 +1263,22 @@ let hexdump_bitstring chan (data, off, len) =
     fprintf chan "%02x " byte;
 
     incr count;
-    linechars.[!linelen] <-
+    Bytes.set linechars !linelen
       (let c = Char.chr byte in
        if isprint c then c else '.');
     incr linelen;
     if !linelen = 8 then fprintf chan " ";
     if !linelen = 16 then (
-      fprintf chan " |%s|\n%08x  " linechars !count;
+      fprintf chan " |%s|\n%08x  " (Bytes.unsafe_to_string linechars) !count;
       linelen := 0;
-      for i = 0 to 15 do linechars.[i] <- ' ' done
+      for i = 0 to 15 do Bytes.set linechars i ' ' done
     )
   done;
 
   if !linelen > 0 then (
     let skip = (16 - !linelen) * 3 + if !linelen < 8 then 1 else 0 in
     for i = 0 to skip-1 do fprintf chan " " done;
-    fprintf chan " |%s|\n%!" linechars
+    fprintf chan " |%s|\n%!" (Bytes.unsafe_to_string linechars)
   ) else
     fprintf chan "\n%!"
 
