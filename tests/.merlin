@@ -1,0 +1,9 @@
+B ../_build/default/src
+B ../_build/default/tests
+FLG -ppx '/home/xguerin/Workspace/bitstring/_build/default/.ppx/ppx_bitstring/ppx.exe --as-ppx'
+FLG -w -40
+PKG bytes
+PKG oUnit
+PKG oUnit.advanced
+PKG unix
+S ../src

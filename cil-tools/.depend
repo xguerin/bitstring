@@ -1,4 +1,0 @@
-bitstring_import_c.cmo: ../bitstring_persistent.cmi ../bitstring_config.cmo \
-    ../bitstring.cmi 
-bitstring_import_c.cmx: ../bitstring_persistent.cmx ../bitstring_config.cmx \
-    ../bitstring.cmx 

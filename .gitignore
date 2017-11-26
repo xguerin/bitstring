@@ -8,7 +8,9 @@
 *.a
 *.so
 *.opt
+*.actual
 
+/_build
 /autom4te.cache
 /bitstring-objinfo
 /bitstring_config.ml
@@ -21,4 +23,5 @@
 /Makefile
 /tests/80_testdata/*.actual
 /tests/test.bmpp
+/bitstring.install
 byteswap.h
