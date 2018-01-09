@@ -11,8 +11,8 @@ let bits = Bitstring.bitstring_of_file "ext3_sb"
 (* The structure is straight from /usr/include/linux/ext3_fs.h *)
 
 let () =
-  bitmatch bits with
-  | { s_inodes_count : 32 : littleendian;	(* Inodes count *)
+  match%bitstring bits with
+  | {|s_inodes_count : 32 : littleendian;	(* Inodes count *)
       s_blocks_count : 32 : littleendian;	(* Blocks count *)
       s_r_blocks_count : 32 : littleendian;	(* Reserved blocks count *)
       s_free_blocks_count : 32 : littleendian;	(* Free blocks count *)
@@ -63,7 +63,7 @@ let () =
       s_reserved_word_pad : 16 : littleendian;
       s_default_mount_opts : 32 : littleendian;
       s_first_meta_bg : 32 : littleendian;	(* First metablock block group *)
-      _ : 6080 : bitstring } ->                 (* Padding to the end of the block *)
+      _ : 6080 : bitstring |} ->                 (* Padding to the end of the block *)
 
     printf "ext3 superblock:\n";
     printf "  s_inodes_count = %ld\n" s_inodes_count;
@@ -74,6 +74,6 @@ let () =
     printf "  s_volume_name = %S\n" s_volume_name;
     printf "  s_last_mounted = %S\n" s_last_mounted
 
-  | { _ } ->
+  | {| _ |} ->
     eprintf "not an ext3 superblock!\n%!";
     exit 2

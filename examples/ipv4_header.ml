@@ -7,14 +7,14 @@ open Printf
 let header = Bitstring.bitstring_of_file "ipv4_header.dat"
 
 let () =
-  bitmatch header with
-  | { version : 4; hdrlen : 4; tos : 8; length : 16;
+  match%bitstring header with
+  | {|version : 4; hdrlen : 4; tos : 8; length : 16;
       identification : 16; flags : 3; fragoffset : 13;
       ttl : 8; protocol : 8; checksum : 16;
       source : 32;
       dest : 32;
       options : (hdrlen-5)*32 : bitstring;
-      payload : -1 : bitstring }
+      payload : -1 : bitstring|}
       when version = 4 ->
 
     printf "IPv%d:\n" version;
@@ -33,9 +33,9 @@ let () =
     printf "  packet payload:\n";
     Bitstring.hexdump_bitstring stdout payload
 
-  | { version : 4 } ->
+  | {|version : 4|} ->
     eprintf "cannot parse IP version %d\n" version
 
-  | { _ } as header ->
+  | {|_|} as header ->
     eprintf "data is smaller than one nibble:\n";
     Bitstring.hexdump_bitstring stderr header

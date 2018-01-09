@@ -10,8 +10,8 @@ let () =
   let filename = Sys.argv.(1) in
   let bits = Bitstring.bitstring_of_file filename in
 
-  bitmatch bits with
-  | { ("GIF87a"|"GIF89a") : 6*8 : string; (* GIF magic. *)
+  match%bitstring bits with
+  | {|("GIF87a"|"GIF89a") : 6*8 : string; (* GIF magic. *)
       width : 16 : littleendian;
       height : 16 : littleendian;
       colormap : 1;			(* Has colormap? *)
@@ -19,7 +19,7 @@ let () =
       sortflag : 1;
       bps : 3;				(* Bits/pixel = bps+1 *)
       bg : 8;				(* Background colour. *)
-      aspectratio : 8 } ->
+      aspectratio : 8|} ->
       printf "%s: GIF image:\n" filename;
       printf "  size %d %d\n" width height;
       printf "  has global colormap? %b\n" colormap;
@@ -29,5 +29,5 @@ let () =
       printf "  background color index %d\n" bg;
       printf "  aspect ratio %d\n" aspectratio
 
-  | { _ } ->
+  | {|_|} ->
       eprintf "%s: Not a GIF image\n" filename
