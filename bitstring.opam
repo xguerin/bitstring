@@ -1,7 +1,7 @@
 authors      : [ "Richard W.M. Jones" "Xavier R. Guérin" ]
-bug-reports  : "https://github.com/xguerin/ppx_bitstring/issues"
+bug-reports  : "https://github.com/xguerin/bitstring/issues"
 dev-repo     : "https://github.com/xguerin/bitstring.git"
-doc          : ["http://et.redhat.com/~rjones/bitstring/html/Bitstring.html"]
+doc          : "https://xguer.in/bitstring"
 homepage     : "https://github.com/xguerin/bitstring"
 license      : "LGPLv2+ with exceptions and GPLv2+"
 maintainer   : "Xavier R. Guérin <ghub@applepine.org>"
