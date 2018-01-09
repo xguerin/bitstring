@@ -5,4 +5,5 @@
   (public_name bitstring)
   (c_names     (bitstring_c))
   (c_flags     (-I.))
+  (libraries   (unix))
   ))

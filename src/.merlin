@@ -1,2 +1,3 @@
 B ../_build/default/src
 FLG -open Bitstring__ -w -40
+PKG unix
