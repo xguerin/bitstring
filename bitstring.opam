@@ -22,4 +22,4 @@ depends: [
   "ocaml-migrate-parsetree" { build & >= "1.0.5" }
 ]
 
-available: ocaml-version >= "4.02.0"
+available: ocaml-version >= "4.02.3"
