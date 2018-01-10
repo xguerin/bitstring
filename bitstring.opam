@@ -23,4 +23,8 @@ depends: [
   "ounit"                   { build              }
 ]
 
+conflicts: [
+  "ppx_bitstring"
+]
+
 available: ocaml-version >= "4.02.3"
