@@ -20,6 +20,7 @@ depends: [
   "jbuilder"                { build              }
   "ppx_tools_versioned"     { build              }
   "ocaml-migrate-parsetree" { build & >= "1.0.5" }
+  "ounit"                   { build              }
 ]
 
 available: ocaml-version >= "4.02.3"
