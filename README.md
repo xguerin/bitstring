@@ -39,7 +39,7 @@ ocamlfind c -package bitstring -package bitstring.ppx -linkpkg ...
 
 ## How to build
 
-`bitstring` version `3` requires OCaml `>= 4.06.0`.
+`bitstring` version `3` requires OCaml `>= 4.02.3`.
 
 ### Dependencies
 
