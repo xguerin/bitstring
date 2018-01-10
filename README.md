@@ -64,6 +64,6 @@ $ jbuilder runtest
 ## License
 
 The library is licensed under the LGPL v2 or later, with the OCaml linking
-exception. See the file COPYING.LIB for full terms. Programs are licensed under
-the gpl v2 or later. see the file copying for full terms. All examples and tests
+exception. See the file `COPYING.LIB` for full terms. Programs are licensed under
+the GPL v2 or later. See the file `COPYING` for full terms. All examples and tests
 are public domain.
