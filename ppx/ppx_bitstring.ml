@@ -516,9 +516,23 @@ let parse_match_fields str =
     location_exn ~loc:str.loc "Invalid number of fields in statement"
 ;;
 
+(*
+ * Some operators like the subtype cast operator (:>) can throw off the parser.
+ * The function below resolve these ambiguities on a case-by-case basis.
+ *)
+let stitch_ambiguous_operators lst =
+  let fn e = function
+    | [] -> [ e ]
+    | hd :: tl when hd = "" || e == "" -> e :: hd :: tl
+    | hd :: tl when Str.first_chars hd 1 = ">" -> (e ^ ":" ^ hd) :: tl
+    | l -> e :: l
+  in
+  List.fold_right fn lst []
+
 let parse_const_fields str =
   let open Qualifiers in
   split_string ~on:":" str.txt
+  |> stitch_ambiguous_operators
   |> split_loc ~loc:str.loc
   |> function
   | [ vl; len ] ->

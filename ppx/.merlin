@@ -7,3 +7,4 @@ PKG ocaml-migrate-parsetree
 PKG ppx_tools_versioned
 PKG result
 PKG str
+S .

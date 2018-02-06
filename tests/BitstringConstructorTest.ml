@@ -130,6 +130,16 @@ let str_item_test context =
   assert_equal str result
 
 (*
+ * Subtyping.
+ *)
+
+let subtype_test context =
+  let x = 42 in
+  let%bitstring b = {| x : 6 |} in
+  let%bitstring c = {| (x :> int) : 6 |} in
+  assert (Bitstring.equals b c)
+
+(*
  * Test suite definition
  *)
 
@@ -140,7 +150,8 @@ let suite = "BitstringConstructorTest" >::: [
     "external_value_test"       >:: external_value_test;
     "int_parser_test"           >:: int_parser_test;
     "int32_parser_test"         >:: int32_parser_test;
-    "str_item_test"             >:: str_item_test
+    "str_item_test"             >:: str_item_test;
+    "subtype_test"              >:: subtype_test;
   ]
 
 let () = run_test_tt_main suite
