@@ -61,6 +61,10 @@ $ jbuilder build
 $ jbuilder runtest
 ```
 
+## Appreciation
+
+Tokens of appreciation are gladly accepted in the form of [virtual coffee](https://buymeacoff.ee/xguerin).
+
 ## License
 
 The library is licensed under the LGPL v2 or later, with the OCaml linking
