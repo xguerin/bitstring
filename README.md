@@ -11,7 +11,7 @@ The original `README` content can be found in the `README.orig` file.
 
 ## Documentation
 
-The documentation is located [here](http://xguer.in/bitstring).
+The documentation is located [here](https://bitstring.software).
 
 ## How to install
 
