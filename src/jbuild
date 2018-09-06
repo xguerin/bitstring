@@ -3,7 +3,7 @@
 (library
  ((name        bitstring)
   (public_name bitstring)
-  (c_names     (bitstring_c))
+  (c_names     (bitstring_fastpath))
   (c_flags     (-I.))
-  (libraries   (unix))
+  (libraries   (str unix))
   ))

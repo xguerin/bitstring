@@ -1,5 +1,8 @@
-(** Bitstring library. *)
-(* Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
+(*
+ * Bitstring library.
+ *
+ * Copyright (C) 2008-2016 Red Hat Inc., Richard W.M. Jones
+ * Copyright (C) 2016 Red Hat Inc, Richard W.M. Jones, Xavier R. Guerin.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,8 +18,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
- * $Id$
  *)
 
 (**
@@ -712,6 +713,9 @@ val is_zeroes_bitstring : bitstring -> bool
 
 val is_ones_bitstring : bitstring -> bool
 (** Tests if the bitstring is all one bits (cf. {!ones_bitstring}). *)
+
+val is_prefix: bitstring -> bitstring -> bool
+(** [is_prefix bs1 bs2] returns true if bs2 is a prefix of bs1 *)
 
 (** {3 Bitstring manipulation} *)
 

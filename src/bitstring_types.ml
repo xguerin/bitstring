@@ -1,6 +1,9 @@
-(* Bitstring library.
- * Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
+(*
+ * Bitstring library.
  *
+ * Copyright (C) 2008-2016 Red Hat Inc., Richard W.M. Jones
+ * Copyright (C) 2016 Red Hat Inc, Richard W.M. Jones, Xavier R. Guerin.
+
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -16,7 +19,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * $Id$
  *)
 
 type endian = BigEndian | LittleEndian | NativeEndian

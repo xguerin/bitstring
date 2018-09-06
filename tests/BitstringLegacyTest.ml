@@ -1221,6 +1221,57 @@ let concat_regression_test _ =
 
   if !errors <> 0 then exit 1
 
+(*
+ * Prefix tests.
+ *)
+
+let is_prefix_basic_aligned_test _ =
+  (* Match mod8 bitstrings *)
+  let%bitstring bs1 = {| 0x1234 : 16 : bigendian |} in
+  let%bitstring bs2 = {| 0x12 : 8 |} in
+  assert_bool "Prefix failed" (Bitstring.is_prefix bs1 bs2);
+  (* Match other bitstrings *)
+  let%bitstring bs1 = {| 0x1A2 : 11 : bigendian |} in
+  let%bitstring bs2 = {| 0x1A : 7 |} in
+  assert_bool "Prefix failed" (Bitstring.is_prefix bs1 bs2)
+
+let is_prefix_nested_aligned_test _ =
+  (* Match mod8 bitstrings *)
+  let%bitstring bs1 = {| 0x12345678l : 32 : bigendian |} in
+  let%bitstring bs2 = {| 0x56 : 8 |} in
+  begin match%bitstring bs1 with
+  | {| _ : 16; n : -1 : bitstring |} ->
+    assert_bool "Prefix failed" (Bitstring.is_prefix n bs2)
+  | {| _ |} ->
+    assert_failure "Invalid bitstring"
+  end;
+  (* Match other bitstrings *)
+  begin match%bitstring bs1 with
+  | {| _ : 18; n : -1 : bitstring |} ->
+    begin match%bitstring bs2 with
+      | {| _ : 2; m : -1 : bitstring |} ->
+        assert_bool "Prefix failed" (Bitstring.is_prefix n m)
+      | {| _ |} -> assert_failure "Invalid bitstring"
+    end
+  | {| _ |} -> assert_failure "Invalid bitstring"
+  end
+
+let is_prefix_basic_unaligned_test _ =
+  let%bitstring bs1 = {| 0x1234 : 15 : bigendian |} in
+  let%bitstring bs2 = {| 0x12 : 7 |} in
+  assert_bool "Prefix failed" (Bitstring.is_prefix bs1 bs2)
+
+let is_prefix_nested_unaligned_test _ =
+  let%bitstring bs1 = {| 0x12345678l : 32 : bigendian |} in
+  let%bitstring bs2 = {| 0x8A : 8 |} in
+  match%bitstring bs1 with
+  | {| _      : 13;
+       nested : -1 : bitstring
+    |} ->
+    assert_bool "Prefix failed" (Bitstring.is_prefix nested bs2)
+  | {| _ |} ->
+    assert_failure "Invalid bitstring"
+
 let suite = "BitstringLegacyTests" >::: [
     "load_test"                          >:: load_test;
     "run_test"                           >:: run_test;
@@ -1248,4 +1299,8 @@ let suite = "BitstringLegacyTests" >::: [
     "check_bind_test"                    >:: check_bind_test;
     "as_binding_bug_test"                >:: as_binding_bug_test;
     "concat_regression_test"             >:: concat_regression_test;
+    "is_prefix_basic_aligned_test"       >:: is_prefix_basic_aligned_test;
+    "is_prefix_nested_aligned_test"      >:: is_prefix_nested_aligned_test;
+    "is_prefix_basic_unaligned_test"     >:: is_prefix_basic_unaligned_test;
+    "is_prefix_nested_unaligned_test"    >:: is_prefix_nested_unaligned_test;
   ]

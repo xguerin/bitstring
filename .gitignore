@@ -9,6 +9,7 @@
 *.so
 *.opt
 *.actual
+*.merlin
 
 /_build
 /autom4te.cache

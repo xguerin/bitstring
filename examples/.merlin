@@ -1,6 +1,0 @@
-B ../_build/default/examples
-B ../_build/default/src
-FLG -ppx '/Users/xguerin/Workspace/bitstring/_build/default/.ppx/bitstring.ppx/ppx.exe --as-ppx'
-FLG -w -40 -w -40 -w -40 -w -40 -w -40 -w -40 -w -40
-PKG unix
-S ../src

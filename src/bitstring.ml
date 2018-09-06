@@ -1,5 +1,8 @@
-(* Bitstring library.
- * Copyright (C) 2008 Red Hat Inc., Richard W.M. Jones
+(*
+ * Bitstring library.
+ *
+ * Copyright (C) 2008-2016 Red Hat Inc., Richard W.M. Jones
+ * Copyright (C) 2016 Red Hat Inc, Richard W.M. Jones, Xavier R. Guerin.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,8 +18,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
- * $Id$
  *)
 
 open Printf
@@ -1205,6 +1206,21 @@ let is_ones_bitstring ((data, off, len) as bits) =
     let ones = ones_bitstring len in
     0 = compare bits ones
   )
+
+external is_prefix_fastpath: bytes -> int -> bytes -> int -> int -> bool
+  = "ocaml_bitstring_is_prefix_fastpath"
+
+let is_prefix ((b1, o1, l1) as bs1) ((b2, o2, l2) as bs2) =
+  (* Fail if either bitstring is invalid *)
+  if l2 > l1 || l1 = 0 || l2 = 0 then
+    false
+  (* Use the fast path if the bitstrings are aligned *)
+  else if o1 land 7 = o2 land 7 then
+    is_prefix_fastpath b1 o1 b2 o2 l2
+  (* Bitstrings are unaligned *)
+  else
+    let re = Str.regexp_string (string_of_bitstring bs2) in
+    Str.string_partial_match re (string_of_bitstring bs1) 0
 
 (*----------------------------------------------------------------------*)
 (* Bit get/set functions. *)
