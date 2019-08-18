@@ -1293,7 +1293,7 @@ let hexdump_bitstring chan (data, off, len) =
 
   if !linelen > 0 then (
     let skip = (16 - !linelen) * 3 + if !linelen < 8 then 1 else 0 in
-    for i = 0 to skip-1 do fprintf chan " " done;
+    for _ = 0 to skip-1 do fprintf chan " " done;
     fprintf chan " |%s|\n%!" (Bytes.unsafe_to_string linechars)
   ) else
     fprintf chan "\n%!"

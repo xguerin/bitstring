@@ -1,0 +1,12 @@
+(executable
+ (name bitstring_tests)
+ (libraries bitstring oUnit)
+ (preprocess
+  (pps ppx_bitstring)))
+
+(alias
+ (name runtest)
+ (deps
+  (:< bitstring_tests.exe))
+ (action
+  (run %{<})))
