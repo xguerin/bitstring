@@ -1,0 +1,7 @@
+(library
+ (name ppx_bitstring)
+ (public_name bitstring.ppx)
+ (kind ppx_rewriter)
+ (libraries str compiler-libs ppx_tools_versioned ocaml-migrate-parsetree)
+ (preprocess
+  (pps ppx_tools_versioned.metaquot_405)))

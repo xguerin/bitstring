@@ -202,23 +202,23 @@ let option_bind opt f =
 
 let rec process_expr_loc ~loc expr =
   match expr with
-  | { pexp_desc = Pexp_ident(ident) } ->
+  | { pexp_desc = Pexp_ident(ident); _ } ->
     let lident = Location.mkloc ident.txt loc in
     { expr with pexp_desc = Pexp_ident(lident); pexp_loc = loc }
-  | { pexp_desc = Pexp_tuple(ops) } ->
+  | { pexp_desc = Pexp_tuple(ops); _ } ->
     let fld = List.fold_left
         (fun acc exp -> acc @ [ process_expr_loc ~loc exp ])
         []
         ops
     in { expr with pexp_desc = Pexp_tuple(fld); pexp_loc = loc }
-  | { pexp_desc = Pexp_construct(ident, ops) } ->
+  | { pexp_desc = Pexp_construct(ident, ops); _ } ->
     let lident = Location.mkloc ident.txt loc in
     let lops = begin match ops with
       | Some o -> Some (process_expr_loc ~loc o)
       | None    -> None
     end in
     { expr with pexp_desc = Pexp_construct(lident, lops); pexp_loc = loc }
-  | { pexp_desc = Pexp_apply(ident, ops) } ->
+  | { pexp_desc = Pexp_apply(ident, ops); _ } ->
     let lident = process_expr_loc ~loc ident in
     let fld = List.fold_left
         (fun acc (lbl, exp) -> acc @ [ (lbl, (process_expr_loc ~loc exp)) ])
@@ -227,7 +227,7 @@ let rec process_expr_loc ~loc expr =
     in { expr with pexp_desc = Pexp_apply(lident, fld); pexp_loc = loc }
   | { pexp_desc = Pexp_fun(ident, ops,
                            { ppat_desc = Ppat_var(pid); ppat_loc; ppat_attributes },
-                           exp) } ->
+                           exp); _ } ->
     let lpid = Location.mkloc pid.txt loc in
     let lpat = { ppat_desc = Ppat_var lpid; ppat_loc = loc; ppat_attributes } in
     let lops = begin match ops with
@@ -248,9 +248,9 @@ let parse_expr expr =
     _ -> location_exn ~loc:expr.loc ("Parse expression error: '" ^ expr.txt ^ "'")
 ;;
 
-let rec process_pat_loc ~loc pat =
+let process_pat_loc ~loc pat =
   match pat with
-  | { ppat_desc = Ppat_var(ident); ppat_loc; ppat_attributes } ->
+  | { ppat_desc = Ppat_var(ident); ppat_loc; ppat_attributes; _ } ->
     let lident = Location.mkloc ident.txt loc in
     { ppat_desc = Ppat_var(lident); ppat_loc = loc; ppat_attributes }
   | _ ->
@@ -412,13 +412,13 @@ let parse_quals quals =
     | hd :: tl -> process_quals (process_qual state hd) tl
   in match expr with
   (* single named qualifiers *)
-  | { pexp_desc = Pexp_ident (_) } ->
+  | { pexp_desc = Pexp_ident (_); _ } ->
     process_qual Qualifiers.empty expr
   (* single functional qualifiers *)
-  | { pexp_desc = Pexp_apply (_, _) } ->
+  | { pexp_desc = Pexp_apply (_, _); _ } ->
     process_qual Qualifiers.empty expr
   (* multiple qualifiers *)
-  | { pexp_desc = Pexp_tuple (e) } ->
+  | { pexp_desc = Pexp_tuple (e); _ } ->
     process_quals Qualifiers.empty e
   (* Unrecognized expression *)
   | expr ->
@@ -478,7 +478,7 @@ let rec evaluate_expr = function
       | Some l, Some r -> Some (l mod r)
       | _ -> None
     end
-  | { pexp_desc = Pexp_constant (const) } ->
+  | { pexp_desc = Pexp_constant (const); _ } ->
     begin match const with
       | Pconst_integer(i, _) -> Some (int_of_string i)
       | _ -> None
@@ -764,7 +764,7 @@ and gen_offset ~loc cur nxt fld beh =
   let open Entity in
   let open Qualifiers in
   match fld.MatchField.qls.offset with
-  | Some ({ pexp_loc } as off) ->
+  | Some ({ pexp_loc; _ } as off) ->
     [%expr
       let [%p nxt.off.pat] = [%e cur.off.exp] + [%e off] in [%e beh]]
       [@metaloc pexp_loc]
@@ -775,7 +775,7 @@ and gen_offset_saver ~loc cur nxt fld beh =
   let open Entity in
   let open Qualifiers in
   match fld.MatchField.qls.save_offset_to with
-  | Some { pexp_desc = Pexp_ident ({ txt; loc = eloc }) } ->
+  | Some { pexp_desc = Pexp_ident ({ txt; loc = eloc }); _ } ->
     let ptxt = pvar ~loc:eloc (Longident.last txt) in
     [%expr
       let [%p ptxt] = [%e nxt.off.exp] - [%e cur.off.exp] in [%e beh]]
@@ -783,12 +783,10 @@ and gen_offset_saver ~loc cur nxt fld beh =
   | Some _ | None -> beh
 
 and gen_unbound_string ~loc cur nxt fld beh fields =
-  let open Entity in
-  let open Context in
   let p = fld.MatchField.pat
   in
   match p with
-  | { ppat_desc = Ppat_var(_) } ->
+  | { ppat_desc = Ppat_var(_); _ } ->
     [%expr
       let [%p p] = [%e (gen_extractor ~loc nxt fld)] in
       [%e (gen_next_all ~loc cur nxt beh fields)]]
@@ -807,16 +805,16 @@ and gen_bound_bitstring ~loc cur nxt fld beh fields =
   and (l, _) = fld.MatchField.len
   in
   match p with
-  | { ppat_desc = Ppat_var(_) } ->
+  | { ppat_desc = Ppat_var(_); _ } ->
     [%expr
-      if Pervasives.(>=) [%e nxt.len.exp] [%e l] then
+      if Stdlib.(>=) [%e nxt.len.exp] [%e l] then
         let [%p p] = [%e (gen_extractor ~loc nxt fld)] in
         [%e (gen_next ~loc cur nxt fld beh fields)]
       else ()]
       [@metaloc loc]
   | [%pat? _ ] ->
     [%expr
-      if Pervasives.(>=) [%e nxt.len.exp] [%e l] then
+      if Stdlib.(>=) [%e nxt.len.exp] [%e l] then
         [%e (gen_next ~loc cur nxt fld beh fields)]
       else ()]
       [@metaloc loc]
@@ -829,7 +827,7 @@ and gen_bound_string ~loc cur nxt fld beh fields =
   let (l, _) = fld.MatchField.len
   in
   [%expr
-    if Pervasives.(>=) [%e nxt.len.exp] [%e l] then
+    if Stdlib.(>=) [%e nxt.len.exp] [%e l] then
       [%e (gen_match ~loc cur nxt fld beh fields)]
     else ()]
     [@metaloc loc]
@@ -840,7 +838,7 @@ and gen_bound_int_with_size ~loc cur nxt fld beh fields =
   let (l, _) = fld.MatchField.len
   in
   [%expr
-    if Pervasives.(>=) [%e nxt.len.exp] [%e l] then
+    if Stdlib.(>=) [%e nxt.len.exp] [%e l] then
       [%e (gen_match ~loc cur nxt fld beh fields)]
     else ()]
     [@metaloc loc]
@@ -851,9 +849,9 @@ and gen_bound_int ~loc cur nxt fld beh fields =
   let (l, _) = fld.MatchField.len
   in
   [%expr
-    if Pervasives.(>=) [%e l]           1  &&
-       Pervasives.(<=) [%e l]           64 &&
-       Pervasives.(>=) [%e nxt.len.exp] [%e l] then
+    if Stdlib.(>=) [%e l]           1  &&
+       Stdlib.(<=) [%e l]           64 &&
+       Stdlib.(>=) [%e nxt.len.exp] [%e l] then
       [%e (gen_match ~loc cur nxt fld beh fields)]
     else ()]
     [@metaloc loc]
@@ -883,7 +881,6 @@ and gen_fields_with_quals ~loc cur nxt fld beh fields =
   |> gen_offset ~loc cur nxt fld
 
 and gen_fields ~loc cur nxt beh fields =
-  let open Qualifiers in
   let (exp, alias) = beh
   in
   match fields with
@@ -938,7 +935,7 @@ let mark_optimized_fastpath fields =
   in
   let check_field off tuple =
     match tuple with
-    | { pat; len = (l, Some (v)); qls = { value_type = Some (Type.Int) }; _ } ->
+    | { pat; len = (l, Some (v)); qls = { value_type = Some (Type.Int); _ }; _ } ->
       if (off land 7) = 0 && (v = 16 || v = 32 || v = 64) then
         (Some (off + v), MatchField.Tuple { tuple with opt = true })
       else
@@ -979,12 +976,11 @@ let gen_case_constant ~loc cur nxt res case value alias =
   |> gen_fields ~loc cur nxt (beh, alias)
 
 let gen_case cur nxt res case =
-  let open Entity in
   let loc = case.pc_lhs.ppat_loc in
   match case.pc_lhs.ppat_desc with
   | Ppat_constant (Pconst_string (value, _)) ->
     gen_case_constant ~loc cur nxt res case value None
-  | Ppat_alias ({ ppat_desc = Ppat_constant (Pconst_string (value, _)) }, { txt = a }) ->
+  | Ppat_alias ({ ppat_desc = Ppat_constant (Pconst_string (value, _)); _ }, { txt = a; _ }) ->
     gen_case_constant ~loc cur nxt res case value (Some a)
   | _ ->
     location_exn ~loc "Wrong pattern type"
@@ -1168,7 +1164,7 @@ let gen_assignment_behavior ~loc sym fields =
   let post =
     [%expr
       let _res = [%e rep] in
-      if Pervasives.(=) (Bitstring.bitstring_length _res) [%e len]
+      if Stdlib.(=) (Bitstring.bitstring_length _res) [%e len]
       then _res else raise Exit]
       [@metaloc loc]
   in
@@ -1201,7 +1197,7 @@ let transform_single_let ~loc ast expr =
   match ast.pvb_pat.ppat_desc, ast.pvb_expr.pexp_desc with
   | Parsetree.Ppat_var (s), Pexp_constant (Pconst_string (value, _)) ->
     let pat = pvar ~loc s.txt in
-    let constructor_expr = gen_constructor_expr loc value in
+    let constructor_expr = gen_constructor_expr ~loc value in
     [%expr let [%p pat] = [%e constructor_expr] in [%e expr]]
   | _ -> location_exn ~loc "Invalid pattern type"
 ;;
@@ -1215,7 +1211,7 @@ let extension expr =
   let loc = expr.pexp_loc in
   match expr.pexp_desc with
   | Pexp_constant (Pconst_string (value, (_ : string option))) ->
-    gen_constructor_expr loc value
+    gen_constructor_expr ~loc value
   | Pexp_let (Nonrecursive, bindings, expr) ->
     List.fold_right
       (fun binding expr -> transform_single_let ~loc binding expr)
