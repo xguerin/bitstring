@@ -3,4 +3,4 @@
  (public_name bitstring)
  (c_names bitstring_fastpath)
  (c_flags -I.)
- (libraries str unix))
+ (libraries str unix stdlib-shims))

@@ -1,30 +1,35 @@
 authors      : [ "Richard W.M. Jones" "Xavier R. Guérin" ]
 bug-reports  : "https://bitbucket.org/thanatonauts/bitstring/issues"
-dev-repo     : "https://bitbucket.org/thanatonauts/bitstring.git"
+dev-repo     : "git+https://bitbucket.org/thanatonauts/bitstring.git"
 doc          : "https://bitstring.software"
 homepage     : "https://bitstring.software"
-license      : "LGPLv2+ with exceptions and GPLv2+"
+license      : ["LGPL-2.0-or-later with exceptions" "GPL-2.0-or-later"]
 maintainer   : "Xavier R. Guérin <ghub@applepine.org>"
-opam-version : "1.2"
+opam-version: "2.0"
 version      : "3.1.1"
 
 build: [
   ["dune" "build" "-p" name "-j" jobs]
+  ["dune" "runtest" "-p" name "-j" jobs] {with-test}
 ]
-
-build-test: [
-  ["dune" "runtest" "-p" name "-j" jobs]
-]
-
 depends: [
-  "dune"                    { build & >= "1.0"   }
-  "ppx_tools_versioned"     { build              }
-  "ocaml-migrate-parsetree" { build & >= "1.0.5" }
-  "ounit"                   { test               }
+  "ocaml" {>= "4.02.3"}
+  "dune"
+  "ppx_tools_versioned" {build}
+  "ocaml-migrate-parsetree" {>= "1.0.5"}
+  "stdlib-shims"
+  "ounit" {with-test}
 ]
-
 conflicts: [
   "ppx_bitstring"
 ]
 
-available: ocaml-version >= "4.02.3"
+synopsis: "bitstrings and bitstring matching for OCaml"
+description: """
+The ocaml-bitstring project adds Erlang-style bitstrings and matching over bitstrings as a syntax extension and library for OCaml. 
+You can use this module to both parse and generate binary formats, files and protocols. 
+Bitstring handling is added as primitives to the language, making it exceptionally simple to use and very powerful."""
+url {
+  src: "https://bitbucket.org/thanatonauts/bitstring/get/v3.1.1.tar.gz"
+  checksum: "md5=7da1b8627c6ab7cb4825a0b4f415d251"
+}
