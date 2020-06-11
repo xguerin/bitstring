@@ -15,9 +15,9 @@
  *)
 
 open Migrate_parsetree
-open Ast_405
+open Ast_410
 
-open Ast_convenience_405
+open Ast_convenience_410
 open Ast_mapper
 open Asttypes
 open Parsetree
@@ -28,7 +28,7 @@ open Printf
  * Version management
  *)
 
-let ocaml_version = Versions.ocaml_405
+let ocaml_version = Versions.ocaml_410
 
 (* Type definition *)
 
@@ -226,10 +226,12 @@ let rec process_expr_loc ~loc expr =
         ops
     in { expr with pexp_desc = Pexp_apply(lident, fld); pexp_loc = loc }
   | { pexp_desc = Pexp_fun(ident, ops,
-                           { ppat_desc = Ppat_var(pid); ppat_loc; ppat_attributes },
+                           { ppat_desc = Ppat_var(pid); ppat_loc; ppat_attributes;
+                           ppat_loc_stack = [] },
                            exp); _ } ->
     let lpid = Location.mkloc pid.txt loc in
-    let lpat = { ppat_desc = Ppat_var lpid; ppat_loc = loc; ppat_attributes } in
+    let lpat = { ppat_desc = Ppat_var lpid; ppat_loc = loc; ppat_attributes;
+    ppat_loc_stack = [] } in
     let lops = begin match ops with
       | Some o -> Some (process_expr_loc ~loc o)
       | None   -> None
@@ -242,7 +244,7 @@ let rec process_expr_loc ~loc expr =
 
 let parse_expr expr =
   try
-    Parse.expression Versions.ocaml_405 (Lexing.from_string expr.txt)
+    Parse.expression Versions.ocaml_410 (Lexing.from_string expr.txt)
     |> process_expr_loc ~loc:expr.loc
   with
     _ -> location_exn ~loc:expr.loc ("Parse expression error: '" ^ expr.txt ^ "'")
@@ -252,14 +254,14 @@ let process_pat_loc ~loc pat =
   match pat with
   | { ppat_desc = Ppat_var(ident); ppat_loc; ppat_attributes; _ } ->
     let lident = Location.mkloc ident.txt loc in
-    { ppat_desc = Ppat_var(lident); ppat_loc = loc; ppat_attributes }
+    { ppat_desc = Ppat_var(lident); ppat_loc = loc; ppat_attributes; ppat_loc_stack = [] }
   | _ ->
     { pat with ppat_loc = loc }
 ;;
 
 let parse_pattern pat =
   try
-    Parse.pattern Versions.ocaml_405 (Lexing.from_string pat.txt)
+    Parse.pattern Versions.ocaml_410 (Lexing.from_string pat.txt)
     |> process_pat_loc ~loc:pat.loc
   with
     _ -> location_exn ~loc:pat.loc ("Parse pattern error: '" ^ pat.txt ^ "'")
@@ -1241,5 +1243,5 @@ let rewriter config cookies = {
 }
 
 let () =
-  Driver.register ~name:"ppx_bitstring" ~args:[] Versions.ocaml_405 rewriter
+  Driver.register ~name:"ppx_bitstring" ~args:[] Versions.ocaml_410 rewriter
 ;;
