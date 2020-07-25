@@ -1,6 +1,6 @@
 (library
- (name ppx_bitstring)
- (public_name bitstring.ppx)
+ (name bitstring_ppx)
+ (public_name bitstring_ppx)
  (kind ppx_rewriter)
  (libraries str compiler-libs ppx_tools_versioned ocaml-migrate-parsetree)
  (preprocess
