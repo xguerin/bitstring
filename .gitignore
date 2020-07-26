@@ -23,6 +23,7 @@
 /create_test_pattern
 /META
 /Makefile
+/site
 /tests/80_testdata/*.actual
 /tests/test.bmpp
 /bitstring.install
