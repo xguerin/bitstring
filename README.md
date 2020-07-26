@@ -14,20 +14,20 @@ The documentation is located [here](https://bitstring.software).
 ## How to install
 ```
 opam install bitstring
-opam install bitstring_ppx
+opam install ppx_bitstring
 ```
 ## How to use
 
 ### Ocamlfind
 ```
-ocamlfind c -package bitstring -package bitstring_ppx -linkpkg ...
+ocamlfind c -package bitstring -package ppx_bitstring -linkpkg ...
 ```
 ### Dune
 ```lisp
 (executable
  ((name        foo)
   (libraries   (bitstring))
-  (preprocess  (pps (bitstring_ppx)))
+  (preprocess  (pps (ppx_bitstring)))
   ))
 ```
 ## How to build
