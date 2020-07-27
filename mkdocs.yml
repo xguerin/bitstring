@@ -1,0 +1,7 @@
+site_name: OCaml Bitstring
+theme: readthedocs
+pages:
+  - "Overview": "index.md"
+  - "Examples": "examples.md"
+  - "Guide": "documentation.md"
+  - "Reference": "reference.md"
