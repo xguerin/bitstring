@@ -26,7 +26,7 @@
 ))
 
 (package
- (name bitstring_ppx)
+ (name ppx_bitstring)
  (synopsis "Bitstrings and bitstring matching for OCaml - PPX extension")
  (description
   "\| The ocaml-bitstring project adds Erlang-style bitstrings and matching over bitstrings as a syntax extension and library for OCaml. 
@@ -34,10 +34,8 @@
   "\| Bitstring handling is added as primitives to the language, making it exceptionally simple to use and very powerful.
  )
  (depends
-  (bitstring (>= 3.1.1))
+  (bitstring (>= 3.2.0))
   (ocaml (or (and :with-test (>= 4.08.0)) (and (= :with-test false) (>= 4.02.3))))
   (ppx_tools_versioned (and :build (>= 5.0.0)))
   (ocaml-migrate-parsetree (and :build (>= 1.0.5)))
-  (ounit :with-test))
- (conflicts
-  (ppx_bitstring (>= 0.0.0))))
+  (ounit :with-test)))

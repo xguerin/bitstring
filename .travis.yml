@@ -1,16 +1,19 @@
 language: c
-sudo: required
+dist: xenial
 install: wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-opam.sh
 script: bash -ex .travis-opam.sh
 env:
-  - PACKAGE=bitstring_ppx OCAML_VERSION=4.02 TESTS=false
-  - PACKAGE=bitstring_ppx OCAML_VERSION=4.03 TESTS=false
-  - PACKAGE=bitstring_ppx OCAML_VERSION=4.04 TESTS=false
-  - PACKAGE=bitstring_ppx OCAML_VERSION=4.05 TESTS=false
-  - PACKAGE=bitstring_ppx OCAML_VERSION=4.06 TESTS=false
-  - PACKAGE=bitstring_ppx OCAML_VERSION=4.07 TESTS=false
-  - PACKAGE=bitstring_ppx OCAML_VERSION=4.08
-  - PACKAGE=bitstring_ppx OCAML_VERSION=4.09
-  - PACKAGE=bitstring_ppx OCAML_VERSION=4.10
+  global:
+  - PINS="bitstring:. ppx_bitstring:."
+  jobs:
+  - PACKAGE=ppx_bitstring OCAML_VERSION=4.02 TESTS=false
+  - PACKAGE=ppx_bitstring OCAML_VERSION=4.03 TESTS=false
+  - PACKAGE=ppx_bitstring OCAML_VERSION=4.04 TESTS=false
+  - PACKAGE=ppx_bitstring OCAML_VERSION=4.05 TESTS=false
+  - PACKAGE=ppx_bitstring OCAML_VERSION=4.06 TESTS=false
+  - PACKAGE=ppx_bitstring OCAML_VERSION=4.07 TESTS=false
+  - PACKAGE=ppx_bitstring OCAML_VERSION=4.08
+  - PACKAGE=ppx_bitstring OCAML_VERSION=4.09
+  - PACKAGE=ppx_bitstring OCAML_VERSION=4.10
 os:
   - linux
