@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Guide - OCaml Bitstring</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Guide";
+    var mkdocs_page_input_path = "documentation.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> OCaml Bitstring</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Guide</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#loading-creating-bitstrings">Loading, creating bitstrings</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#matching-bitstrings-with-patterns">Matching bitstrings with patterns</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#pattern-field-reference">Pattern field reference</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#default-match-cases">Default match cases</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#function-definition">Function definition</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#constructing-bitstrings">Constructing bitstrings</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#construction-exception">Construction exception</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#integer-types">Integer types</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#advanced-pattern-matching">Advanced pattern-matching</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#computed-offsets">Computed offsets</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#check-expressions">Check expressions</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#bind-expressions">Bind expressions</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#map-expressions">Map expressions</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#order-of-evaluation">Order of evaluation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#saving-bit-offsets">Saving bit offsets</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#security-and-type-safety">Security and type safety</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#security-on-input">Security on input</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#security-on-output">Security on output</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#order-of-evaluation_1">Order of evaluation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#safety">Safety</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#limits">Limits</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">OCaml Bitstring</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Guide</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="guide">Guide</h1>
+<h2 id="loading-creating-bitstrings">Loading, creating bitstrings</h2>
+<p>The basic data type is the <code>Bitstring.bitstring</code>, a string of bits of arbitrary
+length. Bitstrings can be any length in bits and operations do not need to be
+byte-aligned (although they will generally be more efficient if they are
+byte-aligned).</p>
+<p>Internally a bitstring is stored as a normal OCaml <code>string</code> together with an
+offset and length, where the offset and length are measured in bits. Thus one
+can efficiently form substrings of bitstrings, overlay a bitstring on existing
+data, and load and save bitstrings from files or other external sources.</p>
+<p>To load a bitstring from a file use <code>Bitstring.bitstring_of_file</code> or
+<code>Bitstring.bitstring_of_chan</code>. There are also functions to create bitstrings
+from arbitrary data. See the <a href="/reference">reference</a> section.</p>
+<h2 id="matching-bitstrings-with-patterns">Matching bitstrings with patterns</h2>
+<p>Use the <code>bitstring</code> extension of the <code>match</code> operator (part of the syntax extension)
+to break apart a bitstring into its fields. <code>match%bitstring</code> works a lot like the
+OCaml <code>match</code> operator. Please note the use of the <code>{| ... |}</code> verbatim notation
+for the matching patterns.</p>
+<p>The general form of <code>match%bitstring</code> is:</p>
+<pre><code class="ocaml">match%bitstring EXPRESSION with
+
+| {| PATTERN |} -&gt; CODE
+| {| PATTERN |} -&gt; CODE
+|  ...
+</code></pre>
+
+<p>As with normal match, the statement attempts to match the bitstring against each
+pattern in turn. If none of the patterns match then the standard library
+<code>Match_failure</code> exception is thrown.</p>
+<p>Patterns look a bit different from normal match patterns. They consist of a list
+of bitfields separated by <code>;</code> where each bitfield contains a bind variable, the
+width (in bits) of the field, and other information. Some example patterns:</p>
+<pre><code class="ocaml">match%bitstring bits with
+
+| {| version : 8; name : 8; param : 8 |} -&gt; ...
+
+   (* Bitstring of at least 3 bytes. First byte is the version
+      number, second byte is a field called name, third byte is
+      a field called parameter. *)
+
+| {| flag : 1 |} -&gt;
+   printf &quot;flag is %b\n&quot; flag
+
+   (* A single flag bit (mapped into an OCaml boolean). *)
+
+| {| len : 4; data : 1 + len |} -&gt;
+   printf &quot;len = %d, data = 0x%Lx\n&quot; len data
+
+   (* A 4-bit length, followed by 1-16 bits of data, where the
+      length of the data is computed from len. *)
+
+| {| ipv6_source : 128 : bitstring;
+     ipv6_dest   : 128 : bitstring |} -&gt; ...
+
+   (* IPv6 source and destination addresses. Each is 128 bits
+      and is mapped into a bitstring type which will be a substring
+      of the main bitstring expression. *)
+</code></pre>
+
+<p>You can also add conditional when-clauses:</p>
+<pre><code class="ocaml">| {| version : 4 |}
+    when version = 4 || version = 6 -&gt; ...
+
+   (* Only match and run the code when version is 4 or 6. If
+      it isn't we will drop through to the next case. *)
+</code></pre>
+
+<p>Note that the pattern is only compared against the first part of the bitstring
+(there may be more data in the bitstring following the pattern, which is not
+matched). In terms of regular expressions you might say that the pattern
+matches <code>^pattern</code>, not <code>^pattern$</code>. To ensure that the bitstring contains only
+the pattern, add a length -1 bitstring to the end and test that its length is
+zero in the when-clause:</p>
+<pre><code class="ocaml">| {| n : 4;
+     rest : -1 : bitstring |}
+     when Bitstring.bitstring_length rest = 0 -&gt; ...
+
+   (* Only matches exactly 4 bits. *)
+</code></pre>
+
+<p>Normally the first part of each field is a binding variable,
+but you can also match a constant, as in:</p>
+<pre><code class="ocaml">| {| (4|6) : 4 |} -&gt; ...
+
+   (* Only matches if the first 4 bits contain either the integer 4 or the integer 6. *)
+</code></pre>
+
+<p>One may also match on strings:</p>
+<pre><code class="ocaml">| {| &quot;MAGIC&quot; : 5*8 : string |} -&gt; ...
+
+   (* Only matches if the string &quot;MAGIC&quot; appears at the start of the input. *)
+</code></pre>
+
+<h3 id="pattern-field-reference">Pattern field reference</h3>
+<p>The exact format of each pattern field is:</p>
+<p><code>pattern : length [: qualifier [,qualifier ...]]</code></p>
+<p><code>pattern</code> is the pattern, binding variable name, or constant to match. <code>length</code>
+is the length in bits which may be either a constant or an expression. The
+length expression is just an OCaml expression and can use any values defined in
+the program, and refer back to earlier fields (but not to later fields).</p>
+<p>Integers can only have lengths in the range <code>[1..64]</code> bits. See the <a href="#integer-types">integer
+types</a> section below for how these are mapped to the OCaml
+<code>int</code>/<code>int32</code>/<code>int64</code> types. This is checked at compile time if the length
+expression is constant, otherwise it is checked at runtime and you will get a
+runtime exception eg. in the case of a computed length expression.</p>
+<p>A bitstring field of length <code>-1</code> matches all the rest of the bitstring (thus
+this is only useful as the last field in a pattern).</p>
+<p>A bitstring field of length <code>0</code> matches an empty bitstring (occasionally useful
+when matching optional subfields).</p>
+<p>Qualifiers are a list of identifiers/expressions which control the type,
+signedness and endianness of the field. Permissible qualifiers are:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Qualifier</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>int</code></td>
+<td align="left">field has an integer type</td>
+</tr>
+<tr>
+<td align="left"><code>string</code></td>
+<td align="left">field is a string type</td>
+</tr>
+<tr>
+<td align="left"><code>bitstring</code></td>
+<td align="left">field is a bitstring type</td>
+</tr>
+<tr>
+<td align="left"><code>signed</code></td>
+<td align="left">field is signed</td>
+</tr>
+<tr>
+<td align="left"><code>unsigned</code></td>
+<td align="left">field is unsigned</td>
+</tr>
+<tr>
+<td align="left"><code>bigendian</code></td>
+<td align="left">field is big endian - a.k.a network byte order</td>
+</tr>
+<tr>
+<td align="left"><code>littleendian</code></td>
+<td align="left">field is little endian - a.k.a Intel byte order</td>
+</tr>
+<tr>
+<td align="left"><code>nativeendian</code></td>
+<td align="left">field is same endianness as the machine</td>
+</tr>
+<tr>
+<td align="left"><code>endian(expr)</code></td>
+<td align="left"><code>expr</code> should be an expression which evaluates to a <code>Bitstring.endian</code> type</td>
+</tr>
+<tr>
+<td align="left"><code>offset(expr)</code></td>
+<td align="left">see <a href="#computed-offsets">computed offsets</a> below</td>
+</tr>
+<tr>
+<td align="left"><code>check(expr)</code></td>
+<td align="left">apply some constraint to the field</td>
+</tr>
+<tr>
+<td align="left"><code>bind(expr)</code></td>
+<td align="left">bind the field to <code>expr</code></td>
+</tr>
+<tr>
+<td align="left"><code>map(lambda)</code></td>
+<td align="left">apply <code>lambda</code> to the field</td>
+</tr>
+</tbody>
+</table>
+<p><code>Bitstring.endian</code> is either <code>LittleEndian</code>, <code>BigEndian</code> or <code>NativeEndian</code>. The
+expression in <code>endian(expr)</code> is an arbitrary OCaml expression and can use the
+value of earlier fields in the bitmatch.</p>
+<p>The default settings are <code>int</code>, <code>unsigned</code>, <code>bigendian</code>, no offset.</p>
+<p>Note that many of these qualifiers cannot be used together, eg. bitstrings do
+not have endianness. The syntax extension should give you a compile-time error
+if you use incompatible qualifiers.</p>
+<h3 id="default-match-cases">Default match cases</h3>
+<p>As well as a list of fields, it is possible to name the bitstring and/or have a
+default match case:</p>
+<pre><code class="ocaml">| {| _ |} -&gt; ...
+
+   (* Default match case. *)
+
+| {| _ |} as pkt -&gt; ...
+
+   (* Default match case, with 'pkt' bound to the whole bitstring. *)
+</code></pre>
+
+<h3 id="function-definition">Function definition</h3>
+<p>The <code>function</code> keyword can also be used for pattern matching:</p>
+<pre><code class="ocaml">let pattern_matcher = function%bitstring
+| {| 1 : 1
+   ; a : 2
+   ; b : 16 : bigendian
+   ; ...
+   |} -&gt; (* Do something *)
+| {| _ |} -&gt; (* Do something else *)
+</code></pre>
+
+<h2 id="constructing-bitstrings">Constructing bitstrings</h2>
+<p>Bitstrings may be constructed using the <code>bitstring</code> extension of the <code>let</code>
+keyword. The <code>let%bitstring</code> expression takes a list of fields, similar to the
+list of fields for matching:</p>
+<pre><code class="ocaml">let version = 1 ;;
+let data = 10 ;;
+let%bitstring bits = {|
+  version : 4;
+  data : 12
+|} ;;
+
+(* Constructs a 16-bit bitstring with the first four bits containing
+   the integer 1, and the following 12 bits containing the integer 10,
+   arranged in network byte order. *)
+
+Bitstring.hexdump_bitstring stdout bits ;;
+
+(* Prints:
+   00000000  10 0a         |..              |
+ *)
+</code></pre>
+
+<p>The format of each field is the same as for pattern fields (see <a href="#pattern-field-reference">Pattern field
+reference section</a>), and things like computed length
+fields, fixed value fields, insertion of bitstrings within bitstrings, etc. are
+all supported.</p>
+<h3 id="construction-exception">Construction exception</h3>
+<p>The <code>let%bitstring</code> expression may throw a <a href="/reference/#exceptions">Bitstring.Construct_failure</a>
+exception at runtime.</p>
+<p>Runtime errors include:</p>
+<ul>
+<li><code>int</code> field length not in the range [1..64]</li>
+<li>a bitstring with a length declared which doesn't have the same length at runtime</li>
+<li>trying to insert an out-of-range value into an <code>int</code> field</li>
+</ul>
+<h2 id="integer-types">Integer types</h2>
+<p>Integer types are mapped to OCaml types <code>bool</code>, <code>int</code>, <code>int32</code> or <code>int64</code> using
+a system which tries to ensure that (a) the types are reasonably predictable and
+(b) the most efficient type is preferred.</p>
+<p>The rules are slightly different depending on whether the bit length expression
+in the field is a compile-time constant or a computed expression.</p>
+<p>Detection of compile-time constants is quite simplistic so only simple integer
+literals and simple expressions (eg. <code>5 * 8</code>) are recognized as constants.</p>
+<p>In any case the bit size of an integer is limited to the range <code>[1..64]</code>. This
+is detected as a compile-time error if that is possible, otherwise a runtime
+check is added which can throw an <code>Invalid_argument</code> exception.</p>
+<p>The mapping is thus:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Bit size</th>
+<th align="left">Constant</th>
+<th align="left">Computed expression</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">1</td>
+<td align="left"><code>bool</code></td>
+<td align="left"><code>int64</code></td>
+</tr>
+<tr>
+<td align="left">2..31</td>
+<td align="left"><code>int</code></td>
+<td align="left"><code>int64</code></td>
+</tr>
+<tr>
+<td align="left">32</td>
+<td align="left"><code>int32</code></td>
+<td align="left"><code>int64</code></td>
+</tr>
+<tr>
+<td align="left">33..64</td>
+<td align="left"><code>int64</code></td>
+<td align="left"><code>int64</code></td>
+</tr>
+</tbody>
+</table>
+<p>A possible future extension may allow people with 64 bit computers to specify a
+more optimal <code>int</code> type for bit sizes in the range <code>32..63</code>. If this was
+implemented then such code <em>could not even be compiled</em> on 32 bit platforms,
+so it would limit portability.</p>
+<p>Another future extension may be to allow computed expressions to assert min/max
+range for the bit size, allowing a more efficient data type than <code>int64</code> to be
+used. (Of course under such circumstances there would still need to be a
+runtime check to enforce the size).</p>
+<h2 id="advanced-pattern-matching">Advanced pattern-matching</h2>
+<h3 id="computed-offsets">Computed offsets</h3>
+<p>You can add an <code>offset(..)</code> qualifier to bitmatch patterns in order to move the
+current offset within the bitstring forwards.</p>
+<p>For example:</p>
+<pre><code class="ocaml">match%bitstring bits with
+| {| field1 : 8;
+     field2 : 8 : offset(160) |} -&gt; ...
+</code></pre>
+
+<p>matches <code>field1</code> at the start of the bitstring and <code>field2</code> at 160 bits into the
+bitstring. The middle 152 bits go unmatched (ie. can be anything).</p>
+<p>The generated code is efficient. If field lengths and offsets are known to be
+constant at compile time, then almost all runtime checks are avoided.
+Non-constant field lengths and/or non-constant offsets can result in more
+runtime checks being added.</p>
+<p>Note that moving the offset backwards, and moving the offset in
+<code>let%bitstring</code> expressions, are both not supported at present.</p>
+<h3 id="check-expressions">Check expressions</h3>
+<p>You can add a <code>check(expr)</code> qualifier to bitmatch patterns. If the expression
+evaluates to false then the current match case fails to match (in other words,
+we fall through to the next match case - there is no error).</p>
+<p>For example:</p>
+<pre><code class="ocaml">match%bitstring bits with
+| { field : 16 : check (field &gt; 100) } -&gt; ...
+</code></pre>
+
+<p>Note the difference between a check expression and a when-clause is that the
+when-clause is evaluated after all the fields have been matched. On the other
+hand a check expression is evaluated after the individual field has been
+matched, which means it is potentially more efficient (if the check expression
+fails then we don't waste any time matching later fields).</p>
+<p>We wanted to use the notation <code>when(expr)</code> here, but because <code>when</code> is a
+reserved word we could not do this.</p>
+<h3 id="bind-expressions">Bind expressions</h3>
+<p>A bind expression is used to change the value of a matched field. For example:</p>
+<pre><code class="ocaml">match%bitstring bits with
+| { len : 16 : bind (len * 8);
+    field : len : bitstring } -&gt; ...
+</code></pre>
+
+<p>In the example, after 'len' has been matched, its value would be multiplied by
+8, so the width of 'field' is the matched value multiplied by 8.</p>
+<p>In the general case:</p>
+<pre><code class="ocaml">| { field : ... : bind (expr) } -&gt; ...
+</code></pre>
+
+<p>evaluates the following after the field has been matched:</p>
+<pre><code class="ocaml">let field = expr in
+   (* remaining fields *)
+</code></pre>
+
+<h3 id="map-expressions">Map expressions</h3>
+<p>A map expression is used to apply a <code>lambda</code> expression to a matched field. The
+matched field would then contain the result of the application:</p>
+<pre><code class="ocaml">{| field : size : map (fun v -&gt; do_something_with v) }|
+</code></pre>
+
+<p>evaluates the following after the field has been matched:</p>
+<pre><code class="ocaml">let field = (fun v -&gt; do_something_with v) temporary_parsed_field in
+   (* remaining fields *)
+</code></pre>
+
+<h3 id="order-of-evaluation">Order of evaluation</h3>
+<p>The choice is arbitrary, but we have chosen that check expressions are evaluated
+first, and bind/map expressions are evaluated after.</p>
+<p>This means that the result of <code>bind()</code> or <code>map()</code> is <em>not</em> available in the check
+expression.</p>
+<p>Note that this rule applies regardless of the order of <code>check()</code>, <code>bind()</code>,
+or <code>map()</code> in the source code.</p>
+<h3 id="saving-bit-offsets">Saving bit offsets</h3>
+<p>Use <code>save_offset_to(variable)</code> to save the current bit offset within the match
+to a variable (strictly speaking, to a pattern). This variable is then made
+available in any <code>check()</code> and <code>bind()</code> clauses in the current field, <em>and</em>
+to any later fields, and to the code after the <code>-&gt;</code>.</p>
+<p>For example:</p>
+<pre><code class="ocaml">match%bitstring bits with
+| {| len : 16;
+     _ : len : bitstring;
+     field : 16 : save_offset_to (field_offset) |} -&gt;
+      printf &quot;field is at bit offset %d in the match\n&quot; field_offset
+</code></pre>
+
+<p>(In that example, <code>field_offset</code> should always have the value <code>len+16</code>).</p>
+<h2 id="security-and-type-safety">Security and type safety</h2>
+<h3 id="security-on-input">Security on input</h3>
+<p>The main concerns for input are buffer overflows and denial of service.</p>
+<p>It is believed that this library is robust against attempted buffer overflows.
+In addition to OCaml's normal bounds checks, we check that field lengths are &gt;=
+0, and many additional checks.</p>
+<p>Denial of service attacks are more problematic. We only work forwards through
+the bitstring, thus computation will eventually terminate. As for computed
+lengths, code such as this is thought to be secure:</p>
+<pre><code class="ocaml">match%bitstring bits with
+| {| len : 64;
+     buffer : Int64.to_int len : bitstring |} -&gt; ...
+</code></pre>
+
+<p>The <code>len</code> field can be set arbitrarily large by an attacker, but when
+pattern-matching against the <code>buffer</code> field this merely causes a test such as
+<code>if len &lt;= remaining_size</code> to fail. Even if the length is chosen so that
+<code>buffer</code> bitstring is allocated, the allocation of sub-bitstrings is efficient
+and doesn't involve an arbitary-sized allocation or any copying.</p>
+<p>However the above does not necessarily apply to strings used in matching, since
+they may cause the library to use the
+<a href="/reference/#converting-bitstrings">Bitstring.string_of_bitstring</a> function,
+which allocates a string. So you should take care if you use the <code>string</code> type
+particularly with a computed length that is derived from external input.</p>
+<p>The main protection against attackers should be to ensure that the main program
+will only read input bitstrings up to a certain length, which is outside the
+scope of this library.</p>
+<h3 id="security-on-output">Security on output</h3>
+<p>As with the input side, computed lengths are believed to be safe. For example:</p>
+<pre><code class="ocaml">let len = read_untrusted_source () in
+let buffer = allocate_bitstring () in
+[%bitstring {|
+  buffer : len : bitstring
+|}]
+</code></pre>
+
+<p>This code merely causes a check that buffer's length is the same as <code>len</code>.
+However the program function <code>allocate_bitstring</code> must refuse to allocate an
+oversized buffer (but that is outside the scope of this library).</p>
+<h3 id="order-of-evaluation_1">Order of evaluation</h3>
+<p>In <code>match%bitstring</code> statements, fields are evaluated left to right.</p>
+<p>Note that the when-clause is evaluated <em>last</em>, so if you are relying on the
+when-clause to filter cases then your code may do a lot of extra and unncessary
+pattern-matching work on fields which may never be needed just to evaluate the
+when-clause. Either rearrange the code to do only the first part of the match,
+followed by the when-clause, followed by a second inner bitmatch, or use a 
+<code>check()</code> qualifier within fields.</p>
+<h3 id="safety">Safety</h3>
+<p>The current implementation is believed to be fully type-safe, and makes compile
+and run-time checks where appropriate. If you find a case where a check is
+missing please submit a bug report or a patch.</p>
+<h2 id="limits">Limits</h2>
+<p>These are thought to be the current limits:</p>
+<ul>
+<li>Integers: <code>[1..64]</code> bits.</li>
+<li>Bitstrings (32-bit): maximum length is limited by the string size, ie. 16 MBytes.</li>
+<li>Bitstrings (64-bit): maximum length is thought to be limited by the string size, ie. effectively unlimited.</li>
+</ul>
+<p>Bitstrings must be loaded into memory before we can match against them. Thus
+available memory may be considered a limit for some applications.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../reference/" class="btn btn-neutral float-right" title="Reference">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../examples/" class="btn btn-neutral" title="Examples"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../examples/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../reference/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

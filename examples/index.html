@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Examples - OCaml Bitstring</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Examples";
+    var mkdocs_page_input_path = "examples.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> OCaml Bitstring</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Examples</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#ipv4-packets">IPv4 packets</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ext3-superblock-parser">EXT3 superblock parser</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#simple-binary-message-parser">Simple binary message parser</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../documentation/">Guide</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../reference/">Reference</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">OCaml Bitstring</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Examples</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="examples">Examples</h1>
+<h2 id="ipv4-packets">IPv4 packets</h2>
+<pre><code class="ocaml">match%bitstring pkt with
+(* IPv4 packet header
+  0                   1                   2                   3   
+  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |   4   |  IHL  |Type of Service|          Total Length         |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |         Identification        |Flags|      Fragment Offset    |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |  Time to Live |    Protocol   |         Header Checksum       |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                       Source Address                          |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                    Destination Address                        |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |                    Options                    |    Padding    |
+ +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*)
+| {| 4 : 4; hdrlen : 4; tos : 8;   length : 16;
+     identification : 16;          flags : 3; fragoffset : 13;
+     ttl : 8; protocol : 8;        checksum : 16;
+     source : 32;
+     dest : 32;
+     options : (hdrlen-5)*32 : bitstring;
+     payload : -1 : bitstring
+   |} -&gt;
+
+  printf &quot;IPv4:\n&quot;;
+  printf &quot;  header length: %d * 32 bit words\n&quot; hdrlen;
+  printf &quot;  type of service: %d\n&quot; tos;
+  printf &quot;  packet length: %d bytes\n&quot; length;
+  printf &quot;  identification: %d\n&quot; identification;
+  printf &quot;  flags: %d\n&quot; flags;
+  printf &quot;  fragment offset: %d\n&quot; fragoffset;
+  printf &quot;  ttl: %d\n&quot; ttl;
+  printf &quot;  protocol: %d\n&quot; protocol;
+  printf &quot;  checksum: %d\n&quot; checksum;
+  printf &quot;  source: %lx  dest: %lx\n&quot; source dest;
+  printf &quot;  header options + padding:\n&quot;;
+  Bitstring.hexdump_bitstring stdout options;
+  printf &quot;  packet payload:\n&quot;;
+  Bitstring.hexdump_bitstring stdout payload
+
+| {| version : 4 |} -&gt;
+  eprintf &quot;unknown IP version %d\n&quot; version;
+  exit 1
+
+| {| _ |} as pkt -&gt;
+  eprintf &quot;data is smaller than one nibble:\n&quot;;
+  Bitstring.hexdump_bitstring stderr pkt;
+  exit 1
+</code></pre>
+
+<h2 id="ext3-superblock-parser">EXT3 superblock parser</h2>
+<pre><code class="ocaml">let bits = Bitstring.bitstring_of_file &quot;tests/ext3_sb&quot;
+
+let () =
+  match%bitstring bits with
+  | {| s_inodes_count : 32 : littleendian;       (* Inodes count *)
+       s_blocks_count : 32 : littleendian;       (* Blocks count *)
+       s_r_blocks_count : 32 : littleendian;     (* Reserved blocks count *)
+       s_free_blocks_count : 32 : littleendian;  (* Free blocks count *)
+       s_free_inodes_count : 32 : littleendian;  (* Free inodes count *)
+       s_first_data_block : 32 : littleendian;   (* First Data Block *)
+       s_log_block_size : 32 : littleendian;     (* Block size *)
+       s_log_frag_size : 32 : littleendian;      (* Fragment size *)
+       s_blocks_per_group : 32 : littleendian;   (* # Blocks per group *)
+       s_frags_per_group : 32 : littleendian;    (* # Fragments per group *)
+       s_inodes_per_group : 32 : littleendian;   (* # Inodes per group *)
+       s_mtime : 32 : littleendian;              (* Mount time *)
+       s_wtime : 32 : littleendian;              (* Write time *)
+       s_mnt_count : 16 : littleendian;          (* Mount count *)
+       s_max_mnt_count : 16 : littleendian;      (* Maximal mount count *)
+       0xef53 : 16 : littleendian |} -&gt;          (* Magic signature *)
+
+    printf &quot;ext3 superblock:\n&quot;;
+    printf &quot;  s_inodes_count = %ld\n&quot; s_inodes_count;
+    printf &quot;  s_blocks_count = %ld\n&quot; s_blocks_count;
+    printf &quot;  s_free_inodes_count = %ld\n&quot; s_free_inodes_count;
+    printf &quot;  s_free_blocks_count = %ld\n&quot; s_free_blocks_count
+
+  | {| _ |} -&gt;
+    eprintf &quot;not an ext3 superblock!\n%!&quot;;
+    exit 2
+</code></pre>
+
+<h2 id="simple-binary-message-parser">Simple binary message parser</h2>
+<pre><code class="ocaml">(*
+  +---------------+---------------+--------------------------+
+  | type          | subtype       | parameter                |
+  +---------------+---------------+--------------------------+
+   &lt;-- 16 bits --&gt; &lt;-- 16 bits --&gt; &lt;------- 32 bits --------&gt;
+
+  All fields are in network byte order.
+*)
+
+let%bitstring make_message typ subtype param = {|
+    typ : 16;
+    subtype : 16;
+    param : 32
+|};;
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../documentation/" class="btn btn-neutral float-right" title="Guide">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../documentation/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
