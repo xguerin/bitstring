@@ -36,6 +36,5 @@
  (depends
   (bitstring (>= 3.2.0))
   (ocaml (or (and :with-test (>= 4.08.0)) (and (= :with-test false) (>= 4.02.3))))
-  (ppx_tools_versioned (and :build (>= 5.0.0)))
-  (ocaml-migrate-parsetree (and :build (>= 1.0.5)))
+  (ppxlib (and :build (>= 0.16.0)))
   (ounit :with-test)))
