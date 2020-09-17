@@ -14,7 +14,7 @@ homepage: "https://github.com/xguerin/bitstring"
 bug-reports: "https://github.com/xguerin/bitstring/issues"
 depends: [
   "dune" {>= "2.5"}
-  "ocaml" {>= "4.02.3"}
+  "ocaml" {>= "4.04.1"}
   "stdlib-shims" {>= "0.1.0"}
 ]
 build: [

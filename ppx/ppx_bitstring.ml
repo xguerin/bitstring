@@ -14,21 +14,9 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *)
 
-open Migrate_parsetree
-open Ast_410
-
-open Ast_convenience_410
-open Ast_mapper
-open Asttypes
-open Parsetree
-open Lexing
+open Ppxlib
 open Printf
-
-(*
- * Version management
- *)
-
-let ocaml_version = Versions.ocaml_410
+open Ast_builder.Default
 
 (* Type definition *)
 
@@ -184,8 +172,7 @@ end
 (* Exception *)
 
 let location_exn ~loc msg =
-  Location.Error (Location.error ~loc msg)
-  |> raise
+  Location.raise_errorf ~loc "%s" msg
 ;;
 
 (* Helper functions *)
@@ -203,7 +190,7 @@ let option_bind opt f =
 let rec process_expr_loc ~loc expr =
   match expr with
   | { pexp_desc = Pexp_ident(ident); _ } ->
-    let lident = Location.mkloc ident.txt loc in
+    let lident = Loc.make ~loc ident.txt in
     { expr with pexp_desc = Pexp_ident(lident); pexp_loc = loc }
   | { pexp_desc = Pexp_tuple(ops); _ } ->
     let fld = List.fold_left
@@ -212,7 +199,7 @@ let rec process_expr_loc ~loc expr =
         ops
     in { expr with pexp_desc = Pexp_tuple(fld); pexp_loc = loc }
   | { pexp_desc = Pexp_construct(ident, ops); _ } ->
-    let lident = Location.mkloc ident.txt loc in
+    let lident = Loc.make ident.txt ~loc in
     let lops = begin match ops with
       | Some o -> Some (process_expr_loc ~loc o)
       | None    -> None
@@ -229,7 +216,7 @@ let rec process_expr_loc ~loc expr =
                            { ppat_desc = Ppat_var(pid); ppat_loc; ppat_attributes;
                            ppat_loc_stack = [] },
                            exp); _ } ->
-    let lpid = Location.mkloc pid.txt loc in
+    let lpid = Loc.make pid.txt ~loc in
     let lpat = { ppat_desc = Ppat_var lpid; ppat_loc = loc; ppat_attributes;
     ppat_loc_stack = [] } in
     let lops = begin match ops with
@@ -244,7 +231,7 @@ let rec process_expr_loc ~loc expr =
 
 let parse_expr expr =
   try
-    Parse.expression Versions.ocaml_410 (Lexing.from_string expr.txt)
+    Parse.expression (Lexing.from_string expr.txt)
     |> process_expr_loc ~loc:expr.loc
   with
     _ -> location_exn ~loc:expr.loc ("Parse expression error: '" ^ expr.txt ^ "'")
@@ -253,7 +240,7 @@ let parse_expr expr =
 let process_pat_loc ~loc pat =
   match pat with
   | { ppat_desc = Ppat_var(ident); ppat_loc; ppat_attributes; _ } ->
-    let lident = Location.mkloc ident.txt loc in
+    let lident = Loc.make ident.txt ~loc in
     { ppat_desc = Ppat_var(lident); ppat_loc = loc; ppat_attributes; ppat_loc_stack = [] }
   | _ ->
     { pat with ppat_loc = loc }
@@ -261,7 +248,7 @@ let process_pat_loc ~loc pat =
 
 let parse_pattern pat =
   try
-    Parse.pattern Versions.ocaml_410 (Lexing.from_string pat.txt)
+    Parse.pattern (Lexing.from_string pat.txt)
     |> process_pat_loc ~loc:pat.loc
   with
     _ -> location_exn ~loc:pat.loc ("Parse pattern error: '" ^ pat.txt ^ "'")
@@ -310,7 +297,7 @@ let rec split_loc_rec ~loc = function
 
 let split_loc ~loc lst =
   split_loc_rec ~loc lst
-  |> List.map2 (fun e loc -> Location.mkloc (String.trim e) loc) lst
+  |> List.map2 (fun e loc -> Loc.make (String.trim e) ~loc) lst
 ;;
 
 (* Processing qualifiers *)
@@ -611,7 +598,7 @@ let gen_int_extractor_dynamic ~loc nxt size sign endian =
   and en = Endian.to_string endian in
   let ex = sprintf "Bitstring.extract_%s_%s_%s" it en sn
   in
-  [%expr [%e evar ~loc ex] [%e edat] [%e eoff] [%e elen] [%e int ~loc size]]
+  [%expr [%e evar ~loc ex] [%e edat] [%e eoff] [%e elen] [%e eint ~loc size]]
     [@metaloc loc]
 ;;
 
@@ -634,7 +621,7 @@ let gen_int_extractor ~loc nxt fld =
       let ex = sprintf "Bitstring.extract_char_%s" (Sign.to_string sign)
       in
       [%expr
-        [%e evar ~loc ex] [%e edat] [%e eoff] [%e elen] [%e int ~loc size]]
+        [%e evar ~loc ex] [%e edat] [%e eoff] [%e elen] [%e eint ~loc size]]
         [@metaloc loc]
     (* 16|32|64-bit type with referred endianness *)
     | Some (size), Some (sign), Some (Endian.Referred r) ->
@@ -643,7 +630,7 @@ let gen_int_extractor ~loc nxt fld =
       let ex = sprintf "Bitstring.extract_%s_ee_%s" it ss
       in
       [%expr
-        [%e evar ~loc ex] ([%e r]) [%e edat] [%e eoff] [%e elen] [%e int ~loc size]]
+        [%e evar ~loc ex] ([%e r]) [%e edat] [%e eoff] [%e elen] [%e eint ~loc size]]
         [@metaloc loc]
     (* 16|32|64-bit type with immediate endianness *)
     | Some (size), Some (sign), Some (endian) ->
@@ -734,7 +721,7 @@ and gen_next_all ~loc cur nxt beh fields =
 
 and gen_match_check ~loc = function
   | Some chk  -> chk
-  | None      -> constr ~loc "true" []
+  | None      -> ebool true ~loc
 
 and gen_match ~loc cur nxt fld beh fields =
   let open Entity in
@@ -778,7 +765,7 @@ and gen_offset_saver ~loc cur nxt fld beh =
   let open Qualifiers in
   match fld.MatchField.qls.save_offset_to with
   | Some { pexp_desc = Pexp_ident ({ txt; loc = eloc }); _ } ->
-    let ptxt = pvar ~loc:eloc (Longident.last txt) in
+    let ptxt = pvar ~loc:eloc (Longident.last_exn txt) in
     [%expr
       let [%p ptxt] = [%e nxt.off.exp] - [%e cur.off.exp] in [%e beh]]
       [@metaloc eloc]
@@ -1002,9 +989,9 @@ let gen_cases ~loc ident cases =
   in
   let nxt = Context.next ~loc cur
   and tupl = [%pat? ([%p cur.dat.pat], [%p cur.off.pat], [%p cur.len.pat])][@metaloc loc]
-  and fnam = str ~loc loc.Location.loc_start.pos_fname
-  and lpos = int ~loc loc.Location.loc_start.pos_lnum
-  and cpos = int ~loc (loc.Location.loc_start.pos_cnum - loc.Location.loc_start.pos_bol)
+  and fnam = estring ~loc loc.Location.loc_start.pos_fname
+  and lpos = eint ~loc loc.Location.loc_start.pos_lnum
+  and cpos = eint ~loc (loc.Location.loc_start.pos_cnum - loc.Location.loc_start.pos_bol)
   in
   List.fold_left
     (fun acc case -> acc @ [ gen_case cur nxt res case ])
@@ -1037,10 +1024,10 @@ let gen_function ~loc cases =
 let gen_constructor_exn ~loc =
   let open Location in
   [%expr Bitstring.Construct_failure (
-      [%e str ~loc "Bad field value"],
-        [%e str ~loc loc.loc_start.pos_fname],
-        [%e int ~loc loc.loc_start.pos_lnum],
-        [%e int ~loc loc.loc_start.pos_cnum])]
+      [%e estring ~loc "Bad field value"],
+        [%e estring ~loc loc.loc_start.pos_fname],
+        [%e eint ~loc loc.loc_start.pos_lnum],
+        [%e eint ~loc loc.loc_start.pos_cnum])]
     [@metaloc loc]
 ;;
 
@@ -1076,7 +1063,7 @@ let gen_constructor_int ~loc sym fld =
     | Some (size), Some (sign), Some (_) when size >= 2 && size <= 8 ->
       let sn = Sign.to_string sign in
       let ex = sprintf "Bitstring.construct_char_%s" sn in
-      (evar ~loc ex, l, int ~loc size)
+      (evar ~loc ex, l, eint ~loc size)
     (* 16|32|64-bit type *)
     | Some (size), Some (sign), Some (Endian.Referred r) ->
       let ss = Sign.to_string sign
@@ -1088,7 +1075,7 @@ let gen_constructor_int ~loc sym fld =
       and en = Endian.to_string endian
       and sn = Sign.to_string sign in
       let ex = sprintf "Bitstring.construct_%s_%s_%s" tp en sn in
-      (evar ~loc ex, l, int ~loc size)
+      (evar ~loc ex, l, eint ~loc size)
     (* Variable size types *)
     | None, Some (sign), Some (Endian.Referred r) ->
       let ss = Sign.to_string sign in
@@ -1160,7 +1147,7 @@ let gen_assignment_behavior ~loc sym fields =
   let res = sym.Entity.exp in
   let rep = [%expr Bitstring.Buffer.contents [%e res]][@metaloc loc] in
   let len = match (evaluate_expr size) with
-    | Some (v)  -> int v
+    | Some (v)  -> eint v ~loc
     | None      -> size
   in
   let post =
@@ -1204,12 +1191,7 @@ let transform_single_let ~loc ast expr =
   | _ -> location_exn ~loc "Invalid pattern type"
 ;;
 
-(*
- * Rewriter. See:
- * https://github.com/let-def/ocaml-migrate-parsetree/blob/master/MANUAL.md#new-registration-interface
- *)
-
-let extension expr =
+let expression_expander expr =
   let loc = expr.pexp_loc in
   match expr.pexp_desc with
   | Pexp_constant (Pconst_string (value, (_ : string option))) ->
@@ -1227,21 +1209,28 @@ let extension expr =
     location_exn ~loc
       "'bitstring' can only be used with 'let', 'match', and as '[%bitstring]'"
 
-let expression mapper = function
-  | [%expr [%bitstring [%e? e0]]] -> mapper.expr mapper (extension e0)
-  | expr -> Ast_mapper.default_mapper.expr mapper expr
+let expression_rule =
+  Extension.V3.declare
+    "bitstring"
+    Extension.Context.expression
+    Ast_pattern.(single_expr_payload __)
+    (fun ~ctxt -> expression_expander)
+  |> Context_free.Rule.extension
 
-let structure_item_mapper mapper = function
-  | [%stri [%%bitstring let [%p? var] = [%e? e0]]] ->
-    [%stri let [%p mapper.pat mapper var] = [%e mapper.expr mapper (extension e0)]]
-  | stri -> Ast_mapper.default_mapper.structure_item mapper stri
+let structure_item_rewriter ~(ctxt : Expansion_context.Extension.t) pat expr =
+  let loc = Expansion_context.Extension.extension_point_loc ctxt in
+  [%stri let [%p pat] = [%e expression_expander expr]]
 
-let rewriter config cookies = {
-  Ast_mapper.default_mapper with
-  expr = expression;
-  structure_item = structure_item_mapper;
-}
+let structure_item_rule =
+  Extension.V3.declare
+    "bitstring"
+    Extension.Context.structure_item
+    Ast_pattern.(pstr (pstr_value nonrecursive (value_binding ~pat:__ ~expr:__ ^:: nil)  ^:: nil))
+    structure_item_rewriter
+  |> Context_free.Rule.extension
 
 let () =
-  Driver.register ~name:"ppx_bitstring" ~args:[] Versions.ocaml_410 rewriter
-;;
+  Driver.register_transformation "bitstring" ~rules:[
+    expression_rule ;
+    structure_item_rule ;
+  ]
