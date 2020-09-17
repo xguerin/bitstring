@@ -21,7 +21,7 @@
  )
  (depends
   (dune (>= 2.5))
-  (ocaml (>= 4.02.3))
+  (ocaml (>= 4.04.1))
   (stdlib-shims (>= 0.1.0))
 ))
 
@@ -35,6 +35,6 @@
  )
  (depends
   (bitstring (>= 3.2.0))
-  (ocaml (or (and :with-test (>= 4.08.0)) (and (= :with-test false) (>= 4.02.3))))
+  (ocaml (or (and :with-test (>= 4.08.0)) (and (= :with-test false) (>= 4.04.1))))
   (ppxlib (and :build (>= 0.16.0)))
   (ounit :with-test)))

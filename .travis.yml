@@ -6,8 +6,6 @@ env:
   global:
   - PINS="bitstring:. ppx_bitstring:."
   jobs:
-  - PACKAGE=ppx_bitstring OCAML_VERSION=4.02 TESTS=false
-  - PACKAGE=ppx_bitstring OCAML_VERSION=4.03 TESTS=false
   - PACKAGE=ppx_bitstring OCAML_VERSION=4.04 TESTS=false
   - PACKAGE=ppx_bitstring OCAML_VERSION=4.05 TESTS=false
   - PACKAGE=ppx_bitstring OCAML_VERSION=4.06 TESTS=false

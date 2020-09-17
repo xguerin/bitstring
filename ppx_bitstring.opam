@@ -15,7 +15,7 @@ bug-reports: "https://github.com/xguerin/bitstring/issues"
 depends: [
   "dune" {>= "2.5"}
   "bitstring" {>= "3.2.0"}
-  "ocaml" {with-test & >= "4.08.0" | with-test = "false" & >= "4.02.3"}
+  "ocaml" {with-test & >= "4.08.0" | with-test = "false" & >= "4.04.1"}
   "ppxlib" {build & >= "0.16.0"}
   "ounit" {with-test}
 ]
