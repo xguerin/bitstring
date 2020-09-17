@@ -2,7 +2,7 @@
 
 (name bitstring)
 
-(version 3.2.0)
+(version 4.0.0)
 
 (generate_opam_files true)
 
@@ -34,7 +34,7 @@
   "\| Bitstring handling is added as primitives to the language, making it exceptionally simple to use and very powerful.
  )
  (depends
-  (bitstring (>= 3.2.0))
+  (bitstring (>= 4.0.0))
   (ocaml (or (and :with-test (>= 4.08.0)) (and (= :with-test false) (>= 4.04.1))))
   (ppxlib (and :build (>= 0.16.0)))
   (ounit :with-test)))
