@@ -34,7 +34,8 @@
   "\| Bitstring handling is added as primitives to the language, making it exceptionally simple to use and very powerful.
  )
  (depends
+  (ocaml (>= 4.04.1))
   (bitstring (>= 4.0.0))
-  (ocaml (or (and :with-test (>= 4.08.0)) (and (= :with-test false) (>= 4.04.1))))
+  (ocaml (and :with-test (>= 4.08.0)))
   (ppxlib (and :build (>= 0.16.0)))
   (ounit :with-test)))
