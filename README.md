@@ -1,4 +1,4 @@
-# OCaml Bistring Library
+# OCaml Bitstring Library
 
 [![Build Status](https://travis-ci.org/xguerin/bitstring.svg?branch=master)](https://travis-ci.org/xguerin/bitstring)
 ```
