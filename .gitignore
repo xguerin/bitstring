@@ -13,6 +13,7 @@
 *.merlin
 
 /_build
+/_opam
 /autom4te.cache
 /bitstring-objinfo
 /bitstring_config.ml
