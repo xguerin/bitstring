@@ -967,9 +967,9 @@ let gen_case_constant ~loc cur nxt res case value alias =
 let gen_case cur nxt res case =
   let loc = case.pc_lhs.ppat_loc in
   match case.pc_lhs.ppat_desc with
-  | Ppat_constant (Pconst_string (value, _)) ->
+  | Ppat_constant (Pconst_string (value, _, _)) ->
     gen_case_constant ~loc cur nxt res case value None
-  | Ppat_alias ({ ppat_desc = Ppat_constant (Pconst_string (value, _)); _ }, { txt = a; _ }) ->
+  | Ppat_alias ({ ppat_desc = Ppat_constant (Pconst_string (value, _, _)); _ }, { txt = a; _ }) ->
     gen_case_constant ~loc cur nxt res case value (Some a)
   | _ ->
     location_exn ~loc "Wrong pattern type"
@@ -1184,7 +1184,7 @@ let gen_constructor_expr ~loc value =
 
 let transform_single_let ~loc ast expr =
   match ast.pvb_pat.ppat_desc, ast.pvb_expr.pexp_desc with
-  | Parsetree.Ppat_var (s), Pexp_constant (Pconst_string (value, _)) ->
+  | Parsetree.Ppat_var (s), Pexp_constant (Pconst_string (value, _, _)) ->
     let pat = pvar ~loc s.txt in
     let constructor_expr = gen_constructor_expr ~loc value in
     [%expr let [%p pat] = [%e constructor_expr] in [%e expr]]
@@ -1194,7 +1194,7 @@ let transform_single_let ~loc ast expr =
 let expression_expander expr =
   let loc = expr.pexp_loc in
   match expr.pexp_desc with
-  | Pexp_constant (Pconst_string (value, (_ : string option))) ->
+  | Pexp_constant (Pconst_string (value, _, (_ : string option))) ->
     gen_constructor_expr ~loc value
   | Pexp_let (Nonrecursive, bindings, expr) ->
     List.fold_right
