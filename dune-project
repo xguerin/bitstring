@@ -37,5 +37,5 @@
   (ocaml (>= 4.04.1))
   (bitstring (>= 4.0.0))
   (ocaml (and :with-test (>= 4.08.0)))
-  (ppxlib (and :build (>= 0.18.0)))
+  (ppxlib (>= 0.18.0))
   (ounit :with-test)))
