@@ -69,6 +69,7 @@ int match_partial_right(int len, char source, char prefix)
 CAMLprim value
 ocaml_bitstring_is_prefix_fastpath(value b1, value o1, value b2, value o2, value l2)
 {
+  CAMLparam5 (b1, o1, b2, o2, l2);
   int il2 = Int_val(l2);
   /*
    * Find the beginning of the bitstrings.
@@ -83,7 +84,7 @@ ocaml_bitstring_is_prefix_fastpath(value b1, value o1, value b2, value o2, value
   int sh = Int_val(o2) & 0x7;
   if (sh != 0) {
     if (!match_partial_left(sh, *ptr1, *ptr2)) {
-      return Val_false;
+      CAMLreturn (Val_false);
     }
     il2 -= 8 - sh;
     ptr1++, ptr2++;
@@ -93,7 +94,7 @@ ocaml_bitstring_is_prefix_fastpath(value b1, value o1, value b2, value o2, value
    */
   int bl2 = il2 >> 3;
   if (memcmp(ptr1, ptr2, bl2) != 0) {
-    return Val_false;
+    CAMLreturn (Val_false);
   }
   /*
    * Check the remainder of the prefix if there is any.
@@ -101,12 +102,12 @@ ocaml_bitstring_is_prefix_fastpath(value b1, value o1, value b2, value o2, value
   int rem = il2 & 0x7;
   if (rem) {
     int res = match_partial_right(rem, ptr1[bl2], ptr2[bl2]);
-    return Val_bool(res);
+    CAMLreturn (Val_bool(res));
   }
   /*
    * The prefix exists.
    */
-  return Val_true;
+  CAMLreturn (Val_true);
 }
 
 /*
@@ -151,11 +152,12 @@ ocaml_bitstring_is_prefix_fastpath(value b1, value o1, value b2, value o2, value
   ocaml_bitstring_extract_fastpath_int##size##_##endian##_##sign  \
   (value strv, value offv)                                        \
 {                                                                 \
+  CAMLparam2 (strv, offv);                                        \
   type *ptr = (type *)((char *)String_val(strv) + Int_val(offv)); \
   type r;                                                         \
   memcpy(&r, ptr, sizeof(r));                                     \
   swap_##endian(size,r);                                          \
-  return Val_int(r);                                              \
+  CAMLreturn (Val_int(r));                                        \
 }
 
 #define extract_fastpath_with_copy(size, endian, sign, type)      \
