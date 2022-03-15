@@ -28,6 +28,12 @@
 #include <machine/endian.h>
 #elif defined(__FreeBSD__)
 #include <sys/endian.h>
+#elif defined(__MINGW32__)
+#include <sys/param.h>
+#elif defined(_WIN32) && defined(_MSC_VER) && (defined(_M_X64) || defined (_M_IX86))
+#define BIG_ENDIAN      4321
+#define LITTLE_ENDIAN   1234
+#define BYTE_ORDER      LITTLE_ENDIAN
 #else
 #include <endian.h>
 #endif
