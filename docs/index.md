@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/xguerin/bitstring.svg?branch=master)](https://travis-ci.org/xguerin/bitstring)
 ```
 Copyright (C) 2008-2016 Red Hat Inc, Richard W.M. Jones.
-Copyright (C) 2016-2018 Red Hat Inc, Richard W.M. Jones, Xavier R. Guérin.
+Copyright (C) 2016-2022 Red Hat Inc, Richard W.M. Jones, Xavier R. Guérin.
 ```
 ## How to install
 ```
