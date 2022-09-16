@@ -1,66 +1,59 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
-  
-  <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Reference - OCaml Bitstring</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
-
-  <link rel="stylesheet" href="../css/theme.css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Reference";
-    var mkdocs_page_input_path = "reference.md";
-    var mkdocs_page_url = null;
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
-  
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Reference - OCaml Bitstring</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Reference";
+        var mkdocs_page_input_path = "reference.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> OCaml Bitstring</a>
-        <div role="search">
+          <a href=".." class="icon icon-home"> OCaml Bitstring
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../documentation/">Guide</a>
-                    </li>
-                </ul>
-                <ul class="current">
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Reference</a>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../documentation/">Guide</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Reference</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#types">Types</a>
     </li>
@@ -81,55 +74,43 @@
     <li class="toctree-l2"><a class="reference internal" href="#getset-bits">Get/set bits</a>
     </li>
     </ul>
-                    </li>
-                </ul>
+                </li>
+              </ul>
       </div>
     </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">OCaml Bitstring</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OCaml Bitstring</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Reference</li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>Reference</li>
     <li class="wy-breadcrumbs-aside">
-      
     </li>
   </ul>
-  
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
               
                 <h1 id="reference">Reference</h1>
 <h2 id="types">Types</h2>
-<pre><code class="ocaml">type endian =
+<pre><code class="language-ocaml">type endian =
 | BigEndian
 | LittleEndian
 | NativeEndian
 </code></pre>
-
-<pre><code class="ocaml">val string_of_endian : endian -&gt; string
+<pre><code class="language-ocaml">val string_of_endian : endian -&gt; string
 </code></pre>
-
 <p>Endianness.</p>
-<pre><code class="ocaml">type bitstring = string * int * int
+<pre><code class="language-ocaml">type bitstring = string * int * int
 </code></pre>
-
 <p><code>bitstring</code> is the basic type used to store bitstrings.</p>
 <p>The type contains the underlying data (a string), the current bit offset within
 the string and the current bit length of the string (counting from the bit
@@ -138,15 +119,13 @@ offset). Note that the offset and length are in bits, not bytes.</p>
 functions and syntax extensions which hide the details.</p>
 <p>See also <code>Bitstring.bitstring_of_string</code>, <code>Bitstring.bitstring_of_file</code>,
 <code>Bitstring.hexdump_bitstring</code>, <code>Bitstring.bitstring_length</code>.</p>
-<pre><code class="ocaml">type t = bitstring
+<pre><code class="language-ocaml">type t = bitstring
 </code></pre>
-
 <p><code>t</code> is a synonym for the <code>Bitstring.bitstring type</code>. This allows you to use this
 module with functors like Set and Map from the stdlib.</p>
 <h2 id="exceptions">Exceptions</h2>
-<pre><code class="ocaml">exception Construct_failure of string * string * int * int
+<pre><code class="language-ocaml">exception Construct_failure of string * string * int * int
 </code></pre>
-
 <p><code>Construct_failure (message, file, line, char)</code> may be raised by the <code>BITSTRING</code>
 constructor. Common reasons are that values are out of range of the fields that
 contain them, or that computed lengths are impossible (eg. negative length bitfields).</p>
@@ -154,119 +133,100 @@ contain them, or that computed lengths are impossible (eg. negative length bitfi
 <p><code>file</code>, <code>line</code> and <code>char</code> point to the original source location of the <code>BITSTRING</code>
 constructor that failed.</p>
 <h2 id="bitstring-comparison">Bitstring comparison</h2>
-<pre><code class="ocaml">val compare : bitstring -&gt; bitstring -&gt; int
+<pre><code class="language-ocaml">val compare : bitstring -&gt; bitstring -&gt; int
 </code></pre>
-
 <p><code>compare bs1 bs2</code> compares two bitstrings and returns zero if they are equal, a
 negative number if bs1 &lt; bs2, or a positive number if bs1 &gt; bs2.  This tests
 "semantic equality" which is not affected by the offset or alignment of the
 underlying representation (see <code>Bitstring.bitstring</code>).</p>
 <p>The ordering is total and lexicographic.</p>
-<pre><code class="ocaml">val equals : bitstring -&gt; bitstring -&gt; bool
+<pre><code class="language-ocaml">val equals : bitstring -&gt; bitstring -&gt; bool
 </code></pre>
-
 <p><code>equals</code> returns true if and only if the two bitstrings are semantically equal.
 It is the same as calling compare and testing if the result is 0, but usually more efficient.</p>
 <h2 id="bitstring-manipulation">Bitstring manipulation</h2>
-<pre><code class="ocaml">val bitstring_length : bitstring -&gt; int
+<pre><code class="language-ocaml">val bitstring_length : bitstring -&gt; int
 </code></pre>
-
 <p><code>bitstring_length bitstring</code> returns the length of the bitstring in bits.
 Note this just returns the third field in the <code>Bitstring.bitstring</code> tuple.</p>
-<pre><code class="ocaml">val subbitstring : bitstring -&gt; int -&gt; int -&gt; bitstring
+<pre><code class="language-ocaml">val subbitstring : bitstring -&gt; int -&gt; int -&gt; bitstring
 </code></pre>
-
 <p><code>subbitstring bits off len</code> returns a sub-bitstring of the bitstring, starting
 at offset off bits and with length len bits.  If the original bitstring is not
 long enough to do this then the function raises <code>Invalid_argument "subbitstring"</code>.</p>
 <p>Note that this function just changes the offset and length fields of the
 <code>Bitstring.bitstring</code> tuple, so is very efficient.</p>
-<pre><code class="ocaml">val dropbits : int -&gt; bitstring -&gt; bitstring
+<pre><code class="language-ocaml">val dropbits : int -&gt; bitstring -&gt; bitstring
 </code></pre>
-
 <p>Drop the first n bits of the bitstring and return a new bitstring which is
 shorter by n bits.  If the length of the original bitstring is less than n
 bits, this raises <code>Invalid_argument "dropbits"</code>.</p>
 <p>Note that this function just changes the offset and length fields of the
 <code>Bitstring.bitstring</code> tuple, so is very efficient.</p>
-<pre><code class="ocaml">val takebits : int -&gt; bitstring -&gt; bitstring
+<pre><code class="language-ocaml">val takebits : int -&gt; bitstring -&gt; bitstring
 </code></pre>
-
 <p>Take the first n bits of the bitstring and return a new bitstring which is
 exactly n bits long.  If the length of the original bitstring is less than n
 bits, this raises <code>Invalid_argument "takebits"</code>.</p>
 <p>Note that this function just changes the offset and length fields of the
 <code>Bitstring.bitstring</code> tuple, so is very efficient.</p>
-<pre><code class="ocaml">val concat : bitstring list -&gt; bitstring
+<pre><code class="language-ocaml">val concat : bitstring list -&gt; bitstring
 </code></pre>
-
 <p>Concatenate a list of bitstrings together into a single bitstring.</p>
 <h2 id="constructing-bitstrings">Constructing bitstrings</h2>
-<pre><code class="ocaml">val empty_bitstring : bitstring
+<pre><code class="language-ocaml">val empty_bitstring : bitstring
 </code></pre>
-
 <p><code>empty_bitstring</code> is the empty, zero-length bitstring.</p>
-<pre><code class="ocaml">val create_bitstring : int -&gt; bitstring
+<pre><code class="language-ocaml">val create_bitstring : int -&gt; bitstring
 </code></pre>
-
 <p><code>create_bitstring n</code> creates an n bit bitstring containing all zeroes.</p>
-<pre><code class="ocaml">val make_bitstring : int -&gt; char -&gt; bitstring
+<pre><code class="language-ocaml">val make_bitstring : int -&gt; char -&gt; bitstring
 </code></pre>
-
 <p>make_bitstring n c creates an n bit bitstring containing the repeated 8 bit
 pattern in c.  For example, <code>make_bitstring 16 '\x5a'</code>will create the bitstring
 <code>0x5a5a</code> or in binary <code>0101 1010 0101 1010</code>.</p>
 <p>Note that the length is in bits, not bytes. The length does NOT need to be a multiple of 8.</p>
-<pre><code class="ocaml">val zeroes_bitstring : int -&gt; bitstring
+<pre><code class="language-ocaml">val zeroes_bitstring : int -&gt; bitstring
 </code></pre>
-
 <p>zeroes_bitstring creates an n bit bitstring of all 0's. Actually this is the
 same as <code>Bitstring.create_bitstring</code>.</p>
-<pre><code class="ocaml">val ones_bitstring : int -&gt; bitstring
+<pre><code class="language-ocaml">val ones_bitstring : int -&gt; bitstring
 </code></pre>
-
 <p><code>ones_bitstring</code> creates an n bit bitstring of all 1's.</p>
-<pre><code class="ocaml">val bitstring_of_string : string -&gt; bitstring
+<pre><code class="language-ocaml">val bitstring_of_string : string -&gt; bitstring
 </code></pre>
-
 <p><code>bitstring_of_string str</code>creates a bitstring of length String.length str * 8
 (bits) containing the bits in str.</p>
 <p>Note that the bitstring uses str as the underlying string (see the
 representation of Bitstring.bitstring) so you should not change str after
 calling this.</p>
-<pre><code class="ocaml">val bitstring_of_file : string -&gt; bitstring
+<pre><code class="language-ocaml">val bitstring_of_file : string -&gt; bitstring
 </code></pre>
-
 <p>bitstring_of_file filename loads the named file into a bitstring.</p>
-<pre><code class="ocaml">val bitstring_of_chan : Pervasives.in_channel -&gt; bitstring
+<pre><code class="language-ocaml">val bitstring_of_chan : Pervasives.in_channel -&gt; bitstring
 </code></pre>
-
 <p><code>bitstring_of_chan chan</code>loads the contents of the input channel chan as a
 bitstring. The length of the final bitstring is determined by the remaining
 input in chan, but will always be a multiple of 8 bits.</p>
 <p>See also Bitstring.bitstring_of_chan_max.</p>
-<pre><code class="ocaml">val bitstring_of_chan_max : Pervasives.in_channel -&gt; int -&gt; bitstring
+<pre><code class="language-ocaml">val bitstring_of_chan_max : Pervasives.in_channel -&gt; int -&gt; bitstring
 </code></pre>
-
 <p><code>bitstring_of_chan_max chan max</code> works like <code>Bitstring.bitstring_of_chan</code> but will
 only read up to max bytes from the channel (or fewer if the end of input occurs
 before that).</p>
-<pre><code class="ocaml">val bitstring_of_file_descr : Unix.file_descr -&gt; bitstring
+<pre><code class="language-ocaml">val bitstring_of_file_descr : Unix.file_descr -&gt; bitstring
 </code></pre>
-
 <p><code>bitstring_of_file_descr fd</code> loads the contents of the file descriptor fd as a
 bitstring.  See also <code>Bitstring.bitstring_of_chan</code>,
 <code>Bitstring.bitstring_of_file_descr_max</code>.</p>
-<pre><code class="ocaml">val bitstring_of_file_descr_max : Unix.file_descr -&gt; int -&gt; bitstring
+<pre><code class="language-ocaml">val bitstring_of_file_descr_max : Unix.file_descr -&gt; int -&gt; bitstring
 </code></pre>
-
 <p><code>bitstring_of_file_descr_max fd max</code> works like <code>Bitstring.bitstring_of_file_descr</code>
 but will only read up to max bytes from the channel (or fewer if the end of
 input occurs before that).</p>
 <h2 id="converting-bitstrings">Converting bitstrings</h2>
-<pre><code class="ocaml">val string_of_bitstring : bitstring -&gt; string
+<pre><code class="language-ocaml">val string_of_bitstring : bitstring -&gt; string
 </code></pre>
-
 <p><code>string_of_bitstring bitstring</code> converts a bitstring to a string (eg. to allow
 comparison). This function is inefficient. In the best case when the bitstring
 is nicely byte-aligned we do a <code>String.sub</code> operation. If the bitstring isn't
@@ -275,15 +235,13 @@ inefficient.</p>
 <p>If the bitstring is not a multiple of 8 bits wide then the final byte of the
 string contains the high bits set to the remaining bits and the low bits set to
 0.</p>
-<pre><code class="ocaml">val bitstring_to_file : bitstring -&gt; string -&gt; unit
+<pre><code class="language-ocaml">val bitstring_to_file : bitstring -&gt; string -&gt; unit
 </code></pre>
-
 <p><code>bitstring_to_file bits</code> filename writes the bitstring bits to the file
 filename. It overwrites the output file. Some restrictions apply, see
 <code>Bitstring.bitstring_to_chan</code>.</p>
-<pre><code class="ocaml">val bitstring_to_chan : bitstring -&gt; Pervasives.out_channel -&gt; unit
+<pre><code class="language-ocaml">val bitstring_to_chan : bitstring -&gt; Pervasives.out_channel -&gt; unit
 </code></pre>
-
 <p><code>bitstring_to_file bits</code> filename writes the bitstring bits to the channel chan.
 Channels are made up of bytes, bitstrings can be any bit length including
 fractions of bytes. So this function only works if the length of the bitstring
@@ -295,15 +253,13 @@ stored fully aligned, otherwise it has to do inefficient bit twiddling like
 and is an exact multiple of 8 bits wide, then this function will always work
 efficiently.</p>
 <h2 id="printing-bitstrings">Printing bitstrings</h2>
-<pre><code class="ocaml">val hexdump_bitstring : Pervasives.out_channel -&gt; bitstring -&gt; unit
+<pre><code class="language-ocaml">val hexdump_bitstring : Pervasives.out_channel -&gt; bitstring -&gt; unit
 </code></pre>
-
 <p><code>hexdump_bitstring chan</code> bitstring prints the bitstring to the output channel in
 a format similar to the Unix command <code>hexdump -C</code>.</p>
 <h2 id="bitstring-buffer">Bitstring buffer</h2>
-<pre><code class="ocaml">module Buffer: sig .. end
+<pre><code class="language-ocaml">module Buffer: sig .. end
 </code></pre>
-
 <p>Buffers are mainly used by the <code>BITSTRING</code> constructor, but may also be useful
 for end users.</p>
 <h2 id="getset-bits">Get/set bits</h2>
@@ -312,54 +268,41 @@ they are not particularly efficient and you should generally use the <code>bitma
 and <code>BITSTRING</code> operators when building and parsing bitstrings.</p>
 <p>These functions all raise <code>Invalid_argument "index out of bounds"</code> if the index
 is out of range of the bitstring.</p>
-<pre><code class="ocaml">val set : bitstring -&gt; int -&gt; unit
+<pre><code class="language-ocaml">val set : bitstring -&gt; int -&gt; unit
 </code></pre>
-
 <p>set bits n sets the nth bit in the bitstring to 1.</p>
-<pre><code class="ocaml">val clear : bitstring -&gt; int -&gt; unit
+<pre><code class="language-ocaml">val clear : bitstring -&gt; int -&gt; unit
 </code></pre>
-
 <p>clear bits n sets the nth bit in the bitstring to 0.</p>
-<pre><code class="ocaml">val is_set : bitstring -&gt; int -&gt; bool
+<pre><code class="language-ocaml">val is_set : bitstring -&gt; int -&gt; bool
 </code></pre>
-
 <p>is_set bits n is true if the nth bit is set to 1.</p>
-<pre><code class="ocaml">val is_clear : bitstring -&gt; int -&gt; bool
+<pre><code class="language-ocaml">val is_clear : bitstring -&gt; int -&gt; bool
 </code></pre>
-
 <p>is_clear bits n is true if the nth bit is set to 0.</p>
-<pre><code class="ocaml">val put : bitstring -&gt; int -&gt; int -&gt; unit
+<pre><code class="language-ocaml">val put : bitstring -&gt; int -&gt; int -&gt; unit
 </code></pre>
-
 <p>put bits n v sets the nth bit in the bitstring to 1 if v is not zero, or to 0
 if v is zero.</p>
-<pre><code class="ocaml">val get : bitstring -&gt; int -&gt; int
+<pre><code class="language-ocaml">val get : bitstring -&gt; int -&gt; int
 </code></pre>
-
 <p>get bits n returns the nth bit (returns non-zero or 0).</p>
               
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="../documentation/" class="btn btn-neutral" title="Guide"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../documentation/" class="btn btn-neutral float-left" title="Guide"><span class="icon icon-circle-arrow-left"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
   </div>
 
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+          
         </div>
       </div>
 
@@ -367,16 +310,17 @@ if v is zero.</p>
 
   </div>
 
-  <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-      
-        <span><a href="../documentation/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../documentation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
 </div>
     <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
     <script src="../js/theme.js" defer></script>
       <script src="../search/main.js" defer></script>
     <script defer>
