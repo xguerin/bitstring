@@ -184,7 +184,7 @@ The `function` keyword can also be used for pattern matching:
 
 ```ocaml
 let pattern_matcher = function%bitstring
-| {| 1 : 1
+| {| false : 1
    ; a : 2
    ; b : 16 : bigendian
    ; ...

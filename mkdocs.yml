@@ -1,6 +1,6 @@
 site_name: OCaml Bitstring
 theme: readthedocs
-pages:
+nav:
   - "Overview": "index.md"
   - "Examples": "examples.md"
   - "Guide": "documentation.md"
