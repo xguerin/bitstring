@@ -13,12 +13,13 @@ license: "LGPL-2.0-or-later"
 homepage: "https://github.com/xguerin/bitstring"
 bug-reports: "https://github.com/xguerin/bitstring/issues"
 depends: [
-  "dune" {>= "2.5"}
+  "dune" {>= "2.7"}
   "ocaml" {>= "5.2.0"}
   "stdlib-shims" {>= "0.1.0"}
+  "odoc" {with-doc}
 ]
 build: [
-  ["dune" "subst"] {pinned}
+  ["dune" "subst"] {dev}
   [
     "dune"
     "build"

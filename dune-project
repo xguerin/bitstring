@@ -1,4 +1,4 @@
-(lang dune 2.5)
+(lang dune 2.7)
 
 (name bitstring)
 
@@ -20,7 +20,6 @@
   "\| Bitstring handling is added as primitives to the language, making it exceptionally simple to use and very powerful.
  )
  (depends
-  (dune (>= 2.5))
   (ocaml (>= 5.2.0))
   (stdlib-shims (>= 0.1.0))
 ))
