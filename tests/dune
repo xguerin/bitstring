@@ -1,6 +1,6 @@
 (test
  (name bitstring_tests)
  (package ppx_bitstring)
- (libraries bitstring oUnit)
+ (libraries bitstring ounit2)
  (preprocess
   (pps ppx_bitstring)))
