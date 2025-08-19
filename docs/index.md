@@ -21,7 +21,7 @@ ocamlfind c -package bitstring -package ppx_bitstring -linkpkg ...
 (executable
  ((name        foo)
   (libraries   (bitstring))
-  (preprocess  (pps (ppx_bitstring)))
+  (preprocess  (pps ppx_bitstring))
   ))
 ```
 ## How to build
