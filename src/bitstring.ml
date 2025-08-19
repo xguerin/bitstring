@@ -354,7 +354,65 @@ module I64 = struct
       invalid_arg "Bitstring.I64.mask"
 
   (* Byte swap an int of a given size. *)
-  (* let byteswap v bits = *)
+  let byteswap v bits =
+    if bits <= 8 then v
+    else if bits <= 16 then (
+      let shift = bits-8 in
+      let v1 = v >>> shift in
+      let v2 = (v land (mask shift)) <<< 8 in
+      v2 lor v1
+    ) else if bits <= 24 then (
+      let shift = bits - 16 in
+      let v1 = v >>> (8+shift) in
+      let v2 = ((v >>> shift) land ff) <<< 8 in
+      let v3 = (v land (mask shift)) <<< 16 in
+      v3 lor v2 lor v1
+    ) else if bits <= 32 then (
+      let shift = bits - 24 in
+      let v1 = v >>> (16+shift) in
+      let v2 = ((v >>> (8+shift)) land ff) <<< 8 in
+      let v3 = ((v >>> shift) land ff) <<< 16 in
+      let v4 = (v land (mask shift)) <<< 24 in
+      v4 lor v3 lor v2 lor v1
+    ) else if bits <= 40 then (
+      let shift = bits - 32 in
+      let v1 = v >>> (24+shift) in
+      let v2 = ((v >>> (16+shift)) land ff) <<< 8 in
+      let v3 = ((v >>> (8+shift)) land ff) <<< 16 in
+      let v4 = ((v >>> shift) land ff) <<< 24 in
+      let v5 = (v land (mask shift)) <<< 32 in
+      v5 lor v4 lor v3 lor v2 lor v1
+    ) else if bits <= 48 then (
+      let shift = bits - 40 in
+      let v1 = v >>> (32+shift) in
+      let v2 = ((v >>> (24+shift)) land ff) <<< 8 in
+      let v3 = ((v >>> (16+shift)) land ff) <<< 16 in
+      let v4 = ((v >>> (8+shift)) land ff) <<< 24 in
+      let v5 = ((v >>> shift) land ff) <<< 32 in
+      let v6 = (v land (mask shift)) <<< 40 in
+      v6 lor v5 lor v4 lor v3 lor v2 lor v1
+    ) else if bits <= 56 then (
+      let shift = bits - 48 in
+      let v1 = v >>> (40+shift) in
+      let v2 = ((v >>> (32+shift)) land ff) <<< 8 in
+      let v3 = ((v >>> (24+shift)) land ff) <<< 16 in
+      let v4 = ((v >>> (16+shift)) land ff) <<< 24 in
+      let v5 = ((v >>> (8+shift)) land ff) <<< 32 in
+      let v6 = ((v >>> shift) land ff) <<< 40 in
+      let v7 = (v land (mask shift)) <<< 48 in
+      v7 lor v6 lor v5 lor v4 lor v3 lor v2 lor v1
+    ) else  (
+      let shift = bits - 56 in
+      let v1 = v >>> (48+shift) in
+      let v2 = ((v >>> (40+shift)) land ff) <<< 8 in
+      let v3 = ((v >>> (32+shift)) land ff) <<< 16 in
+      let v4 = ((v >>> (24+shift)) land ff) <<< 24 in
+      let v5 = ((v >>> (16+shift)) land ff) <<< 32 in
+      let v6 = ((v >>> (8+shift)) land ff) <<< 40 in
+      let v7 = ((v >>> shift) land ff) <<< 48 in
+      let v8 = (v land (mask shift)) <<< 56 in
+      v8 lor v7 lor v6 lor v5 lor v4 lor v3 lor v2 lor v1
+    )
 
   (* Check a value is in range 0 .. 2^bits-1. *)
   let range_unsigned v bits =
@@ -671,54 +729,9 @@ let extract_int64_be_unsigned data off len flen =
   word (*, off+flen, len-flen*)
 
 let extract_int64_le_unsigned data off len flen =
-  let byteoff = off lsr 3 in
-
-  let strlen = Bytes.length data in
-
-  let word =
-    (* Optimize the common (byte-aligned) case. *)
-    if off land 7 = 0 then (
-      let word =
-	let c0 = _get_byte64 data byteoff strlen in
-	let c1 = _get_byte64 data (byteoff+1) strlen in
-	let c2 = _get_byte64 data (byteoff+2) strlen in
-	let c3 = _get_byte64 data (byteoff+3) strlen in
-	let c4 = _get_byte64 data (byteoff+4) strlen in
-	let c5 = _get_byte64 data (byteoff+5) strlen in
-	let c6 = _get_byte64 data (byteoff+6) strlen in
-	let c7 = _get_byte64 data (byteoff+7) strlen in
-	_make_int64_le c0 c1 c2 c3 c4 c5 c6 c7 in
-      Int64.logand word (I64.mask flen)
-    ) else (
-      (* Extract the next 64 bits, slow method. *)
-      let word =
-	let c0 = extract_char_unsigned data off len 8
-	and off = off + 8 and len = len - 8 in
-	let c1 = extract_char_unsigned data off len 8
-	and off = off + 8 and len = len - 8 in
-	let c2 = extract_char_unsigned data off len 8
-	and off = off + 8 and len = len - 8 in
-	let c3 = extract_char_unsigned data off len 8
-	and off = off + 8 and len = len - 8 in
-	let c4 = extract_char_unsigned data off len 8
-	and off = off + 8 and len = len - 8 in
-	let c5 = extract_char_unsigned data off len 8
-	and off = off + 8 and len = len - 8 in
-	let c6 = extract_char_unsigned data off len 8
-	and off = off + 8 and len = len - 8 in
-	let c7 = extract_char_unsigned data off len 8 in
-	let c0 = Int64.of_int c0 in
-	let c1 = Int64.of_int c1 in
-	let c2 = Int64.of_int c2 in
-	let c3 = Int64.of_int c3 in
-	let c4 = Int64.of_int c4 in
-	let c5 = Int64.of_int c5 in
-	let c6 = Int64.of_int c6 in
-	let c7 = Int64.of_int c7 in
-	_make_int64_le c0 c1 c2 c3 c4 c5 c6 c7 in
-      Int64.logand word (I64.mask flen)
-    ) in
-  word (*, off+flen, len-flen*)
+  let v = extract_int64_be_unsigned data off len flen in
+  let v = I64.byteswap v flen in
+  v
 
 let extract_int64_ne_unsigned =
   if nativeendian = BigEndian
