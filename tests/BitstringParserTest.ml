@@ -225,16 +225,42 @@ let wrong_fp_extraction_dynamic context =
   | {| _ |} -> assert_bool "Invalid bitstring" false
 
 (*
+ * Wrong LE extraction on partial int64.
+ *)
+
+ let wrong_le_partial_int64_extraction context =
+  (*
+   * Forward.
+   *)
+  let mb = ((Bytes.of_string "\xA0\x00\x00\x00\x00\x00\x00\x00"), 0, 64) in
+  match%bitstring mb with
+  | {| a:4; b:60:littleendian |} ->
+    assert_equal a 10;
+    assert_equal b 0L
+  | {| _ |} -> assert_bool "Invalid bitstring" false;
+  (*
+   * Backward.
+   *)
+  let mb = ((Bytes.of_string "\x00\x00\x00\x00\x00\x00\x00\x0A"), 0, 64) in
+  match%bitstring mb with
+  | {| b:60:littleendian; a:4 |} ->
+    assert_equal a 10;
+    assert_equal b 0L
+  | {| _ |} -> assert_bool "Invalid bitstring" false
+;;
+
+(*
  * Test suite definition
  *)
 
 let suite = "BitstringParserTest" >::: [
-    "ext3"                        >:: ext3_test;
-    "gif"                         >:: gif_test;
-    "pcap"                        >:: pcap_test;
-    "function"                    >:: function_parser_test;
-    "function_inline"             >:: function_parser_inline_test;
-    "parser_with_guard"           >:: parser_with_guard_test;
-    "wrong_fp_extraction"         >:: wrong_fp_extraction;
-    "wrong_fp_extraction_dynamic" >:: wrong_fp_extraction_dynamic;
+    "ext3"                              >:: ext3_test;
+    "gif"                               >:: gif_test;
+    "pcap"                              >:: pcap_test;
+    "function"                          >:: function_parser_test;
+    "function_inline"                   >:: function_parser_inline_test;
+    "parser_with_guard"                 >:: parser_with_guard_test;
+    "wrong_fp_extraction"               >:: wrong_fp_extraction;
+    "wrong_fp_extraction_dynamic"       >:: wrong_fp_extraction_dynamic;
+    "wrong_le_partial_int64_extraction" >:: wrong_le_partial_int64_extraction;
   ]
