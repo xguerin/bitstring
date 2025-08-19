@@ -8,7 +8,7 @@
     <title>Guide - OCaml Bitstring</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
@@ -17,12 +17,11 @@
         var mkdocs_page_url = null;
       </script>
     
-    <script src="../js/jquery-3.6.0.min.js" defer></script>
     <!--[if lt IE 9]>
       <script src="../js/html5shiv.min.js"></script>
     <![endif]-->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-      <script>hljs.initHighlightingOnLoad();</script> 
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -34,7 +33,7 @@
           <a href=".." class="icon icon-home"> OCaml Bitstring
         </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -49,7 +48,7 @@
                 </li>
               </ul>
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="./">Guide</a>
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Guide</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#loading-creating-bitstrings">Loading, creating bitstrings</a>
     </li>
@@ -121,8 +120,8 @@
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-      <li>Guide</li>
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Guide</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -239,62 +238,62 @@ signedness and endianness of the field. Permissible qualifiers are:</p>
 <table>
 <thead>
 <tr>
-<th align="left">Qualifier</th>
-<th align="left">Description</th>
+<th style="text-align: left;">Qualifier</th>
+<th style="text-align: left;">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left"><code>int</code></td>
-<td align="left">field has an integer type</td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;">field has an integer type</td>
 </tr>
 <tr>
-<td align="left"><code>string</code></td>
-<td align="left">field is a string type</td>
+<td style="text-align: left;"><code>string</code></td>
+<td style="text-align: left;">field is a string type</td>
 </tr>
 <tr>
-<td align="left"><code>bitstring</code></td>
-<td align="left">field is a bitstring type</td>
+<td style="text-align: left;"><code>bitstring</code></td>
+<td style="text-align: left;">field is a bitstring type</td>
 </tr>
 <tr>
-<td align="left"><code>signed</code></td>
-<td align="left">field is signed</td>
+<td style="text-align: left;"><code>signed</code></td>
+<td style="text-align: left;">field is signed</td>
 </tr>
 <tr>
-<td align="left"><code>unsigned</code></td>
-<td align="left">field is unsigned</td>
+<td style="text-align: left;"><code>unsigned</code></td>
+<td style="text-align: left;">field is unsigned</td>
 </tr>
 <tr>
-<td align="left"><code>bigendian</code></td>
-<td align="left">field is big endian - a.k.a network byte order</td>
+<td style="text-align: left;"><code>bigendian</code></td>
+<td style="text-align: left;">field is big endian - a.k.a network byte order</td>
 </tr>
 <tr>
-<td align="left"><code>littleendian</code></td>
-<td align="left">field is little endian - a.k.a Intel byte order</td>
+<td style="text-align: left;"><code>littleendian</code></td>
+<td style="text-align: left;">field is little endian - a.k.a Intel byte order</td>
 </tr>
 <tr>
-<td align="left"><code>nativeendian</code></td>
-<td align="left">field is same endianness as the machine</td>
+<td style="text-align: left;"><code>nativeendian</code></td>
+<td style="text-align: left;">field is same endianness as the machine</td>
 </tr>
 <tr>
-<td align="left"><code>endian(expr)</code></td>
-<td align="left"><code>expr</code> should be an expression which evaluates to a <code>Bitstring.endian</code> type</td>
+<td style="text-align: left;"><code>endian(expr)</code></td>
+<td style="text-align: left;"><code>expr</code> should be an expression which evaluates to a <code>Bitstring.endian</code> type</td>
 </tr>
 <tr>
-<td align="left"><code>offset(expr)</code></td>
-<td align="left">see <a href="#computed-offsets">computed offsets</a> below</td>
+<td style="text-align: left;"><code>offset(expr)</code></td>
+<td style="text-align: left;">see <a href="#computed-offsets">computed offsets</a> below</td>
 </tr>
 <tr>
-<td align="left"><code>check(expr)</code></td>
-<td align="left">apply some constraint to the field</td>
+<td style="text-align: left;"><code>check(expr)</code></td>
+<td style="text-align: left;">apply some constraint to the field</td>
 </tr>
 <tr>
-<td align="left"><code>bind(expr)</code></td>
-<td align="left">bind the field to <code>expr</code></td>
+<td style="text-align: left;"><code>bind(expr)</code></td>
+<td style="text-align: left;">bind the field to <code>expr</code></td>
 </tr>
 <tr>
-<td align="left"><code>map(lambda)</code></td>
-<td align="left">apply <code>lambda</code> to the field</td>
+<td style="text-align: left;"><code>map(lambda)</code></td>
+<td style="text-align: left;">apply <code>lambda</code> to the field</td>
 </tr>
 </tbody>
 </table>
@@ -375,31 +374,31 @@ check is added which can throw an <code>Invalid_argument</code> exception.</p>
 <table>
 <thead>
 <tr>
-<th align="left">Bit size</th>
-<th align="left">Constant</th>
-<th align="left">Computed expression</th>
+<th style="text-align: left;">Bit size</th>
+<th style="text-align: left;">Constant</th>
+<th style="text-align: left;">Computed expression</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">1</td>
-<td align="left"><code>bool</code></td>
-<td align="left"><code>int64</code></td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><code>bool</code></td>
+<td style="text-align: left;"><code>int64</code></td>
 </tr>
 <tr>
-<td align="left">2..31</td>
-<td align="left"><code>int</code></td>
-<td align="left"><code>int64</code></td>
+<td style="text-align: left;">2..31</td>
+<td style="text-align: left;"><code>int</code></td>
+<td style="text-align: left;"><code>int64</code></td>
 </tr>
 <tr>
-<td align="left">32</td>
-<td align="left"><code>int32</code></td>
-<td align="left"><code>int64</code></td>
+<td style="text-align: left;">32</td>
+<td style="text-align: left;"><code>int32</code></td>
+<td style="text-align: left;"><code>int64</code></td>
 </tr>
 <tr>
-<td align="left">33..64</td>
-<td align="left"><code>int64</code></td>
-<td align="left"><code>int64</code></td>
+<td style="text-align: left;">33..64</td>
+<td style="text-align: left;"><code>int64</code></td>
+<td style="text-align: left;"><code>int64</code></td>
 </tr>
 </tbody>
 </table>
@@ -580,14 +579,15 @@ available memory may be considered a limit for some applications.</p>
     
   </span>
 </div>
-    <script>var base_url = '..';</script>
-    <script src="../js/theme_extra.js" defer></script>
-    <script src="../js/theme.js" defer></script>
-      <script src="../search/main.js" defer></script>
-    <script defer>
-        window.onload = function () {
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
             SphinxRtdTheme.Navigation.enable(true);
-        };
+        });
     </script>
 
 </body>
