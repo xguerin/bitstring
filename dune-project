@@ -2,7 +2,7 @@
 
 (name bitstring)
 
-(version 5.0.1)
+(version 5.0.2)
 
 (generate_opam_files true)
 
@@ -34,7 +34,7 @@
  )
  (depends
   (ocaml (>= 5.2.0))
-  (bitstring (>= 5.0.1))
+  (bitstring (>= 5.0.2))
   (ocaml (and :with-test (>= 5.2.0)))
   (ppxlib (>= 0.36.0))
   (ounit :with-test)))
