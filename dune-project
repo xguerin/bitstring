@@ -1,4 +1,4 @@
-(lang dune 2.7)
+(lang dune 3.18)
 
 (name bitstring)
 
@@ -10,6 +10,7 @@
 (license LGPL-2.0-or-later)
 (authors "Richard W.M. Jones" "Xavier R. Guérin")
 (maintainers "Xavier R. Guérin <xguerin@users.noreply.github.com>")
+(maintenance_intent "(latest)")
 
 (package
  (name bitstring)
