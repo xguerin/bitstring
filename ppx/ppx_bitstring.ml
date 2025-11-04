@@ -18,6 +18,12 @@ open Ppxlib
 open Printf
 open Ast_builder.Default
 
+(* Exception *)
+
+let location_exn ~loc msg =
+  Location.raise_errorf ~loc "%s" msg
+;;
+
 (* Type definition *)
 
 module Entity = struct
@@ -167,13 +173,12 @@ module MatchField = struct
     | Any of Parsetree.pattern
     | Tuple of tuple
   ;;
+
+  let as_evar v = 
+    match v.pat with
+    | {ppat_desc = Ppat_var(v); _} -> evar ~loc:v.loc v.txt
+    | {ppat_loc; _} -> location_exn ~loc:ppat_loc "Pattern is not a variable"
 end
-
-(* Exception *)
-
-let location_exn ~loc msg =
-  Location.raise_errorf ~loc "%s" msg
-;;
 
 (* Helper functions *)
 
@@ -691,7 +696,8 @@ let gen_value ~loc fld res beh =
   | Some b, None  ->
     [%expr let [%p fld.pat] = [%e b] in [%e beh]][@metaloc loc]
   | None, Some m  ->
-    [%expr let [%p fld.pat] = [%e m] [%e res] in [%e beh]][@metaloc loc]
+    let exp = MatchField.as_evar fld in
+    [%expr let [%p fld.pat] = [%e m] [%e exp] in [%e beh]][@metaloc loc]
   | _, _ -> beh
 ;;
 
