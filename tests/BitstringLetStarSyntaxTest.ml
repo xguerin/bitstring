@@ -15,8 +15,8 @@ let match_bits_with_let_star_syntax _ =
   (let* bits = Some (Bitstring.bitstring_of_string "U") in
    Some
      (match%bitstring bits with
-     | {| hi: 4; lo: 4 |} -> assert_equal hi lo
-     | {| _ |} -> assert_failure "Something wen't terribly wrong!"))
+      | {| hi: 4; lo: 4 |} -> assert_equal hi lo
+      | {| _ |} -> assert_failure "Something wen't terribly wrong!"))
   |> ignore
 ;;
 
@@ -33,8 +33,8 @@ let match_bits_with_and_star_syntax _ =
    and* bits = Some (Bitstring.bitstring_of_string "U") in
    Some
      (match%bitstring bits with
-     | {| hi: 4; lo: 4 |} -> assert_equal lo s
-     | {| _ |} -> assert_failure "Something wen't terribly wrong!"))
+      | {| hi: 4; lo: 4 |} -> assert_equal lo s
+      | {| _ |} -> assert_failure "Something wen't terribly wrong!"))
   |> ignore
 ;;
 
@@ -43,8 +43,8 @@ let match_bits_with_and_plus_syntax _ =
    and+ bits = Some (Bitstring.bitstring_of_string "U") in
    Some
      (match%bitstring bits with
-     | {| hi: 4; lo: 4 |} -> assert_equal lo s
-     | {| _ |} -> assert_failure "Something wen't terribly wrong!"))
+      | {| hi: 4; lo: 4 |} -> assert_equal lo s
+      | {| _ |} -> assert_failure "Something wen't terribly wrong!"))
   |> ignore
 ;;
 

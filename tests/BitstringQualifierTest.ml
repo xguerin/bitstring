@@ -26,13 +26,14 @@ let map_test context =
   match%bitstring source with
   | {| value0 : 16 : map (fun v -> v + 1)
      ; value1 : 16 : map (fun v -> Some v)
-    |} ->
+    |}
+    ->
     assert_equal value0 2;
-    begin match value1 with
-      | Some v -> assert_equal v 2
-      | _      -> assert_bool "Invalid map result" false
-    end
+    (match value1 with
+     | Some v -> assert_equal v 2
+     | _ -> assert_bool "Invalid map result" false)
   | {| _ |} -> assert_bool "Invalid pattern" false
+;;
 
 (*
  * Test of the save_offset_to() qualifier
@@ -45,20 +46,22 @@ let save_offset_test context =
      ; _      :  7 : save_offset_to (off1)
      ; _      :  4 : save_offset_to (off2)
      ; "abc"  : 24 : save_offset_to (off3), string
-    |} ->
+    |}
+    ->
     assert_equal off0 0;
     assert_equal off1 3;
     assert_equal off2 10;
     assert_equal off3 14
   | {| _ |} -> assert_bool "Invalid pattern" false
+;;
 
 (*
  * Test suite definition
  *)
 
-let suite = "BitstringQualifierTest" >::: [
-    "map"             >:: map_test;
-    "save_offset_to"  >:: save_offset_test
-  ]
+let suite =
+  "BitstringQualifierTest"
+  >::: [ "map" >:: map_test; "save_offset_to" >:: save_offset_test ]
+;;
 
 let () = run_test_tt_main suite

@@ -25,6 +25,5 @@
  *)
 
 let nativeendian =
-  if Sys.big_endian
-  then Bitstring_types.BigEndian
-  else Bitstring_types.LittleEndian
+  if Sys.big_endian then Bitstring_types.BigEndian else Bitstring_types.LittleEndian
+;;

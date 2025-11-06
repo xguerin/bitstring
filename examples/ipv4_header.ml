@@ -15,8 +15,7 @@ let () =
       dest : 32;
       options : (hdrlen-5)*32 : bitstring;
       payload : -1 : bitstring|}
-      when version = 4 ->
-
+    when version = 4 ->
     printf "IPv%d:\n" version;
     printf "  header length: %d * 32 bit words\n" hdrlen;
     printf "  type of service: %d\n" tos;
@@ -32,10 +31,8 @@ let () =
     Bitstring.hexdump_bitstring stdout options;
     printf "  packet payload:\n";
     Bitstring.hexdump_bitstring stdout payload
-
-  | {|version : 4|} ->
-    eprintf "cannot parse IP version %d\n" version
-
+  | {|version : 4|} -> eprintf "cannot parse IP version %d\n" version
   | {|_|} as header ->
     eprintf "data is smaller than one nibble:\n";
     Bitstring.hexdump_bitstring stderr header
+;;

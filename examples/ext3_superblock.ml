@@ -63,8 +63,9 @@ let () =
       s_reserved_word_pad : 16 : littleendian;
       s_default_mount_opts : 32 : littleendian;
       s_first_meta_bg : 32 : littleendian;	(* First metablock block group *)
-      _ : 6080 : bitstring |} ->                 (* Padding to the end of the block *)
-
+      _ : 6080 : bitstring |}
+    ->
+    (* Padding to the end of the block *)
     printf "ext3 superblock:\n";
     printf "  s_inodes_count = %ld\n" s_inodes_count;
     printf "  s_blocks_count = %ld\n" s_blocks_count;
@@ -73,7 +74,7 @@ let () =
     printf "  s_uuid = %S\n" s_uuid;
     printf "  s_volume_name = %S\n" s_volume_name;
     printf "  s_last_mounted = %S\n" s_last_mounted
-
   | {| _ |} ->
     eprintf "not an ext3 superblock!\n%!";
     exit 2
+;;

@@ -646,12 +646,14 @@ bitmatch bits with
    {3 Types}
 *)
 
-type endian = BigEndian | LittleEndian | NativeEndian
+type endian =
+  | BigEndian
+  | LittleEndian
+  | NativeEndian
 
-val string_of_endian : endian -> string
 (** Endianness. *)
+val string_of_endian : endian -> string
 
-type bitstring = bytes * int * int
 (** [bitstring] is the basic type used to store bitstrings.
 
     The type contains the underlying data (a bytes),
@@ -667,16 +669,16 @@ type bitstring = bytes * int * int
     See also {!bitstring_of_string}, {!bitstring_of_file},
     {!hexdump_bitstring}, {!bitstring_length}.
 *)
+type bitstring = bytes * int * int
 
-type t = bitstring
 (** [t] is a synonym for the {!bitstring} type.
 
     This allows you to use this module with functors like
     [Set] and [Map] from the stdlib. *)
+type t = bitstring
 
 (** {3 Exceptions} *)
 
-exception Construct_failure of string * string * int * int
 (** [Construct_failure (message, file, line, char)] may be
     raised by the [BITSTRING] constructor.
 
@@ -689,10 +691,10 @@ exception Construct_failure of string * string * int * int
     [file], [line] and [char] point to the original source
     location of the [BITSTRING] constructor that failed.
 *)
+exception Construct_failure of string * string * int * int
 
 (** {3 Bitstring comparison} *)
 
-val compare : bitstring -> bitstring -> int
 (** [compare bs1 bs2] compares two bitstrings and returns zero
     if they are equal, a negative number if [bs1 < bs2], or a
     positive number if [bs1 > bs2].
@@ -702,30 +704,30 @@ val compare : bitstring -> bitstring -> int
     (see {!bitstring}).
 
     The ordering is total and lexicographic. *)
+val compare : bitstring -> bitstring -> int
 
-val equals : bitstring -> bitstring -> bool
 (** [equals] returns true if and only if the two bitstrings are
     semantically equal.  It is the same as calling [compare] and
     testing if the result is [0], but usually more efficient. *)
+val equals : bitstring -> bitstring -> bool
 
-val is_zeroes_bitstring : bitstring -> bool
 (** Tests if the bitstring is all zero bits (cf. {!zeroes_bitstring}) *)
+val is_zeroes_bitstring : bitstring -> bool
 
-val is_ones_bitstring : bitstring -> bool
 (** Tests if the bitstring is all one bits (cf. {!ones_bitstring}). *)
+val is_ones_bitstring : bitstring -> bool
 
-val is_prefix: bitstring -> bitstring -> bool
 (** [is_prefix bs1 bs2] returns true if bs2 is a prefix of bs1 *)
+val is_prefix : bitstring -> bitstring -> bool
 
 (** {3 Bitstring manipulation} *)
 
-val bitstring_length : bitstring -> int
 (** [bitstring_length bitstring] returns the length of
     the bitstring in bits.
 
     Note this just returns the third field in the {!bitstring} tuple. *)
+val bitstring_length : bitstring -> int
 
-val subbitstring : bitstring -> int -> int -> bitstring
 (** [subbitstring bits off len] returns a sub-bitstring
     of the bitstring, starting at offset [off] bits and
     with length [len] bits.
@@ -735,8 +737,8 @@ val subbitstring : bitstring -> int -> int -> bitstring
 
     Note that this function just changes the offset and length
     fields of the {!bitstring} tuple, so is very efficient. *)
+val subbitstring : bitstring -> int -> int -> bitstring
 
-val dropbits : int -> bitstring -> bitstring
 (** Drop the first n bits of the bitstring and return a new
     bitstring which is shorter by n bits.
 
@@ -745,8 +747,8 @@ val dropbits : int -> bitstring -> bitstring
 
     Note that this function just changes the offset and length
     fields of the {!bitstring} tuple, so is very efficient. *)
+val dropbits : int -> bitstring -> bitstring
 
-val takebits : int -> bitstring -> bitstring
 (** Take the first n bits of the bitstring and return a new
     bitstring which is exactly n bits long.
 
@@ -755,21 +757,21 @@ val takebits : int -> bitstring -> bitstring
 
     Note that this function just changes the offset and length
     fields of the {!bitstring} tuple, so is very efficient. *)
+val takebits : int -> bitstring -> bitstring
 
-val concat : bitstring list -> bitstring
 (** Concatenate a list of bitstrings together into a single
     bitstring. *)
+val concat : bitstring list -> bitstring
 
 (** {3 Constructing bitstrings} *)
 
-val empty_bitstring : bitstring
 (** [empty_bitstring] is the empty, zero-length bitstring. *)
+val empty_bitstring : bitstring
 
-val create_bitstring : int -> bitstring
 (** [create_bitstring n] creates an [n] bit bitstring
     containing all zeroes. *)
+val create_bitstring : int -> bitstring
 
-val make_bitstring : int -> char -> bitstring
 (** [make_bitstring n c] creates an [n] bit bitstring
     containing the repeated 8 bit pattern in [c].
 
@@ -778,16 +780,16 @@ val make_bitstring : int -> char -> bitstring
 
     Note that the length is in bits, not bytes.  The length does NOT
     need to be a multiple of 8. *)
+val make_bitstring : int -> char -> bitstring
 
-val zeroes_bitstring : int -> bitstring
 (** [zeroes_bitstring] creates an [n] bit bitstring of all 0's.
 
     Actually this is the same as {!create_bitstring}. *)
+val zeroes_bitstring : int -> bitstring
 
-val ones_bitstring : int -> bitstring
 (** [ones_bitstring] creates an [n] bit bitstring of all 1's. *)
+val ones_bitstring : int -> bitstring
 
-val bitstring_of_string : string -> bitstring
 (** [bitstring_of_string str] creates a bitstring
     of length [String.length str * 8] (bits) containing the
     bits in [str].
@@ -795,12 +797,12 @@ val bitstring_of_string : string -> bitstring
     Note that the bitstring uses [str] as the underlying
     string (see the representation of {!bitstring}) so you
     should not change [str] after calling this. *)
+val bitstring_of_string : string -> bitstring
 
-val bitstring_of_file : string -> bitstring
 (** [bitstring_of_file filename] loads the named file
     into a bitstring. *)
+val bitstring_of_file : string -> bitstring
 
-val bitstring_of_chan : in_channel -> bitstring
 (** [bitstring_of_chan chan] loads the contents of
     the input channel [chan] as a bitstring.
 
@@ -809,28 +811,28 @@ val bitstring_of_chan : in_channel -> bitstring
     be a multiple of 8 bits.
 
     See also {!bitstring_of_chan_max}. *)
+val bitstring_of_chan : in_channel -> bitstring
 
-val bitstring_of_chan_max : in_channel -> int -> bitstring
 (** [bitstring_of_chan_max chan max] works like
     {!bitstring_of_chan} but will only read up to
     [max] bytes from the channel (or fewer if the end of input
     occurs before that). *)
+val bitstring_of_chan_max : in_channel -> int -> bitstring
 
-val bitstring_of_file_descr : Unix.file_descr -> bitstring
 (** [bitstring_of_file_descr fd] loads the contents of
     the file descriptor [fd] as a bitstring.
 
     See also {!bitstring_of_chan}, {!bitstring_of_file_descr_max}. *)
+val bitstring_of_file_descr : Unix.file_descr -> bitstring
 
-val bitstring_of_file_descr_max : Unix.file_descr -> int -> bitstring
 (** [bitstring_of_file_descr_max fd max] works like
     {!bitstring_of_file_descr} but will only read up to
     [max] bytes from the channel (or fewer if the end of input
     occurs before that). *)
+val bitstring_of_file_descr_max : Unix.file_descr -> int -> bitstring
 
 (** {3 Converting bitstrings} *)
 
-val string_of_bitstring : bitstring -> string
 (** [string_of_bitstring bitstring] converts a bitstring to a string
     (eg. to allow comparison).
 
@@ -842,14 +844,14 @@ val string_of_bitstring : bitstring -> string
     If the bitstring is not a multiple of 8 bits wide then the
     final byte of the string contains the high bits set to the
     remaining bits and the low bits set to 0. *)
+val string_of_bitstring : bitstring -> string
 
-val bitstring_to_file : bitstring -> string -> unit
 (** [bitstring_to_file bits filename] writes the bitstring [bits]
     to the file [filename].  It overwrites the output file.
 
     Some restrictions apply, see {!bitstring_to_chan}. *)
+val bitstring_to_file : bitstring -> string -> unit
 
-val bitstring_to_chan : bitstring -> out_channel -> unit
 (** [bitstring_to_file bits filename] writes the bitstring [bits]
     to the channel [chan].
 
@@ -866,27 +868,29 @@ val bitstring_to_chan : bitstring -> out_channel -> unit
     [BITSTRING] operator and is an exact multiple of 8 bits wide,
     then this function will always work efficiently.
 *)
+val bitstring_to_chan : bitstring -> out_channel -> unit
 
 (** {3 Printing bitstrings} *)
 
-val hexdump_bitstring : out_channel -> bitstring -> unit
 (** [hexdump_bitstring chan bitstring] prints the bitstring
     to the output channel in a format similar to the
     Unix command [hexdump -C]. *)
+val hexdump_bitstring : out_channel -> bitstring -> unit
 
 (** {3 Bitstring buffer} *)
 
+(** Buffers are mainly used by the [BITSTRING] constructor, but
+    may also be useful for end users.  They work much like the
+    standard library [Buffer] module. *)
 module Buffer : sig
   type t
+
   val create : unit -> t
   val contents : t -> bitstring
   val add_bits : t -> bytes -> int -> unit
   val add_bit : t -> bool -> unit
   val add_byte : t -> int -> unit
 end
-(** Buffers are mainly used by the [BITSTRING] constructor, but
-    may also be useful for end users.  They work much like the
-    standard library [Buffer] module. *)
 
 (** {3 Get/set bits}
 
@@ -899,32 +903,32 @@ end
     if the index is out of range of the bitstring.
 *)
 
+(** [set bits n] sets the [n]th bit in the bitstring to 1. *)
 val set : bitstring -> int -> unit
-  (** [set bits n] sets the [n]th bit in the bitstring to 1. *)
 
+(** [clear bits n] sets the [n]th bit in the bitstring to 0. *)
 val clear : bitstring -> int -> unit
-  (** [clear bits n] sets the [n]th bit in the bitstring to 0. *)
 
+(** [is_set bits n] is true if the [n]th bit is set to 1. *)
 val is_set : bitstring -> int -> bool
-  (** [is_set bits n] is true if the [n]th bit is set to 1. *)
 
+(** [is_clear bits n] is true if the [n]th bit is set to 0. *)
 val is_clear : bitstring -> int -> bool
-  (** [is_clear bits n] is true if the [n]th bit is set to 0. *)
 
-val put : bitstring -> int -> int -> unit
-  (** [put bits n v] sets the [n]th bit in the bitstring to 1
+(** [put bits n v] sets the [n]th bit in the bitstring to 1
       if [v] is not zero, or to 0 if [v] is zero. *)
+val put : bitstring -> int -> int -> unit
 
+(** [get bits n] returns the [n]th bit (returns non-zero or 0). *)
 val get : bitstring -> int -> int
-  (** [get bits n] returns the [n]th bit (returns non-zero or 0). *)
 
 (** {3 Miscellaneous} *)
 
-val debug : bool ref
 (** Set this variable to true to enable extended debugging.
     This only works if debugging was also enabled in the
     [pa_bitstring.ml] file at compile time, otherwise it
     does nothing. *)
+val debug : bool ref
 
 (**/**)
 
@@ -935,54 +939,60 @@ val debug : bool ref
 (* 'extract' functions are used in bitmatch statements. *)
 
 val extract_bit : bytes -> int -> int -> int -> bool
-
 val extract_char_unsigned : bytes -> int -> int -> int -> int
-
 val extract_char_signed : bytes -> int -> int -> int -> int
-
 val extract_int_be_unsigned : bytes -> int -> int -> int -> int
-
 val extract_int_be_signed : bytes -> int -> int -> int -> int
-
 val extract_int_le_unsigned : bytes -> int -> int -> int -> int
-
 val extract_int_le_signed : bytes -> int -> int -> int -> int
-
 val extract_int_ne_unsigned : bytes -> int -> int -> int -> int
-
 val extract_int_ne_signed : bytes -> int -> int -> int -> int
-
 val extract_int_ee_unsigned : endian -> bytes -> int -> int -> int -> int
-
 val extract_int_ee_signed : endian -> bytes -> int -> int -> int -> int
-
 val extract_int32_be_unsigned : bytes -> int -> int -> int -> int32
-
 val extract_int32_le_unsigned : bytes -> int -> int -> int -> int32
-
 val extract_int32_ne_unsigned : bytes -> int -> int -> int -> int32
-
 val extract_int32_ee_unsigned : endian -> bytes -> int -> int -> int -> int32
-
 val extract_int64_be_unsigned : bytes -> int -> int -> int -> int64
-
 val extract_int64_le_unsigned : bytes -> int -> int -> int -> int64
-
 val extract_int64_ne_unsigned : bytes -> int -> int -> int -> int64
-
 val extract_int64_ee_unsigned : endian -> bytes -> int -> int -> int -> int64
 
-external extract_fastpath_int16_be_unsigned : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int16_be_unsigned"
+external extract_fastpath_int16_be_unsigned
+  :  bytes
+  -> int
+  -> int
+  = "ocaml_bitstring_extract_fastpath_int16_be_unsigned"
 
-external extract_fastpath_int16_le_unsigned : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int16_le_unsigned"
+external extract_fastpath_int16_le_unsigned
+  :  bytes
+  -> int
+  -> int
+  = "ocaml_bitstring_extract_fastpath_int16_le_unsigned"
 
-external extract_fastpath_int16_ne_unsigned : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int16_ne_unsigned"
+external extract_fastpath_int16_ne_unsigned
+  :  bytes
+  -> int
+  -> int
+  = "ocaml_bitstring_extract_fastpath_int16_ne_unsigned"
 
-external extract_fastpath_int16_be_signed : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int16_be_signed"
+external extract_fastpath_int16_be_signed
+  :  bytes
+  -> int
+  -> int
+  = "ocaml_bitstring_extract_fastpath_int16_be_signed"
 
-external extract_fastpath_int16_le_signed : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int16_le_signed"
+external extract_fastpath_int16_le_signed
+  :  bytes
+  -> int
+  -> int
+  = "ocaml_bitstring_extract_fastpath_int16_le_signed"
 
-external extract_fastpath_int16_ne_signed : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int16_ne_signed"
+external extract_fastpath_int16_ne_signed
+  :  bytes
+  -> int
+  -> int
+  = "ocaml_bitstring_extract_fastpath_int16_ne_signed"
 
 (*
 external extract_fastpath_int24_be_unsigned : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int24_be_unsigned"
@@ -998,17 +1008,41 @@ external extract_fastpath_int24_le_signed : bytes -> int -> int = "ocaml_bitstri
 external extract_fastpath_int24_ne_signed : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int24_ne_signed"
 *)
 
-external extract_fastpath_int32_be_unsigned : bytes -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_be_unsigned"
+external extract_fastpath_int32_be_unsigned
+  :  bytes
+  -> int
+  -> int32
+  = "ocaml_bitstring_extract_fastpath_int32_be_unsigned"
 
-external extract_fastpath_int32_le_unsigned : bytes -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_le_unsigned"
+external extract_fastpath_int32_le_unsigned
+  :  bytes
+  -> int
+  -> int32
+  = "ocaml_bitstring_extract_fastpath_int32_le_unsigned"
 
-external extract_fastpath_int32_ne_unsigned : bytes -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_ne_unsigned"
+external extract_fastpath_int32_ne_unsigned
+  :  bytes
+  -> int
+  -> int32
+  = "ocaml_bitstring_extract_fastpath_int32_ne_unsigned"
 
-external extract_fastpath_int32_be_signed : bytes -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_be_signed"
+external extract_fastpath_int32_be_signed
+  :  bytes
+  -> int
+  -> int32
+  = "ocaml_bitstring_extract_fastpath_int32_be_signed"
 
-external extract_fastpath_int32_le_signed : bytes -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_le_signed"
+external extract_fastpath_int32_le_signed
+  :  bytes
+  -> int
+  -> int32
+  = "ocaml_bitstring_extract_fastpath_int32_le_signed"
 
-external extract_fastpath_int32_ne_signed : bytes -> int -> int32 = "ocaml_bitstring_extract_fastpath_int32_ne_signed"
+external extract_fastpath_int32_ne_signed
+  :  bytes
+  -> int
+  -> int32
+  = "ocaml_bitstring_extract_fastpath_int32_ne_signed"
 
 (*
 external extract_fastpath_int40_be_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_be_unsigned"
@@ -1048,59 +1082,63 @@ external extract_fastpath_int56_le_signed : bytes -> int -> int64 = "ocaml_bitst
 external extract_fastpath_int56_ne_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_ne_signed"
 *)
 
-external extract_fastpath_int64_be_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_be_unsigned"
+external extract_fastpath_int64_be_unsigned
+  :  bytes
+  -> int
+  -> int64
+  = "ocaml_bitstring_extract_fastpath_int64_be_unsigned"
 
-external extract_fastpath_int64_le_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_le_unsigned"
+external extract_fastpath_int64_le_unsigned
+  :  bytes
+  -> int
+  -> int64
+  = "ocaml_bitstring_extract_fastpath_int64_le_unsigned"
 
-external extract_fastpath_int64_ne_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_ne_unsigned"
+external extract_fastpath_int64_ne_unsigned
+  :  bytes
+  -> int
+  -> int64
+  = "ocaml_bitstring_extract_fastpath_int64_ne_unsigned"
 
-external extract_fastpath_int64_be_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_be_signed"
+external extract_fastpath_int64_be_signed
+  :  bytes
+  -> int
+  -> int64
+  = "ocaml_bitstring_extract_fastpath_int64_be_signed"
 
-external extract_fastpath_int64_le_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_le_signed"
+external extract_fastpath_int64_le_signed
+  :  bytes
+  -> int
+  -> int64
+  = "ocaml_bitstring_extract_fastpath_int64_le_signed"
 
-external extract_fastpath_int64_ne_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int64_ne_signed"
+external extract_fastpath_int64_ne_signed
+  :  bytes
+  -> int
+  -> int64
+  = "ocaml_bitstring_extract_fastpath_int64_ne_signed"
 
 (* 'construct' functions are used in BITSTRING constructors. *)
 val construct_bit : Buffer.t -> bool -> int -> exn -> unit
-
 val construct_char_unsigned : Buffer.t -> int -> int -> exn -> unit
-
 val construct_char_signed : Buffer.t -> int -> int -> exn -> unit
-
 val construct_int_be_unsigned : Buffer.t -> int -> int -> exn -> unit
-
 val construct_int_le_unsigned : Buffer.t -> int -> int -> exn -> unit
-
 val construct_int_ne_unsigned : Buffer.t -> int -> int -> exn -> unit
-
 val construct_int_ee_unsigned : endian -> Buffer.t -> int -> int -> exn -> unit
-
 val construct_int_be_signed : Buffer.t -> int -> int -> exn -> unit
-
 val construct_int_le_signed : Buffer.t -> int -> int -> exn -> unit
-
 val construct_int_ne_signed : Buffer.t -> int -> int -> exn -> unit
-
 val construct_int_ee_signed : endian -> Buffer.t -> int -> int -> exn -> unit
-
 val construct_int32_be_unsigned : Buffer.t -> int32 -> int -> exn -> unit
-
 val construct_int32_le_unsigned : Buffer.t -> int32 -> int -> exn -> unit
-
 val construct_int32_ne_unsigned : Buffer.t -> int32 -> int -> exn -> unit
-
 val construct_int32_ee_unsigned : endian -> Buffer.t -> int32 -> int -> exn -> unit
-
 val construct_int64_be_unsigned : Buffer.t -> int64 -> int -> exn -> unit
-
 val construct_int64_le_unsigned : Buffer.t -> int64 -> int -> exn -> unit
-
 val construct_int64_ne_unsigned : Buffer.t -> int64 -> int -> exn -> unit
-
 val construct_int64_ee_unsigned : endian -> Buffer.t -> int64 -> int -> exn -> unit
-
 val construct_string : Buffer.t -> string -> unit
-
 val construct_bitstring : Buffer.t -> bitstring -> unit
 
 (* Alias of functions shadowed by Core. *)

@@ -3,4 +3,5 @@
  (public_name ppx_bitstring)
  (kind ppx_rewriter)
  (libraries str compiler-libs ppxlib)
- (preprocess (pps ppxlib.metaquot)))
+ (preprocess
+  (pps ppxlib.metaquot)))

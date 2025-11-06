@@ -21,9 +21,13 @@
  *
  *)
 
-type endian = BigEndian | LittleEndian | NativeEndian
+type endian =
+  | BigEndian
+  | LittleEndian
+  | NativeEndian
 
 let string_of_endian = function
   | BigEndian -> "bigendian"
   | LittleEndian -> "littleendian"
   | NativeEndian -> "nativeendian"
+;;
