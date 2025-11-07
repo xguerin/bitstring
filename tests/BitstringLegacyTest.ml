@@ -1,48 +1,36 @@
 open OUnit2
 open Printf
 
-(*
- * Helper functions
- *)
+(* Helper functions *)
 
 let rec range a b = if a <= b then a :: range (a + 1) b else []
 
-(*
- * Just check that the extension and library load without error.
- *)
+(* Just check that the extension and library load without error. *)
 
 let load_test _ =
   let _ = Bitstring.extract_bit in
   ()
 ;;
 
-(*
- * Just check that we can run some functions from the library.
- *)
+(* Just check that we can run some functions from the library. *)
 
 let run_test _ =
   let bits = Bitstring.create_bitstring 16 in
   ignore (Bitstring.string_of_bitstring bits)
 ;;
 
-(*
- * Match random bits.
- *)
+(* Match random bits. *)
 
 let match_random_bits_test _ =
   Random.self_init ();
   for len = 0 to 999 do
-    (*
-     * Create a random string of bits.
-     *)
+    (* Create a random string of bits. *)
     let expected = List.map (fun _ -> Random.bool ()) (range 0 (len - 1)) in
     let bits = Bitstring.Buffer.create () in
     List.iter (Bitstring.Buffer.add_bit bits) expected;
     let bits = Bitstring.Buffer.contents bits in
-    (*
-     * Now read the bitstring in groups of 1, 2, 3 .. etc. bits.  In each case
-     * check the result against what we generated ('expected').
-     *)
+    (* Now read the bitstring in groups of 1, 2, 3 .. etc. bits. In each case
+       check the result against what we generated ('expected'). *)
     let actual =
       let rec loop bits =
         match%bitstring bits with
@@ -107,17 +95,13 @@ let match_random_bits_test _ =
   done
 ;;
 
-(*
- * Match random bits with integers.
- *)
+(* Match random bits with integers. *)
 
 let match_random_bits_with_int_test _ =
   Random.self_init ();
   for len = 1 to 99 do
     for bitlen = 1 to 63 do
-      (*
-       * Create a random string of ints.
-       *)
+      (* Create a random string of ints. *)
       let expected =
         List.map
           (fun _ -> Random.int64 (Int64.sub (Int64.shift_left 1L bitlen) 1L))
@@ -133,10 +117,8 @@ let match_random_bits_with_int_test _ =
              (Failure "constructing string"))
         expected;
       let bits = Bitstring.Buffer.contents bits in
-      (*
-       * Now read the bitstring as integers.
-       * In each case check the result against what we generated ('expected').
-       *)
+      (* Now read the bitstring as integers. In each case check the result
+         against what we generated ('expected'). *)
       let actual =
         let rec loop bits =
           match%bitstring bits with
@@ -153,9 +135,7 @@ let match_random_bits_with_int_test _ =
   done
 ;;
 
-(*
- * Check value limits.
- *)
+(* Check value limits. *)
 
 let check_value_limits_test _ =
   let a = Array.init 387 (fun i -> i - 129) in
@@ -184,9 +164,7 @@ let check_value_limits_test _ =
     [ -2, 3; -4, 7; -8, 15; -16, 31; -32, 63; -64, 127; -128, 255 ]
 ;;
 
-(*
- * Signed byte create.
- *)
+(* Signed byte create. *)
 
 let signed_byte_create_test _ =
   let a n =
@@ -217,9 +195,7 @@ let signed_byte_create_test _ =
   assert_equal ok true
 ;;
 
-(*
- * Signed byte create and match
- *)
+(* Signed byte create and match *)
 
 let signed_byte_create_and_match_test _ =
   let a n =
@@ -265,9 +241,7 @@ let signed_byte_create_and_match_test _ =
   assert_equal ok true
 ;;
 
-(*
- * Signed int limits
- *)
+(* Signed int limits *)
 
 let signed_int_limits_test _ =
   Random.self_init ();
@@ -445,10 +419,8 @@ let signed_int_limits_test _ =
     | _ -> ())
 ;;
 
-(*
- * Test functions which construct and extract fixed-length ints of various
- * sizes. Manquent les tests random pour bits = 31
- *)
+(* Test functions which construct and extract fixed-length ints of various
+   sizes. Manquent les tests random pour bits = 31 *)
 
 let fixed_extraction_test _ =
   for i = 0 to 129 do
@@ -623,9 +595,7 @@ let extract_regression_test _ =
   assert (i3 = 3_L)
 ;;
 
-(*
- * Construct and match against random variable sized strings.
- *)
+(* Construct and match against random variable sized strings. *)
 
 let nr_passes = 10000
 let max_size = 8 (* max field size in bits *)
@@ -724,10 +694,8 @@ let construct_and_match_random_test _ =
   done
 ;;
 
-(*
- * Test the Bitstring.Buffer module and string_of_bitstring in nasty non-aligned
- * corner cases.
- *)
+(* Test the Bitstring.Buffer module and string_of_bitstring in nasty non-aligned
+   corner cases. *)
 
 let nasty_non_aligned_corner_case_test _ =
   Random.self_init ();
@@ -746,12 +714,11 @@ let nasty_non_aligned_corner_case_test _ =
         expected
       in
       (* Create a random bitstring:
-       * +-------------+-------------------------------------------+
-       * | (random)    | bits that we check (expected)             |
-       * +-------------+-------------------------------------------+
-       * 0           offset                                    offset+len
-       *                <---------------- len bits --------------->
-       *)
+         +-------------+-------------------------------------------+
+         | (random)    | bits that we check (expected)             |
+         +-------------+-------------------------------------------+
+         0           offset                                    offset+len
+                        <---------------- len bits ---------------> *)
       let bits =
         let bits = Bitstring.Buffer.create () in
         Bitstring.Buffer.add_bits bits str1 offset;
@@ -786,9 +753,7 @@ let nasty_non_aligned_corner_case_test _ =
   done
 ;;
 
-(*
- * Test concat and the bit get functions.
- *)
+(* Test concat and the bit get functions. *)
 
 let concat_bit_get_test _ =
   for i = 0 to 33 do
@@ -816,9 +781,7 @@ let concat_bit_get_test _ =
   done
 ;;
 
-(*
- * Compare bitstrings.
- *)
+(* Compare bitstrings. *)
 
 let sgn = function
   | 0 -> 0
@@ -896,9 +859,7 @@ let subbitstring_test _ =
   done
 ;;
 
-(*
- * Test takebits call.
- *)
+(* Test takebits call. *)
 
 let takebits_test _ =
   let bits = Bitstring.make_bitstring 65 '\x5a' in
@@ -908,9 +869,7 @@ let takebits_test _ =
   done
 ;;
 
-(*
- * Test the various functions to load bitstrings from files.
- *)
+(* Test the various functions to load bitstrings from files. *)
 
 let file_load_test _ =
   let bits1 =
@@ -960,9 +919,7 @@ let file_load_test _ =
   Unix.unlink filename
 ;;
 
-(*
- * Test if bitstrings are all zeroes or all ones.
- *)
+(* Test if bitstrings are all zeroes or all ones. *)
 
 let zeroes_ones_test _ =
   for i = 0 to 33 do
@@ -989,9 +946,7 @@ let zeroes_ones_test _ =
   done
 ;;
 
-(*
- * Endianness expressions
- *)
+(* Endianness expressions *)
 
 let endianness_test _ =
   let rec loop = function
@@ -1026,22 +981,19 @@ let endianness_test _ =
     ]
 ;;
 
-(*
- * Simple offset test
- *)
+(* Simple offset test *)
 
 let simple_offset_test _ =
   let make_bits i n j m k =
     let pad1 = Bitstring.ones_bitstring (n - 8) in
     let pad2 = Bitstring.ones_bitstring (m - n - 8) in
     [%bitstring
-      {|
-    i : 8;
-    pad1 : n-8 : bitstring;
-    j : 8;			     (* this should be at offset(n) *)
-    pad2 : m-n-8 : bitstring;
-    k : 8			     (* this should be at offset(m) *)
-      |}]
+      {| i : 8
+       ; pad1 : n-8 : bitstring
+       ; j : 8 (* this should be at offset(n) *)
+       ; pad2 : m-n-8 : bitstring
+       ; k : 8 (* this should be at offset(m) *)
+       |}]
   in
   let test_bits bits i n j m k =
     match%bitstring bits with
@@ -1061,22 +1013,19 @@ let simple_offset_test _ =
   done
 ;;
 
-(*
- * Offset string. The rotation functions used for strings are
- * very complicated so this is worth testing separately.
- *)
+(* Offset string. The rotation functions used for strings are very complicated
+   so this is worth testing separately. *)
 
 let offset_string_test _ =
   let make_bits si n sj m sk =
     let pad1 = Bitstring.ones_bitstring (n - 64) in
     let pad2 = Bitstring.ones_bitstring (m - n - 8) in
     [%bitstring
-      {|
-    si : 64 : string;
-    pad1 : n-64 : bitstring;
-    sj : 8 : string;		     (* this should be at offset(n) *)
-    pad2 : m-n-8 : bitstring;
-    sk : 64 : string		     (* this should be at offset(m) *)
+      {| si : 64 : string
+       ; pad1 : n-64 : bitstring
+       ; sj : 8 : string  (* this should be at offset(n) *)
+       ; pad2 : m-n-8 : bitstring
+       ; sk : 64 : string (* this should be at offset(m) *)
        |}]
   in
   let test_bits bits si n sj m sk =
@@ -1100,9 +1049,7 @@ let offset_string_test _ =
   done
 ;;
 
-(*
- * Test computed offsets when original_off <> 0.
- *)
+(* Test computed offsets when original_off <> 0. *)
 
 let computed_offset_test _ =
   let make_bits p i n j m k =
@@ -1110,30 +1057,27 @@ let computed_offset_test _ =
     let pad1 = Bitstring.ones_bitstring (n - 8) in
     let pad2 = Bitstring.ones_bitstring (m - n - 8) in
     [%bitstring
-      {|
-      pad0 : p     : bitstring;	  (* will be skipped below *)
-      i    : 8;
-      pad1 : n-8   : bitstring;
-      j    : 8;			              (* this should be at offset(n) *)
-      pad2 : m-n-8 : bitstring;
-      k    : 8			              (* this should be at offset(m) *)
-    |}]
+      {| pad0 : p     : bitstring  (* will be skipped below *)
+       ; i    : 8
+       ; pad1 : n-8   : bitstring
+       ; j    : 8                  (* this should be at offset(n) *)
+       ; pad2 : m-n-8 : bitstring
+       ; k    : 8                  (* this should be at offset(m) *)
+       |}]
   in
   let test_bits bits p i n j m k =
-    (*
-     * Skip the 'p' padding bits so the match starts at a non-zero offset.
-     *)
+    (* Skip the 'p' padding bits so the match starts at a non-zero offset. *)
     let bits = Bitstring.dropbits p bits in
     match%bitstring bits with
-    | {| i' : 8;
-         j' : 8 : offset(n);
-         k' : 8 : offset(m)
-      |}
+    | {| i' : 8
+       ; j' : 8 : offset(n)
+       ; k' : 8 : offset(m)
+       |}
       when i = i' && j = j' && k = k' -> () (* ok *)
-    | {| i' : 8;
-         j' : 8 : offset(n);
-         k' : 8 : offset(m)
-      |}
+    | {| i' : 8
+       ; j' : 8 : offset(n)
+       ;  k' : 8 : offset(m)
+       |}
       ->
       Printf.printf "\n%d %d %d\n" p n m;
       Bitstring.hexdump_bitstring stdout bits;
@@ -1156,9 +1100,7 @@ let computed_offset_test _ =
   done
 ;;
 
-(*
- * Test save_offset_to.
- *)
+(* Test save_offset_to. *)
 
 let save_offset_to_test _ =
   let make_bits p i n j m k =
@@ -1166,13 +1108,12 @@ let save_offset_to_test _ =
     let pad1 = Bitstring.ones_bitstring (n - 8) in
     let pad2 = Bitstring.ones_bitstring (m - n - 8) in
     [%bitstring
-      {|
-    pad0 : p : bitstring;	     (* will be skipped below *)
-    i : 8;
-    pad1 : n-8 : bitstring;
-    j : 8;			     (* this should be at offset(n) *)
-    pad2 : m-n-8 : bitstring;
-    k : 8			     (* this should be at offset(m) *)
+      {| pad0 : p : bitstring (* will be skipped below *)
+       ; i : 8
+       ; pad1 : n-8 : bitstring
+       ; j : 8                (* this should be at offset(n) *)
+       ; pad2 : m-n-8 : bitstring
+       ; k : 8                (* this should be at offset(m) *)
       |}]
   in
   let test_bits bits p i n j m k =
@@ -1200,9 +1141,7 @@ let save_offset_to_test _ =
   done
 ;;
 
-(*
- * Test check() and bind().
- *)
+(* Test check() and bind(). *)
 
 let check_bind_test _ =
   let%bitstring bits = {| 101 : 16; 202 : 16 |} in
@@ -1214,9 +1153,7 @@ let check_bind_test _ =
   | {| _ |} -> failwith "70_check_and_bind: match failed"
 ;;
 
-(*
- * Test hexdump.
- *)
+(* Test hexdump. *)
 
 let () =
   let diff = "diff" in
@@ -1237,17 +1174,13 @@ let () =
          let n = String.sub filename 3 (String.length filename - 3) in
          let n = int_of_string n in
          let bits = Bitstring.bitstring_of_file ("../../../tests/data/" ^ filename) in
-         (*
-          * 'bitstring_of_file' loads whole bytes.  Truncate it to
-          * the real bit-length.
-          *)
+         (* 'bitstring_of_file' loads whole bytes. Truncate it to the real
+            bit-length. *)
          let bits = Bitstring.takebits n bits in
          filename, n, bits)
       files
   in
-  (*
-   * Hexdump the bits, then compare using external 'diff' program.
-   *)
+  (* Hexdump the bits, then compare using external 'diff' program. *)
   List.iter
     (fun (filename, n, bits) ->
        let output_filename = sprintf "../../../tests/data/hex%d.actual" n in
@@ -1270,10 +1203,7 @@ let () =
     files
 ;;
 
-(*
- * Regression test for bug in 'as-binding' found by Matej Kosik.
- * $Id$
- *)
+(* Regression test for bug in 'as-binding' found by Matej Kosik. *)
 
 let as_binding_bug_test _ =
   let bits = Bitstring.ones_bitstring 1 in
@@ -1288,9 +1218,7 @@ let as_binding_bug_test _ =
   | {| _ |} -> assert false
 ;;
 
-(*
- * Regression test for bug in concatenation found by Phil Tomson.
- *)
+(* Regression test for bug in concatenation found by Phil Tomson. *)
 
 let concat_regression_test _ =
   let errors = ref 0 in
@@ -1365,9 +1293,7 @@ let concat_regression_test _ =
   if !errors <> 0 then exit 1
 ;;
 
-(*
- * Prefix tests.
- *)
+(* Prefix tests. *)
 
 let is_prefix_basic_aligned_test _ =
   (* Match mod8 bitstrings *)

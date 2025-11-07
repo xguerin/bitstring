@@ -1,25 +1,21 @@
-(*
- * Copyright (c) 2016 Xavier R. Guérin <xguerin@users.noreply.github.com>
- *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *)
+(* Copyright (c) 2016 Xavier R. Guérin <xguerin@users.noreply.github.com>
+  
+   Permission to use, copy, modify, and distribute this software for any purpose
+   with or without fee is hereby granted, provided that the above copyright
+   notice and this permission notice appear in all copies.
+  
+   THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+   REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+   AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+   INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+   LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
+   OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+   PERFORMANCE OF THIS SOFTWARE. *)
 
 open OUnit2
 open Bitstring
 
-(*
- * Imbricated bitstring test
- *)
+(* Imbricated bitstring test *)
 
 let imbricated_bistring_test context =
   let result = "\xde\xad\xbe\xef\x42\x0a" in
@@ -38,9 +34,7 @@ let imbricated_bistring_test context =
   assert_equal result dump
 ;;
 
-(*
- * Constructor style test
- *)
+(* Constructor style test *)
 
 let constructor_style_test context =
   let%bitstring bits1 =
@@ -71,9 +65,7 @@ let constructor_style_test context =
   assert_bool "Bistrings are not equal" (Bitstring.equals bits1 bits2)
 ;;
 
-(*
- * Swap test
- *)
+(* Swap test *)
 
 let swap bs =
   match%bitstring bs with
@@ -91,9 +83,7 @@ let swap_test context =
   assert_bool "Bitstring swap failed" (Bitstring.equals three (swap three))
 ;;
 
-(*
- * External value test
- *)
+(* External value test *)
 
 let external_value_test context =
   let result = "\x00\x02\x00\x00\x00\x01\xC0" in
@@ -113,9 +103,7 @@ let external_value_test context =
   assert_equal str result
 ;;
 
-(*
- * Int for [17,31] bits test
- *)
+(* Int for [17,31] bits test *)
 
 let int_parser_test context =
   let result = "\x00\x00\x02" in
@@ -124,9 +112,7 @@ let int_parser_test context =
   assert_equal str result
 ;;
 
-(*
- * Int32 for 32 bits test
- *)
+(* Int32 for 32 bits test *)
 
 let int32_parser_test context =
   let result = "\x00\x00\x00\x02" in
@@ -135,9 +121,7 @@ let int32_parser_test context =
   assert_equal str result
 ;;
 
-(*
- * Structural let
- *)
+(* Structural let *)
 
 let%bitstring ext_bits = {| 2_l : 32 |}
 
@@ -147,9 +131,7 @@ let str_item_test context =
   assert_equal str result
 ;;
 
-(*
- * Subtyping.
- *)
+(* Subtyping. *)
 
 let subtype_test context =
   let x = 42 in
@@ -158,9 +140,7 @@ let subtype_test context =
   assert (Bitstring.equals b c)
 ;;
 
-(*
- * Test suite definition
- *)
+(* Test suite definition *)
 
 let suite =
   "BitstringConstructorTest"

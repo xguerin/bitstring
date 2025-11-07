@@ -1,41 +1,35 @@
-(*
- * Bitstring library.
- *
- * Copyright (C) 2008-2016 Red Hat Inc., Richard W.M. Jones
- * Copyright (C) 2016 Red Hat Inc, Richard W.M. Jones, Xavier R. Guerin.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version,
- * with the OCaml linking exception described in COPYING.LIB.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *)
+(* Bitstring library.
+ 
+   Copyright (C) 2008-2016 Red Hat Inc., Richard W.M. Jones
+   Copyright (C) 2016 Red Hat Inc, Richard W.M. Jones, Xavier R. Guerin
+ 
+   This library is free software; you can redistribute it and/or modify it under
+   the terms of the GNU Lesser General Public License as published by the Free
+   Software Foundation; either version 2 of the License, or (at your option) any
+   later version, with the OCaml linking exception described in COPYING.LIB.
+ 
+   This library is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+   FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+   more details.
+ 
+   You should have received a copy of the GNU Lesser General Public License
+   along with this library; if not, write to the Free Software Foundation, Inc.,
+   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA. *)
 
 open Printf
 include Bitstring_types
 include Bitstring_config
 
-(* Enable runtime debug messages.  Must also have been enabled
- * in pa_bitstring.ml.
- *)
+(* Enable runtime debug messages. *)
 let debug = ref false
 
 (* Exceptions. *)
 exception Construct_failure of string * string * int * int
 
-(* A bitstring is simply the data itself (as a byte sequence), and the
- * bitoffset and the bitlength within the byte sequence.  Note offset/length
- * are counted in bits, not bytes.
- *)
+(* A bitstring is simply the data itself (as a byte sequence), and the bitoffset
+   and the bitlength within the byte sequence. Note offset/length are counted
+   in bits, not bytes. *)
 type bitstring = bytes * int * int
 type t = bitstring
 
@@ -154,13 +148,13 @@ let takebits n (data, off, len) =
 ;;
 
 (*----------------------------------------------------------------------*)
+
 (* Bitwise functions.
- *
- * We try to isolate all bitwise functions within these modules.
- *)
+  
+   We try to isolate all bitwise functions within these modules. *)
 
 module I = struct
-  (* Bitwise operations on ints.  Note that we assume int <= 31 bits. *)
+  (* Bitwise operations on ints. Note that we assume int <= 31 bits. *)
   external ( <<< ) : int -> int -> int = "%lslint"
   external ( >>> ) : int -> int -> int = "%lsrint"
   external to_int : int -> int = "%identity"
@@ -221,9 +215,8 @@ module I = struct
     else pred (minus_one <<< pred bits) < v
   ;;
 
-  (* Call function g on the top bits, then f on each full byte
-   * (big endian - so start at top).
-   *)
+  (* Call function g on the top bits, then f on each full byte (big endian - so
+     start at top). *)
   let rec map_bytes_be g f v bits =
     if bits >= 8
     then (
@@ -236,9 +229,8 @@ module I = struct
       g (to_int lsb) bits)
   ;;
 
-  (* Call function g on the top bits, then f on each full byte
-   * (little endian - so start at root).
-   *)
+  (* Call function g on the top bits, then f on each full byte (little endian -
+    so start at root). *)
   let rec map_bytes_le g f v bits =
     if bits >= 8
     then (
@@ -253,10 +245,8 @@ module I = struct
 end
 
 module I32 = struct
-  (* Bitwise operations on int32s.  Note we try to keep it as similar
-   * as possible to the I module above, to make it easier to track
-   * down bugs.
-   *)
+  (* Bitwise operations on int32s. Note we try to keep it as similar as
+    possible to the I module above, to make it easier to track down bugs. *)
   let ( <<< ) = Int32.shift_left
   let ( >>> ) = Int32.shift_right_logical
   let ( land ) = Int32.logand
@@ -313,9 +303,8 @@ module I32 = struct
     v land mask = zero
   ;;
 
-  (* Call function g on the top bits, then f on each full byte
-   * (big endian - so start at top).
-   *)
+  (* Call function g on the top bits, then f on each full byte (big endian - so
+    start at top). *)
   let rec map_bytes_be g f v bits =
     if bits >= 8
     then (
@@ -328,9 +317,8 @@ module I32 = struct
       g (to_int lsb) bits)
   ;;
 
-  (* Call function g on the top bits, then f on each full byte
-   * (little endian - so start at root).
-   *)
+  (* Call function g on the top bits, then f on each full byte (little endian -
+    so start at root). *)
   let rec map_bytes_le g f v bits =
     if bits >= 8
     then (
@@ -345,10 +333,8 @@ module I32 = struct
 end
 
 module I64 = struct
-  (* Bitwise operations on int64s.  Note we try to keep it as similar
-   * as possible to the I/I32 modules above, to make it easier to track
-   * down bugs.
-   *)
+  (* Bitwise operations on int64s. Note we try to keep it as similar as possible
+     to the I/I32 modules above, to make it easier to track down bugs. *)
   let ( <<< ) = Int64.shift_left
   let ( >>> ) = Int64.shift_right_logical
   let ( land ) = Int64.logand
@@ -447,9 +433,8 @@ module I64 = struct
     v land mask = zero
   ;;
 
-  (* Call function g on the top bits, then f on each full byte
-   * (big endian - so start at top).
-   *)
+  (* Call function g on the top bits, then f on each full byte (big endian - so
+     start at top). *)
   let rec map_bytes_be g f v bits =
     if bits >= 8
     then (
@@ -462,9 +447,8 @@ module I64 = struct
       g (to_int lsb) bits)
   ;;
 
-  (* Call function g on the top bits, then f on each full byte
-   * (little endian - so start at root).
-   *)
+  (* Call function g on the top bits, then f on each full byte (little endian -
+     so start at root). *)
   let rec map_bytes_le g f v bits =
     if bits >= 8
     then (
@@ -479,15 +463,14 @@ module I64 = struct
 end
 
 (*----------------------------------------------------------------------*)
-(* Extraction functions.
- *
- * NB: internal functions, called from the generated macros, and
- * the parameters should have been checked for sanity already).
- *)
 
-(* Extract and convert to numeric.  A single bit is returned as
- * a boolean.  There are no endianness or signedness considerations.
- *)
+(* Extraction functions.
+  
+   NB: internal functions, called from the generated macros, and the parameters
+   should have been checked for sanity already). *)
+
+(* Extract and convert to numeric. A single bit is returned as a boolean.
+   There are no endianness or signedness considerations. *)
 let extract_bit data off len _ =
   (* final param is always 1 *)
   let byteoff = off lsr 3 in
@@ -496,9 +479,8 @@ let extract_bit data off len _ =
   b (*, off+1, len-1*)
 ;;
 
-(* Returns 8 bit unsigned aligned bytes from the string.
- * If the string ends then this returns 0's.
- *)
+(* Returns 8 bit unsigned aligned bytes from the string. If the string ends then
+   this returns 0's. *)
 let _get_byte data byteoff strlen =
   if strlen > byteoff then Char.code (Bytes.get data byteoff) else 0
 ;;
@@ -511,8 +493,8 @@ let _get_byte64 data byteoff strlen =
   if strlen > byteoff then Int64.of_int (Char.code (Bytes.get data byteoff)) else 0L
 ;;
 
-(* Extend signed [2..31] bits int to 31 bits int or 63 bits int for 64
-   bits platform*)
+(* Extend signed [2..31] bits int to 31 bits int or 63 bits int for 64 bits
+   platform. *)
 let extend_sign len v =
   let b = pred Sys.word_size - len in
   (v lsl b) asr b
@@ -523,9 +505,8 @@ let extract_and_extend_sign f data off len flen =
   extend_sign flen w
 ;;
 
-(* Extract [2..8] bits.  Because the result fits into a single
- * byte we don't have to worry about endianness, only signedness.
- *)
+(* Extract [2..8] bits. Because the result fits into a single byte we don't
+   have to worry about endianness, only signedness. *)
 let extract_char_unsigned data off len flen =
   let byteoff = off lsr 3 in
   (* Optimize the common (byte-aligned) case. *)
@@ -534,9 +515,8 @@ let extract_char_unsigned data off len flen =
     let byte = Char.code (Bytes.get data byteoff) in
     byte lsr (8 - flen) (*, off+flen, len-flen*))
   else (
-    (* Extract the 16 bits at byteoff and byteoff+1 (note that the
-     * second byte might not exist in the original string).
-     *)
+    (* Extract the 16 bits at byteoff and byteoff+1 (note that the second byte
+       might not exist in the original string). *)
     let strlen = Bytes.length data in
     let word =
       (_get_byte data byteoff strlen lsl 8) + _get_byte data (byteoff + 1) strlen
@@ -552,7 +532,7 @@ let extract_char_unsigned data off len flen =
 
 let extract_char_signed = extract_and_extend_sign extract_char_unsigned
 
-(* Extract [9..31] bits.  We have to consider endianness and signedness. *)
+(* Extract [9..31] bits. We have to consider endianness and signedness. *)
 let extract_int_be_unsigned data off len flen =
   let byteoff = off lsr 3 in
   let strlen = Bytes.length data in
@@ -642,7 +622,7 @@ let _make_int32_le c0 c1 c2 c3 =
     c0
 ;;
 
-(* Extract exactly 32 bits.  We have to consider endianness and signedness. *)
+(* Extract exactly 32 bits. We have to consider endianness and signedness. *)
 let extract_int32_be_unsigned data off len flen =
   let byteoff = off lsr 3 in
   let strlen = Bytes.length data in
@@ -718,7 +698,7 @@ let _make_int64_be c0 c1 c2 c3 c4 c5 c6 c7 =
 
 let _make_int64_le c0 c1 c2 c3 c4 c5 c6 c7 = _make_int64_be c7 c6 c5 c4 c3 c2 c1 c0
 
-(* Extract [1..64] bits.  We have to consider endianness and signedness. *)
+(* Extract [1..64] bits. We have to consider endianness and signedness. *)
 let extract_int64_be_unsigned data off len flen =
   let byteoff = off lsr 3 in
   let strlen = Bytes.length data in
@@ -834,15 +814,10 @@ external extract_fastpath_int16_ne_signed
 
 (*
 external extract_fastpath_int24_be_unsigned : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int24_be_unsigned"
-
 external extract_fastpath_int24_le_unsigned : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int24_le_unsigned"
-
 external extract_fastpath_int24_ne_unsigned : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int24_ne_unsigned"
-
 external extract_fastpath_int24_be_signed : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int24_be_signed"
-
 external extract_fastpath_int24_le_signed : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int24_le_signed"
-
 external extract_fastpath_int24_ne_signed : bytes -> int -> int = "ocaml_bitstring_extract_fastpath_int24_ne_signed"
 *)
 
@@ -884,39 +859,22 @@ external extract_fastpath_int32_ne_signed
 
 (*
 external extract_fastpath_int40_be_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_be_unsigned"
-
 external extract_fastpath_int40_le_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_le_unsigned"
-
 external extract_fastpath_int40_ne_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_ne_unsigned"
-
 external extract_fastpath_int40_be_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_be_signed"
-
 external extract_fastpath_int40_le_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_le_signed"
-
 external extract_fastpath_int40_ne_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int40_ne_signed"
-
 external extract_fastpath_int48_be_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_be_unsigned"
-
 external extract_fastpath_int48_le_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_le_unsigned"
-
 external extract_fastpath_int48_ne_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_ne_unsigned"
-
 external extract_fastpath_int48_be_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_be_signed"
-
 external extract_fastpath_int48_le_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_le_signed"
-
 external extract_fastpath_int48_ne_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int48_ne_signed"
-
 external extract_fastpath_int56_be_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_be_unsigned"
-
 external extract_fastpath_int56_le_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_le_unsigned"
-
 external extract_fastpath_int56_ne_unsigned : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_ne_unsigned"
-
 external extract_fastpath_int56_be_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_be_signed"
-
 external extract_fastpath_int56_le_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_le_signed"
-
 external extract_fastpath_int56_ne_signed : bytes -> int -> int64 = "ocaml_bitstring_extract_fastpath_int56_ne_signed"
 *)
 
@@ -957,15 +915,15 @@ external extract_fastpath_int64_ne_signed
   = "ocaml_bitstring_extract_fastpath_int64_ne_signed"
 
 (*----------------------------------------------------------------------*)
+
 (* Constructor functions. *)
 
 module Buffer = struct
   type t =
     { buf : Buffer.t
     ; mutable len : int (* Length in bits. *)
-    ; (* Last byte in the buffer (if len is not aligned).  We store
-       * it outside the buffer because buffers aren't mutable.
-       *)
+    ; (* Last byte in the buffer (if len is not aligned). We store it outside
+         the buffer because buffers aren't mutable. *)
       mutable last : int
     }
 
@@ -995,7 +953,7 @@ module Buffer = struct
       (* Target buffer is byte-aligned. *)
       Buffer.add_char buf (Char.chr byte)
     else (
-      (* Target buffer is unaligned.  'last' is meaningful. *)
+      (* Target buffer is unaligned. 'last' is meaningful. *)
       let first = byte lsr shift in
       let second = (byte lsl (8 - shift)) land 0xff in
       Buffer.add_char buf (Char.chr (last lor first));
@@ -1019,9 +977,8 @@ module Buffer = struct
     t.len <- len + 1
   ;;
 
-  (* Add a small number of bits (definitely < 8).  This uses a loop
-   * to call add_bit so it's slow.
-   *)
+  (* Add a small number of bits (definitely < 8). This uses a loop to call
+     add_bit so it's slow. *)
   let _add_bits t c slen =
     if slen < 1 || slen >= 8 then invalid_arg "Bitstring.Buffer._add_bits";
     for i = slen - 1 downto 0 do
@@ -1041,9 +998,8 @@ module Buffer = struct
           (* Common case - everything is byte-aligned. *)
           Buffer.add_subbytes buf str 0 (slen lsr 3)
         else (
-          (* Target buffer is aligned.  Copy whole bytes then leave the
-           * remaining bits in last.
-           *)
+          (* Target buffer is aligned. Copy whole bytes then leave the remaining
+             bits in last. *)
           let slenbytes = slen lsr 3 in
           if slenbytes > 0 then Buffer.add_subbytes buf str 0 slenbytes;
           let lastidx = min slenbytes (Bytes.length str - 1) in
@@ -1053,12 +1009,11 @@ module Buffer = struct
           t.last <- last land mask);
         t.len <- len + slen)
       else (
-        (* Target buffer is unaligned.  Copy whole bytes using
-         * add_byte which knows how to deal with an unaligned
-         * target buffer, then call add_bit for the remaining < 8 bits.
-         *
-         * XXX This is going to be dog-slow.
-         *)
+        (* Target buffer is unaligned. Copy whole bytes using add_byte which
+           knows how to deal with an unaligned target buffer, then call add_bit
+           for the remaining < 8 bits.
+          
+           XXX This is going to be dog-slow. *)
         let slenbytes = slen lsr 3 in
         for i = 0 to slenbytes - 1 do
           let byte = Char.code (Bytes.get str i) in
@@ -1186,9 +1141,8 @@ let construct_int64_ee_unsigned = function
   | NativeEndian -> construct_int64_ne_unsigned
 ;;
 
-(* Construct from a string of bytes, exact multiple of 8 bits
- * in length of course.
- *)
+(* Construct from a string of bytes, exact multiple of 8 bits in length of
+   course. *)
 let construct_string buf str =
   let len = String.length str in
   Buffer.add_bits buf (Bytes.unsafe_of_string str) (len lsl 3)
@@ -1196,9 +1150,8 @@ let construct_string buf str =
 
 (* Construct from a bitstring. *)
 let construct_bitstring buf (data, off, len) =
-  (* Add individual bits until we get to the next byte boundary of
-   * the underlying string.
-   *)
+  (* Add individual bits until we get to the next byte boundary of the
+     underlying string. *)
   let blen = 7 - ((off + 7) land 7) in
   let blen = min blen len in
   let rec loop off len blen =
@@ -1230,6 +1183,7 @@ let concat bs =
 ;;
 
 (*----------------------------------------------------------------------*)
+
 (* Extract a string from a bitstring. *)
 let string_of_bitstring (data, off, len) =
   if off land 7 = 0 && len land 7 = 0
@@ -1258,7 +1212,6 @@ let string_of_bitstring (data, off, len) =
 ;;
 
 (* To channel. *)
-
 let bitstring_to_chan ((data, off, len) as bits) chan =
   (* Fail if the bitstring length isn't a multiple of 8. *)
   if len land 7 <> 0 then invalid_arg "bitstring_to_chan";
@@ -1284,14 +1237,14 @@ let bitstring_to_file bits filename =
 ;;
 
 (*----------------------------------------------------------------------*)
+
 (* Comparison. *)
 let compare ((data1, off1, len1) as bs1) ((data2, off2, len2) as bs2) =
   (* In the fully-aligned case, this is reduced to string comparison ... *)
   if off1 land 7 = 0 && len1 land 7 = 0 && off2 land 7 = 0 && len2 land 7 = 0
   then (
-    (* ... but we have to do that by hand because the bits may
-     * not extend to the full length of the underlying string.
-     *)
+    (* ... but we have to do that by hand because the bits may not extend to the
+       full length of the underlying string. *)
     let off1 = off1 lsr 3
     and off2 = off2 lsr 3
     and len1 = len1 lsr 3
@@ -1376,6 +1329,7 @@ let is_prefix ((b1, o1, l1) as bs1) ((b2, o2, l2) as bs2) =
 ;;
 
 (*----------------------------------------------------------------------*)
+
 (* Bit get/set functions. *)
 
 let index_out_of_bounds () = invalid_arg "index out of bounds"
@@ -1410,6 +1364,7 @@ let is_set bits n = get bits n <> 0
 let is_clear bits n = get bits n = 0
 
 (*----------------------------------------------------------------------*)
+
 (* Display functions. *)
 
 let isprint c =
@@ -1458,6 +1413,7 @@ let hexdump_bitstring chan (data, off, len) =
 ;;
 
 (*----------------------------------------------------------------------*)
+
 (* Alias of functions shadowed by Core. *)
 
 let char_code = Char.code

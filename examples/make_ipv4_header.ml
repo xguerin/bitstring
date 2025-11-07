@@ -1,6 +1,4 @@
-(* Create an IPv4 header.
- * $Id$
- *)
+(* Create an IPv4 header. *)
 
 open Printf
 
@@ -21,12 +19,11 @@ let payload_length = (length - (hdrlen * 4)) * 8
 let payload = Bitstring.create_bitstring payload_length
 
 let%bitstring header =
-  {|
-    version : 4; hdrlen : 4; tos : 8; length : 16;
-    identification : 16; flags : 3; fragoffset : 13;
-    ttl : 8; protocol : 8; checksum : 16;
-    source : 32; dest : 32
-  |}
+  {| version : 4; hdrlen : 4; tos : 8; length : 16
+   ; identification : 16; flags : 3; fragoffset : 13
+   ; ttl : 8; protocol : 8; checksum : 16
+   ; source : 32; dest : 32
+   |}
 ;;
 
-let () = Bitstring.bitstring_to_file header "ipv4_header_out.dat"
+let () = Bitstring.bitstring_to_file header "ipv4_header.dat"

@@ -1,32 +1,26 @@
-(*
- * Copyright (c) 2016 Xavier R. Guérin <xguerin@users.noreply.github.com>
- *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *)
+(* Copyright (c) 2016 Xavier R. Guérin <xguerin@users.noreply.github.com>
+  
+   Permission to use, copy, modify, and distribute this software for any purpose
+   with or without fee is hereby granted, provided that the above copyright
+   notice and this permission notice appear in all copies.
+  
+   THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+   REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+   AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+   INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+   LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
+   OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+   PERFORMANCE OF THIS SOFTWARE. *)
 
 open OUnit2
 open Bitstring
 
-(*
- * EXT3 superblock parsing test
- *)
+(* EXT3 superblock parsing test *)
 
 let ext3_test context =
   let bits = Bitstring.bitstring_of_file "../../../tests/data/ext3_sb" in
   match%bitstring bits with
-  (*
-   * Check if the file is an EXT3 superblock
-   *)
+  (* Check if the file is an EXT3 superblock *)
   | {|  50200_l   : 32 : littleendian  (* Inodes count *)
      ;  _         : 32 : littleendian  (* Blocks count *)
      ;  _         : 32 : littleendian  (* Reserved blocks count *)
@@ -45,22 +39,16 @@ let ext3_test context =
      ;  0xef53    : 16 : littleendian  (* Magic signature *)
     |}
     -> ()
-  (*
-   * Otherwise, throw an error
-   *)
+  (* Otherwise, throw an error *)
   | {| _ |} -> failwith "Invalid EXT3 superblock"
 ;;
 
-(*
- * GIF parser test
- *)
+(* GIF parser test *)
 
 let gif_test context =
   let bits = Bitstring.bitstring_of_file "../../../tests/data/sad_face.gif" in
   match%bitstring bits with
-  (*
-   * Check if the file is a GIF image
-   *)
+  (* Check if the file is a GIF image *)
   | {|  ("GIF87a" | "GIF89a")  : 6*8 : string        ; (* GIF magic. *)
         2145                   : 16  : littleendian  ;
         2145                   : 16  : littleendian  ;
@@ -72,15 +60,11 @@ let gif_test context =
         0                      : 8
     |}
     -> ()
-  (*
-   * Otherwise, throw an error
-   *)
+  (* Otherwise, throw an error *)
   | {| _ |} -> failwith "Invalid GIF image"
 ;;
 
-(*
- * PCAP parser test
- *)
+(* PCAP parser test *)
 
 let to_bitstring_endian = function
   | 0xa1b2c3d4_l | 0xa1b23c4d_l -> Bitstring.BigEndian
@@ -150,9 +134,7 @@ let pcap_packet_test context endian packet =
 let pcap_test context =
   let bits = Bitstring.bitstring_of_file "../../../tests/data/net.pcap" in
   match%bitstring bits with
-  (*
-   * Check if the file is a PCAP file
-   *)
+  (* Check if the file is a PCAP file *)
   | {|  ((0xa1b2c3d4_l |
           0xa1b23c4d_l |
           0xd4c3b2a1_l |
@@ -166,15 +148,11 @@ let pcap_test context =
         packet                    : -1 : bitstring
     |}
     -> pcap_packet_test context (to_bitstring_endian magic) packet
-  (*
-   * Otherwise, throw an error
-   *)
+  (* Otherwise, throw an error *)
   | {| _ |} -> failwith "Not a valid PCAP file"
 ;;
 
-(*
- * Function-style parser test
- *)
+(* Function-style parser test *)
 
 let function_parser = function%bitstring
   | {|  1       : 3
@@ -189,9 +167,7 @@ let function_parser_test context =
   [%bitstring {| 1 : 3; 2 : 4; "hello" : 40 : string |}] |> function_parser
 ;;
 
-(*
- * Function-style parser test, inline
- *)
+(* Function-style parser test, inline *)
 
 let function_parser_inline_test context =
   [%bitstring {| 1 : 3; 2 : 4; "hello" : 40 : string |}]
@@ -204,9 +180,7 @@ let function_parser_inline_test context =
   | {| _ |} -> assert_bool "Invalid bitstring" false
 ;;
 
-(*
- * parser with a guard (PR#16)
- *)
+(* Parser with a guard (PR#16) *)
 
 let parser_with_guard_test context =
   let bits = Bitstring.bitstring_of_string "abc" in
@@ -215,9 +189,7 @@ let parser_with_guard_test context =
   | {| _ |} -> assert_bool "Guard was honored" true
 ;;
 
-(*
- * Wrong fastpath extraction function #46
- *)
+(* Wrong fastpath extraction function #46 *)
 
 let wrong_fp_extraction context =
   let mb = Bytes.of_string "\000\000\145", 0, 24 in
@@ -234,14 +206,10 @@ let wrong_fp_extraction_dynamic context =
   | {| _ |} -> assert_bool "Invalid bitstring" false
 ;;
 
-(*
- * Wrong LE extraction on partial int64.
- *)
+(* Wrong LE extraction on partial int64. *)
 
 let wrong_le_partial_int64_extraction context =
-  (*
-   * Forward.
-   *)
+  (* Forward. *)
   let mb = Bytes.of_string "\xA0\x00\x00\x00\x00\x00\x00\x00", 0, 64 in
   match%bitstring mb with
   | {| a:4; b:60:littleendian |} ->
@@ -249,9 +217,7 @@ let wrong_le_partial_int64_extraction context =
     assert_equal b 0L
   | {| _ |} ->
     assert_bool "Invalid bitstring" false;
-    (*
-     * Backward.
-     *)
+    (* Backward. *)
     let mb = Bytes.of_string "\x00\x00\x00\x00\x00\x00\x00\x0A", 0, 64 in
     (match%bitstring mb with
      | {| b:60:littleendian; a:4 |} ->
@@ -260,9 +226,7 @@ let wrong_le_partial_int64_extraction context =
      | {| _ |} -> assert_bool "Invalid bitstring" false)
 ;;
 
-(*
- * Test suite definition
- *)
+(* Test suite definition *)
 
 let suite =
   "BitstringParserTest"

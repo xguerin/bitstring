@@ -1,6 +1,4 @@
-(* GIF header parser.
- * $Id$
- *)
+(* GIF header parser. *)
 
 open Printf
 
@@ -9,15 +7,16 @@ let () =
   let filename = Sys.argv.(1) in
   let bits = Bitstring.bitstring_of_file filename in
   match%bitstring bits with
-  | {|("GIF87a"|"GIF89a") : 6*8 : string; (* GIF magic. *)
-      width : 16 : littleendian;
-      height : 16 : littleendian;
-      colormap : 1;			(* Has colormap? *)
-      colorbits : 3;			(* Color res = colorbits+1 *)
-      sortflag : 1;
-      bps : 3;				(* Bits/pixel = bps+1 *)
-      bg : 8;				(* Background colour. *)
-      aspectratio : 8|}
+  | {| ("GIF87a"|"GIF89a") : 6*8 : string       (* GIF magic. *)
+     ; width               : 16  : littleendian
+     ; height              : 16  : littleendian
+     ; colormap            : 1                  (* Has colormap? *)
+     ; colorbits           : 3                  (* Color res = colorbits+1 *)
+     ; sortflag            : 1
+     ; bps                 : 3                  (* Bits/pixel = bps+1 *)
+     ; bg                  : 8                  (* Background colour. *)
+     ; aspectratio         : 8
+     |}
     ->
     printf "%s: GIF image:\n" filename;
     printf "  size %d %d\n" width height;
