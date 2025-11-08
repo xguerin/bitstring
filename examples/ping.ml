@@ -1,20 +1,26 @@
-(* Read in IPv4 and IPv6 ping packets and display them.
- * $Id$
- *)
+(* Read in IPv4 and IPv6 ping packets and display them. *)
 
 open Printf
 
 let display pkt =
   match%bitstring pkt with
   (* IPv4 packet header *)
-  | {|4 : 4; hdrlen : 4; tos : 8; length : 16;
-      identification : 16; flags : 3; fragoffset : 13;
-      ttl : 8; protocol : 8; checksum : 16;
-      source : 32;
-      dest : 32;
-      options : (hdrlen-5)*32 : bitstring;
-      payload : -1 : bitstring|} ->
-
+  | {| 4              : 4
+     ; hdrlen         : 4
+     ; tos            : 8
+     ; length         : 16
+     ; identification : 16
+     ; flags          : 3
+     ; fragoffset     : 13
+     ; ttl            : 8
+     ; protocol       : 8
+     ; checksum       : 16
+     ; source         : 32
+     ; dest           : 32
+     ; options        : (hdrlen-5)*32 : bitstring
+     ; payload        : -1            : bitstring
+     |}
+    ->
     printf "IPv4:\n";
     printf "  header length: %d * 32 bit words\n" hdrlen;
     printf "  type of service: %d\n" tos;
@@ -30,14 +36,18 @@ let display pkt =
     Bitstring.hexdump_bitstring stdout options;
     printf "  packet payload:\n";
     Bitstring.hexdump_bitstring stdout payload
-
   (* IPv6 packet header *)
-  | {|6 : 4; tclass : 8; flow : 20;
-      length : 16; nexthdr : 8; ttl : 8;
-      source : 128 : bitstring;
-      dest : 128 : bitstring;
-      payload : -1 : bitstring|} ->
-
+  | {| 6       : 4
+     ; tclass  : 8
+     ; flow    : 20
+     ; length  : 16
+     ; nexthdr : 8
+     ; ttl     : 8
+     ; source  : 128 : bitstring
+     ; dest    : 128 : bitstring
+     ; payload : -1  : bitstring
+     |}
+    ->
     printf "IPv6:\n";
     printf "  traffic class: %d\n" tclass;
     printf "  flow label: %d\n" flow;
@@ -50,18 +60,18 @@ let display pkt =
     Bitstring.hexdump_bitstring stdout dest;
     printf "packet payload:\n";
     Bitstring.hexdump_bitstring stdout payload
-
-  | {|version : 4|} ->
+  | {| version : 4 |} ->
     eprintf "unknown IP version %d\n" version;
     exit 1
-
-  | {|_|} as pkt ->
+  | {| _ |} as pkt ->
     eprintf "data is smaller than one nibble:\n";
     Bitstring.hexdump_bitstring stderr pkt;
     exit 1
+;;
 
 let () =
   let pkt = Bitstring.bitstring_of_file "ping.ipv4" in
   display pkt;
   let pkt = Bitstring.bitstring_of_file "ping.ipv6" in
   display pkt
+;;

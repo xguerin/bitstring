@@ -94,19 +94,17 @@ let () =
 ## Simple binary message parser
 
 ```ocaml
-(*
-  +---------------+---------------+--------------------------+
-  | type          | subtype       | parameter                |
-  +---------------+---------------+--------------------------+
-   <-- 16 bits --> <-- 16 bits --> <------- 32 bits -------->
+(* +---------------+---------------+--------------------------+
+   | type          | subtype       | parameter                |
+   +---------------+---------------+--------------------------+
+    <-- 16 bits --> <-- 16 bits --> <------- 32 bits -------->
 
-  All fields are in network byte order.
-*)
+   All fields are in network byte order. *)
 
 let%bitstring make_message typ subtype param = {|
-	typ : 16;
-	subtype : 16;
-	param : 32
+  typ : 16;
+  subtype : 16;
+  param : 32
 |};;
 ```
 
