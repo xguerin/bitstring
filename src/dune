@@ -4,5 +4,5 @@
  (foreign_stubs
   (language c)
   (names bitstring_fastpath)
-  (flags -I.))
+  (flags :standard -I.))
  (libraries str unix stdlib-shims))
