@@ -1267,8 +1267,8 @@ let compare ((data1, off1, len1) as bs1) ((data2, off2, len2) as bs2) =
     if r <> 0 then r else len1 - len2)
 ;;
 
-let equals ((_, _, len1) as bs1) ((_, _, len2) as bs2) =
-  if len1 <> len2 then false else if bs1 = bs2 then true else 0 = compare bs1 bs2
+let equals ((d1, o1, len1) as bs1) ((d2, o2, len2) as bs2) =
+  if len1 <> len2 then false else if d1 == d2 && o1 = o2 then true else 0 = compare bs1 bs2
 ;;
 
 let is_zeroes_bitstring ((data, off, len) as bits) =
